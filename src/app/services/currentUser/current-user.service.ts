@@ -14,7 +14,11 @@ export class CurrentUserService {
     this.user = user;
   }
 
+  clearCurrentUser():void {
+    this.user = null;
+  }
+
   get userName(): string {
-    return this.user.username;
+    return this.user ? this.user.username : '';
   }
 }

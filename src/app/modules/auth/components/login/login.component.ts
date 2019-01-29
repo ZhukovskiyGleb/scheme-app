@@ -13,7 +13,7 @@ export class LoginComponent implements OnInit {
   editForm: FormGroup;
 
   constructor(private auth: AuthService,
-              private navigate: Router) { }
+              private navigation: Router) { }
 
   ngOnInit() {
     this.initForm();
@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit {
       this.auth.login(this.editForm.value.email, this.editForm.value.password)
       .subscribe( (result: boolean) => {
         if (result) {
-          this.navigate.navigate(['/parts']);
+          this.navigation.navigate(['/parts']);
         }
       }, (error) => {
         switch (error.code) {

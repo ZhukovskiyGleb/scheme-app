@@ -70,6 +70,22 @@ export class AuthService {
     );
   }
 
+  logout(): Observable<boolean> {
+    return from(firebase.auth().signOut())
+    .pipe(
+      map(() => {
+        this.token = null;
+        this.isLogged = false;
+        this.currentUser.clearCurrentUser();
+        return true;
+      }),
+      catchError((error) => {
+        console.log('AuthService -> logout -> ', error);
+        throw error;
+      })
+    );
+  }
+
   get isUserLogged(): boolean {
     return this.isLogged;
   }

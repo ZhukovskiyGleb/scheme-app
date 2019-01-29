@@ -27,13 +27,16 @@
             </a>
           </div>
         </div>
-        <div class="navbar-item" *ngIf="auth.isUserLogged">
-            <div class="buttons">
-              <a class="button">
-                <strong>Выйти</strong>
-              </a>
-            </div>
+        <div class="navbar-item has-dropdown is-hoverable" *ngIf="auth.isUserLogged">
+          <a class="navbar-link">
+            {{currentUser.userName}}
+          </a>
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item" (click)="onLogoutClick()">
+              Выйти
+            </a>
           </div>
+        </div>
       </div>
     </div>
   </nav>

@@ -14,7 +14,7 @@ export class RegisterComponent implements OnInit {
   editForm: FormGroup;
 
   constructor(private auth: AuthService,
-              private navigate: Router) { }
+              private navigation: Router) { }
 
   ngOnInit() {
     this.initForm();
@@ -39,7 +39,7 @@ export class RegisterComponent implements OnInit {
       this.auth.registerNewUser(this.editForm.value.email, this.editForm.value.password.new, this.editForm.value.name)
       .subscribe( (result: boolean) => {
         if (result) {
-          this.navigate.navigate(['/parts']);
+          this.navigation.navigate(['/parts']);
         }
       }, (error) => {
         switch (error.code) {
