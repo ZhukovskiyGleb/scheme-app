@@ -3,7 +3,7 @@ import { from, Observable, of } from 'rxjs';
 import { map, tap, switchMap, catchError } from 'rxjs/operators';
 import { FireDbService } from '../fire-db/fire-db.service';
 import { CurrentUserService } from '../currentUser/current-user.service';
-import { UserModel } from 'src/app/models/user-model';
+import { UserModel } from 'src/app/core/models/user-model';
 import { FirebaseService } from '../firebase/firebase.service';
 
 

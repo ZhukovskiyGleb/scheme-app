@@ -5,12 +5,12 @@ import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {CoreModule} from "./core/core.module";
 import {AngularFirestoreModule} from "@angular/fire/firestore";
-import {FireDbService} from "./services/fire-db/fire-db.service";
-import { AuthService } from './services/auth/auth.service';
-import { CurrentUserService } from './services/currentUser/current-user.service';
+import {FireDbService} from "./core/services/fire-db/fire-db.service";
+import { AuthService } from './core/services/auth/auth.service';
+import { CurrentUserService } from './core/services/currentUser/current-user.service';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ErrorInterceptorService } from './interceptors/error-interceptor.service';
-import { FirebaseService } from './services/firebase/firebase.service';
+import { FirebaseService } from './core/services/firebase/firebase.service';
 
 @NgModule({
   declarations: [

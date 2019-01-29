@@ -1,7 +1,7 @@
 import {Injectable, OnInit} from '@angular/core';
 import * as firebase from 'firebase';
 import { from, Observable } from 'rxjs';
-import { UserModel } from 'src/app/models/user-model';
+import { UserModel } from 'src/app/core/models/user-model';
 
 @Injectable({
   providedIn: 'root'
