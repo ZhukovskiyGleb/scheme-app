@@ -1,3 +1,33 @@
-<p>
-  login works!
-</p>
+<section class="hero is-fullheight-with-navbar is-warning is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        Войти
+      </h1>
+      <form [formGroup]="editForm" (ngSubmit)="submitForm()">
+        <div class="field">
+          <label class="label">Почтовый адрес</label>
+          <div class="control">
+            <input class="input" type="email" formControlName="email" placeholder="Введите ваш почтовый адрес">
+          </div>
+          <p class="help is-danger" *ngIf="editForm.get('email').touched && editForm.hasError('email', ['email'])">Почтовый адрес введен неверно</p>
+        </div>
+        <div class="field">
+          <label class="label">Пароль</label>
+          <div class="control">
+            <input class="input" type="password" formControlName="password" placeholder="Введите ваш пароль">
+          </div>
+          <p class="help is-danger" *ngIf="editForm.get('password').touched && editForm.hasError('required', ['password'])">Введите пароль</p>
+        </div>
+        <div class="field is-grouped">
+          <div class="control">
+            <button type="submit" class="button is-link" [disabled]="!editForm.valid">Войти</button>
+          </div>
+          <div class="control">
+            <button routerLink="new" type="button" class="button is-text">Регистрация</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

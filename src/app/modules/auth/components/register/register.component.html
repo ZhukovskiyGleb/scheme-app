@@ -1,3 +1,43 @@
-<p>
-  register works!
-</p>
+<section class="hero is-fullheight-with-navbar is-warning is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        Регистрация
+      </h1>
+      <form [formGroup]="editForm" (ngSubmit)="submitForm()">
+        <div class="field">
+          <label class="label">Почтовый адрес</label>
+          <div class="control">
+            <input class="input" type="email" formControlName="email" placeholder="Введите ваш почтовый адрес">
+          </div>
+          <p class="help is-danger" *ngIf="editForm.get('email').touched && editForm.hasError('email', ['email'])">Почтовый адрес введен неверно</p>
+        </div>
+        <div class="field" formGroupName="password">
+          <div class="field">
+            <label class="label">Пароль</label>
+            <div class="control">
+              <input class="input" type="password" formControlName="new" placeholder="Введите ваш пароль">
+            </div>
+            <p class="help is-danger" *ngIf="editForm.get('password').get('new').touched && editForm.hasError('required', ['password', 'new'])">Введите пароль</p>
+          </div>
+          <div class="field">
+            <label class="label">Подтверждение пароля</label>
+            <div class="control">
+              <input class="input" type="password" formControlName="confirm" placeholder="Повторите ваш пароль">
+            </div>
+            <p class="help is-danger" *ngIf="editForm.get('password').touched && editForm.hasError('required', ['password', 'confirm'])">Введите пароль повторно</p>
+            <p class="help is-danger" *ngIf="editForm.hasError('equal', ['password'])">Пароли не совпадают</p>
+          </div>
+        </div>
+        <div class="field is-grouped">
+          <div class="control">
+            <button type="submit" class="button is-link" [disabled]="!editForm.valid">Зарегистрировать</button>
+          </div>
+          <div class="control">
+            <button routerLink="/login" type="button" class="button is-text">Назад</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
