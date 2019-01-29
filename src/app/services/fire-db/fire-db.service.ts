@@ -19,16 +19,14 @@ export class FireDbService implements OnInit{
     });
   }
 
-  createNewUser(uid: string, name: string): Observable<boolean> {
+  createNewUser(uid: string, name: string): Observable<void> {
     return from(
       this.db.collection('users').doc(uid).set(
         {
           username: name
-        }).then(() => {
-          return true;
         }).catch((error) => {
           console.log('FireDbService -> createNewUser ->', error);
-          return false;
+          throw error;
         })
     );
   }

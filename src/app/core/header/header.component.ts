@@ -21,7 +21,7 @@ export class HeaderComponent implements OnInit {
 
   onLogoutClick() {
     this.auth.logout()
-    .subscribe((result: boolean) => {
+    .subscribe(() => {
       this.navigation.navigate(['/home']);
     }, (error) => {
         

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {FormControl, FormGroup, NgForm, Validators} from "@angular/forms";
+import {FormControl, FormGroup, NgForm, Validators, FormBuilder} from "@angular/forms";
 import { LoginValidators } from '../share/login-validators';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { Router } from '@angular/router';
@@ -13,36 +13,34 @@ export class LoginComponent implements OnInit {
   editForm: FormGroup;
 
   constructor(private auth: AuthService,
-              private navigation: Router) { }
+              private navigation: Router,
+              private fb: FormBuilder) { }
 
   ngOnInit() {
     this.initForm();
   }
 
   initForm() {
-    this.editForm = new FormGroup({
-      'email': new FormControl(null, [Validators.required, Validators.email]),
-      'password': new FormControl(null, [Validators.required, LoginValidators.checkLength])
+    this.editForm = this.fb.group({
+      email: [null, [
+        Validators.required,
+        Validators.email
+      ]],
+      password: [null, [
+        Validators.required, 
+        LoginValidators.checkLength
+      ]]
     });
   }
 
   submitForm() {
     if (this.editForm.valid) {
       this.editForm.disable();
-      this.auth.login(this.editForm.value.email, this.editForm.value.password)
-      .subscribe( (result: boolean) => {
-        if (result) {
+      const {email, password} = this.editForm.value;
+      this.auth.login(email, password)
+      .subscribe(() => {
           this.navigation.navigate(['/parts']);
-        }
-      }, (error) => {
-        switch (error.code) {
-          case ('auth/user-not-fount'):
-
-            break;
-          case ('auth/wrong-password'):
-
-            break;
-        }
+      }, () => {
         this.editForm.enable();
       });
     }

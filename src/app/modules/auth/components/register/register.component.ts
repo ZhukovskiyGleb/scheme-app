@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {FormControl, FormGroup, ValidationErrors, Validators} from "@angular/forms";
+import {FormControl, FormGroup, ValidationErrors, Validators, FormBuilder} from "@angular/forms";
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { Router } from '@angular/router';
 import { LoginValidators } from '../share/login-validators';
@@ -14,20 +14,27 @@ export class RegisterComponent implements OnInit {
   editForm: FormGroup;
 
   constructor(private auth: AuthService,
-              private navigation: Router) { }
+              private navigation: Router,
+              private fb: FormBuilder) { }
 
   ngOnInit() {
     this.initForm();
   }
 
   initForm() {
-    this.editForm = new FormGroup({
-      'name': new FormControl(null, [Validators.required]),
-      'email': new FormControl(null, [Validators.required, Validators.email]),
-      'password': new FormGroup({
-        'new': new FormControl(null, [Validators.required, LoginValidators.checkLength]),
-        'confirm': new FormControl(null, Validators.required)
-      }, LoginValidators.checkEqual)
+    this.editForm = this.fb.group({
+      name: [null, Validators.required],
+      email: [null, [
+        Validators.required, 
+        Validators.email
+      ]],
+      password: this.fb.group({
+        new: [null, [
+          Validators.required, 
+          LoginValidators.checkLength
+        ]],
+        confirm: [null, Validators.required]
+      }, {validators: [LoginValidators.checkEqual]})
     });
   }
 
@@ -36,20 +43,11 @@ export class RegisterComponent implements OnInit {
   submitForm() {
     if (this.editForm.valid) {
       this.editForm.disable();
-      this.auth.registerNewUser(this.editForm.value.email, this.editForm.value.password.new, this.editForm.value.name)
-      .subscribe( (result: boolean) => {
-        if (result) {
-          this.navigation.navigate(['/parts']);
-        }
-      }, (error) => {
-        switch (error.code) {
-          case ('auth/invalid-email'):
-
-            break;
-          case ('auth/email-already-in-use'):
-
-            break;
-        }
+      const {email, password, name} = this.editForm.value;
+      this.auth.registerNewUser(email, password.new, name)
+      .subscribe( () => {
+        this.navigation.navigate(['/parts']);
+      }, () => {
         this.editForm.enable();
       });
     }

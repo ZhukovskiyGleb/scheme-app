@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import * as firebase from "firebase";
 import { from, Observable, of } from 'rxjs';
 import { map, tap, switchMap, catchError } from 'rxjs/operators';
 import { FireDbService } from '../fire-db/fire-db.service';
 import { CurrentUserService } from '../currentUser/current-user.service';
 import { UserModel } from 'src/app/models/user-model';
+import { FirebaseService } from '../firebase/firebase.service';
 
 
 @Injectable({
@@ -15,11 +15,12 @@ export class AuthService {
   private isLogged: boolean;
   private uid: string;
 
-  constructor(private fireDB: FireDbService,
+  constructor(private firebase: FirebaseService,
+              private fireDB: FireDbService,
               private currentUser: CurrentUserService) { }
 
-  registerNewUser(email: string, password: string, name: string): Observable<boolean> {
-    return from(firebase.auth().createUserWithEmailAndPassword(email, password))
+  registerNewUser(email: string, password: string, name: string): Observable<void> {
+    return this.firebase.createUserWithEmailAndPassword(email, password)
     .pipe(
       switchMap((userCred: firebase.auth.UserCredential) => {
         this.uid = userCred.user.uid;
@@ -33,19 +34,18 @@ export class AuthService {
       switchMap((uid) => {
         return this.fireDB.createNewUser(uid, name);
       }),
-      map(result => {
+      tap(() => {
         this.currentUser.setCurrentUser(new UserModel(name));
-        return result;
       }),
-      catchError((error) => {
+      catchError(error => {
         console.log('AuthService -> registerNewUser -> ', error);
         throw error;
       })
     );
   }
 
-  login(email: string, password: string): Observable<boolean> {
-    return from(firebase.auth().signInWithEmailAndPassword(email, password))
+  login(email: string, password: string): Observable<void> {
+    return this.firebase.signInWithEmailAndPassword(email, password)
     .pipe(
       switchMap((userCred: firebase.auth.UserCredential) => {
         this.uid = userCred.user.uid;
@@ -61,7 +61,6 @@ export class AuthService {
       }),
       map( (user: UserModel) => {
         this.currentUser.setCurrentUser(user);
-        return true;
       }),
       catchError((error) => {
         console.log('AuthService -> login -> ', error);
@@ -70,14 +69,13 @@ export class AuthService {
     );
   }
 
-  logout(): Observable<boolean> {
-    return from(firebase.auth().signOut())
+  logout(): Observable<void> {
+    return this.firebase.logout()
     .pipe(
       map(() => {
         this.token = null;
         this.isLogged = false;
         this.currentUser.clearCurrentUser();
-        return true;
       }),
       catchError((error) => {
         console.log('AuthService -> logout -> ', error);
