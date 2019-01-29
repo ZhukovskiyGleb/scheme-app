@@ -1,5 +1,7 @@
 import {Injectable, OnInit} from '@angular/core';
 import * as firebase from 'firebase';
+import { from, Observable } from 'rxjs';
+import { UserModel } from 'src/app/models/user-model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,12 +11,42 @@ export class FireDbService implements OnInit{
   private db = firebase.firestore();
 
   constructor() {
+  }
+
+  ngOnInit(): void {
     this.db.settings({
       timestampsInSnapshots: true
     });
   }
 
-  ngOnInit(): void {
+  createNewUser(uid: string, name: string): Observable<boolean> {
+    return from(
+      this.db.collection('users').doc(uid).set(
+        {
+          username: name
+        }).then(() => {
+          return true;
+        }).catch((error) => {
+          console.log('FireDbService -> createNewUser ->', error);
+          return false;
+        })
+    );
+  }
 
+  getUserByUid(uid): Observable<UserModel> {
+    return from(
+      this.db.collection('users').doc(uid).get()
+      .then((user) => {
+        if (user.exists) {
+          return new UserModel(user.data().username);
+        } else {
+          console.log('FireDbService -> getUserByUid -> user not found');
+          return null;
+        }
+      }).catch((error) => {
+        console.log('FireDbService -> getUserByUid ->', error);
+        return null;
+      })
+    );
   }
 }

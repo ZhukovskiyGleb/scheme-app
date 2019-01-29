@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {FormControl, FormGroup, ValidationErrors, Validators} from "@angular/forms";
+import { AuthService } from 'src/app/services/auth/auth.service';
+import { Router } from '@angular/router';
+import { LoginValidators } from '../share/login-validators';
 
 @Component({
   selector: 'app-register',
@@ -10,7 +13,8 @@ export class RegisterComponent implements OnInit {
 
   editForm: FormGroup;
 
-  constructor() { }
+  constructor(private auth: AuthService,
+              private navigate: Router) { }
 
   ngOnInit() {
     this.initForm();
@@ -18,24 +22,36 @@ export class RegisterComponent implements OnInit {
 
   initForm() {
     this.editForm = new FormGroup({
+      'name': new FormControl(null, [Validators.required]),
       'email': new FormControl(null, [Validators.required, Validators.email]),
       'password': new FormGroup({
-        'new': new FormControl(null, Validators.required),
+        'new': new FormControl(null, [Validators.required, LoginValidators.checkLength]),
         'confirm': new FormControl(null, Validators.required)
-      }, this.checkEqual)
+      }, LoginValidators.checkEqual)
     });
   }
 
-  checkEqual(group: FormGroup): ValidationErrors | null {
-    if (group.value.new !== group.value.confirm) {
-      return {equal: true};
-    }
-    return null;
-  }
+  
 
   submitForm() {
     if (this.editForm.valid) {
-      console.log(this.editForm.value.email);
+      this.editForm.disable();
+      this.auth.registerNewUser(this.editForm.value.email, this.editForm.value.password.new, this.editForm.value.name)
+      .subscribe( (result: boolean) => {
+        if (result) {
+          this.navigate.navigate(['/parts']);
+        }
+      }, (error) => {
+        switch (error.code) {
+          case ('auth/invalid-email'):
+
+            break;
+          case ('auth/email-already-in-use'):
+
+            break;
+        }
+        this.editForm.enable();
+      });
     }
   }
 

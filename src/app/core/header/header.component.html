@@ -13,20 +13,27 @@
     </div>
 
     <div id="navbarMain" class="navbar-menu">
-      <div class="navbar-start">
-        <a routerLink="/home" class="navbar-item">
+      <div class="navbar-start" *ngIf="auth.isUserLogged">
+        <a routerLink="/parts" class="navbar-item">
           Список деталей
         </a>
       </div>
 
       <div class="navbar-end">
-        <div class="navbar-item">
+        <div class="navbar-item" *ngIf="!auth.isUserLogged">
           <div class="buttons">
             <a routerLink="/login" class="button is-primary">
               <strong>Войти</strong>
             </a>
           </div>
         </div>
+        <div class="navbar-item" *ngIf="auth.isUserLogged">
+            <div class="buttons">
+              <a class="button">
+                <strong>Выйти</strong>
+              </a>
+            </div>
+          </div>
       </div>
     </div>
   </nav>

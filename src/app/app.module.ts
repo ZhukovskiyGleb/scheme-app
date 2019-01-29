@@ -4,10 +4,10 @@ import {NgModule} from '@angular/core';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {CoreModule} from "./core/core.module";
-import {AngularFireModule} from "@angular/fire";
-import {environment} from "../environments/environment";
 import {AngularFirestoreModule} from "@angular/fire/firestore";
 import {FireDbService} from "./services/fire-db/fire-db.service";
+import { AuthService } from './services/auth/auth.service';
+import { CurrentUserService } from './services/currentUser/current-user.service';
 
 @NgModule({
   declarations: [
@@ -16,11 +16,10 @@ import {FireDbService} from "./services/fire-db/fire-db.service";
   imports: [
     BrowserModule,
     AppRoutingModule,
-    CoreModule,
-    AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    CoreModule
   ],
-  providers: [FireDbService],
+  providers: [FireDbService, CurrentUserService, AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule{
