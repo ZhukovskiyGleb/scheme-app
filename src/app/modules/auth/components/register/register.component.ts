@@ -46,7 +46,7 @@ export class RegisterComponent implements OnInit {
       const {email, password, name} = this.editForm.value;
       this.auth.registerNewUser(email, password.new, name)
       .subscribe( () => {
-        this.navigation.navigate(['/parts']);
+        this.navigation.navigate(['/home']);
       }, () => {
         this.editForm.enable();
       });

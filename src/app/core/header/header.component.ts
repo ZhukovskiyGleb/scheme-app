@@ -28,4 +28,12 @@ export class HeaderComponent implements OnInit {
       });
   }
 
+  onBurgerClick() {
+    const burger = document.getElementById("burger")
+    burger.classList.toggle('is-active');
+
+    const menu = document.getElementById("navbarMain")
+    menu.classList.toggle('is-active');
+  }
+
 }

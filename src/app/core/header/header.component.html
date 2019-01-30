@@ -5,7 +5,7 @@
         <img src="../../../assets/images/logo.png">
       </a>
 
-      <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarMain">
+      <a id="burger" role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarMain" (click)="onBurgerClick()">
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
@@ -13,16 +13,19 @@
     </div>
 
     <div id="navbarMain" class="navbar-menu">
-      <div class="navbar-start" *ngIf="auth.isUserLogged">
+      <div class="navbar-start">
         <a routerLink="/parts" class="navbar-item">
           Список деталей
+        </a>
+        <a routerLink="/parts" class="navbar-item" *ngIf="auth.isUserLogged">
+          Хранилище
         </a>
       </div>
 
       <div class="navbar-end">
         <div class="navbar-item" *ngIf="!auth.isUserLogged">
           <div class="buttons">
-            <a routerLink="/login" class="button is-primary">
+            <a routerLink="/login" class="button is-warning">
               <strong>Войти</strong>
             </a>
           </div>

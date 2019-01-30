@@ -1,27 +1,20 @@
 import { Injectable, OnInit } from '@angular/core';
 import * as firebase from 'firebase';
-import { config, Observable, from, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { config, Observable, from, of, Subject } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
-  static config = {
-    apiKey: "AIzaSyC_pnixCaDhoahrEnHvhXjtiiD3jkfqxeg",
-    authDomain: "workbench-a10ea.firebaseapp.com",
-    databaseURL: "https://workbench-a10ea.firebaseio.com",
-    projectId: "workbench-a10ea",
-    storageBucket: "workbench-a10ea.appspot.com",
-    messagingSenderId: "632656283520"
-  };
-
   constructor() { 
     
   }
 
-  init() {
-    
+  getLastUser(): Observable<firebase.User> {
+    const observer = new Subject<firebase.User>();
+    firebase.auth().onAuthStateChanged(observer);
+    return observer;
   }
 
   createUserWithEmailAndPassword(email:string, password: string): Observable<firebase.auth.UserCredential> {
@@ -39,7 +32,7 @@ export class FirebaseService {
   }
 
   logout(): Observable<void> {
-    return from(firebase.auth().signOut())
+    return from(firebase.auth().signOut());
   }
 
   hasCurrentUser(): boolean {
@@ -66,6 +59,8 @@ export class FirebaseService {
               alert('Данный почтовый адрес уже используется');
               break;
             default:
+              alert('Ошибка');
+              break;
           }
 
         throw error

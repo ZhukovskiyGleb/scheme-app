@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injector } from '@angular/core';
 import * as firebase from 'firebase';
-import { FirebaseService } from './core/services/firebase/firebase.service';
+import { AuthService } from './core/services/auth/auth.service';
+import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -8,11 +11,16 @@ import { FirebaseService } from './core/services/firebase/firebase.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  constructor () {
-    firebase.initializeApp(FirebaseService.config);
+  constructor (private injector: Injector,
+              private navigation: Router) {
+    firebase.initializeApp(environment.firebaseConfig);
   }
 
   ngOnInit() {
-    
+    const auth = this.injector.get(AuthService);
+    auth.loadLastUser()
+    .subscribe((value) => {
+      // this.navigation.navigate(['/parts']);
+    });
   }
 }

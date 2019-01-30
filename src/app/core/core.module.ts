@@ -3,11 +3,13 @@ import {CommonModule} from '@angular/common';
 import {HeaderComponent} from './header/header.component';
 import {FooterComponent} from './footer/footer.component';
 import {RouterModule} from "@angular/router";
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
     HeaderComponent,
     FooterComponent,
+    PageNotFoundComponent
   ],
   imports: [
     CommonModule,
@@ -15,7 +17,8 @@ import {RouterModule} from "@angular/router";
   ],
   exports: [
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    PageNotFoundComponent
   ]
 })
 export class CoreModule {}

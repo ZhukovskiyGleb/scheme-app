@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { from, Observable, of } from 'rxjs';
-import { map, tap, switchMap, catchError } from 'rxjs/operators';
+import { from, Observable, of, throwError } from 'rxjs';
+import { map, tap, switchMap, catchError, take } from 'rxjs/operators';
 import { FireDbService } from '../fire-db/fire-db.service';
 import { CurrentUserService } from '../currentUser/current-user.service';
 import { UserModel } from 'src/app/core/models/user-model';
@@ -12,7 +12,7 @@ import { FirebaseService } from '../firebase/firebase.service';
 })
 export class AuthService {
   private token: string;
-  private isLogged: boolean;
+  private isLogged: boolean = false;
   private uid: string;
 
   constructor(private firebase: FirebaseService,
@@ -64,6 +64,41 @@ export class AuthService {
       }),
       catchError((error) => {
         console.log('AuthService -> login -> ', error);
+        throw error;
+      })
+    );
+  }
+
+  loadLastUser():Observable<boolean> {
+    return this.firebase.getLastUser()
+    .pipe(
+      take(1),
+      tap((user: firebase.User) => {
+        if (!user) {
+          throw ('no user');
+        }
+      }),
+      switchMap((user: firebase.User) => {
+        this.uid = user.uid;
+        return from(user.getIdToken());
+      }),
+      map((token:string) => {
+        this.token = token;
+        this.isLogged = true;
+        return this.uid;
+      }),
+      switchMap((uid) => {
+        return this.fireDB.getUserByUid(uid);
+      }),
+      map( (user: UserModel) => {
+        this.currentUser.setCurrentUser(user);
+        return true;
+      }),
+      catchError((error) => {
+        if (error == 'no user') {
+          return of(false);
+        }
+        console.log('AuthService -> loadLastUser -> ', error);
         throw error;
       })
     );

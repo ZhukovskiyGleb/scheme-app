@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
       const {email, password} = this.editForm.value;
       this.auth.login(email, password)
       .subscribe(() => {
-          this.navigation.navigate(['/parts']);
+          this.navigation.navigate(['/home']);
       }, () => {
         this.editForm.enable();
       });
