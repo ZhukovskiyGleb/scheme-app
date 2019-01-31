@@ -7,7 +7,7 @@ export class LoginValidators {
         }
         return null;
       }
-    
+
     static checkLength(control: FormControl): ValidationErrors | null {
         if (control.value && control.value.length < 6) {
           return {length: true};

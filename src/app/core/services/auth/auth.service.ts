@@ -12,7 +12,7 @@ import { FirebaseService } from '../firebase/firebase.service';
 })
 export class AuthService {
   private token: string;
-  private isLogged: boolean = false;
+  private isLogged = false;
   private uid: string;
 
   constructor(private firebase: FirebaseService,
@@ -26,7 +26,7 @@ export class AuthService {
         this.uid = userCred.user.uid;
         return from(userCred.user.getIdToken());
       }),
-      map((token:string) => {
+      map((token: string) => {
         this.token = token;
         this.isLogged = true;
         return this.uid;
@@ -51,7 +51,7 @@ export class AuthService {
         this.uid = userCred.user.uid;
         return from(userCred.user.getIdToken());
       }),
-      map((token:string) => {
+      map((token: string) => {
         this.token = token;
         this.isLogged = true;
         return this.uid;
@@ -69,7 +69,14 @@ export class AuthService {
     );
   }
 
-  loadLastUser():Observable<boolean> {
+  hasLastUser(): Observable<boolean> {
+    return this.firebase.getLastUser()
+    .pipe(
+      map(user => user ? true : false)
+    );
+  }
+
+  loadLastUser(): Observable<boolean> {
     return this.firebase.getLastUser()
     .pipe(
       take(1),
@@ -82,7 +89,7 @@ export class AuthService {
         this.uid = user.uid;
         return from(user.getIdToken());
       }),
-      map((token:string) => {
+      map((token: string) => {
         this.token = token;
         this.isLogged = true;
         return this.uid;

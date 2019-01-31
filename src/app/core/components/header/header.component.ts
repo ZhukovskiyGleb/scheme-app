@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { CurrentUserService } from 'src/app/core/services/currentUser/current-user.service';
-import { Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -10,6 +9,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
+
+  isActivated = false;
 
   constructor(public auth: AuthService,
               public currentUser: CurrentUserService,
@@ -24,16 +25,12 @@ export class HeaderComponent implements OnInit {
     .subscribe(() => {
       this.navigation.navigate(['/home']);
     }, (error) => {
-        
+
       });
   }
 
   onBurgerClick() {
-    const burger = document.getElementById("burger")
-    burger.classList.toggle('is-active');
-
-    const menu = document.getElementById("navbarMain")
-    menu.classList.toggle('is-active');
+    this.isActivated = ! this.isActivated;
   }
 
 }

@@ -1,0 +1,12 @@
+.pagination {
+    margin: 10px;
+}
+.pagination-ellipsis {
+    color: white;
+}
+.pagination-previous,
+.pagination-next {
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+}

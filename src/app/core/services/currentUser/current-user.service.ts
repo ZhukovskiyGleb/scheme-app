@@ -10,11 +10,11 @@ export class CurrentUserService {
 
   constructor() { }
 
-  setCurrentUser(user:UserModel) {
+  setCurrentUser(user: UserModel) {
     this.user = user;
   }
 
-  clearCurrentUser():void {
+  clearCurrentUser(): void {
     this.user = null;
   }
 

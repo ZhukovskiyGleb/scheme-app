@@ -1,0 +1,27 @@
+<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+    <button class="pagination-previous" [disabled]="!(totalPages > 1 && currentPage > 1)">Предыдущая</button>
+    <button class="pagination-next" [disabled]="!(totalPages > 1 && currentPage < totalPages)">Следующая</button>
+    <ul class="pagination-list">
+      <li>
+        <a class="pagination-link" aria-label="Goto first page" *ngIf="totalPages > 2 && currentPage > 2">F 1</a>
+      </li>
+      <li>
+        <span class="pagination-ellipsis" *ngIf="totalPages > 5 && currentPage > 3">&hellip;</span>
+      </li>
+      <li>
+        <a class="pagination-link" aria-label="Goto prev page" *ngIf="totalPages > 1 && currentPage > 1">-1 {{currentPage - 1}}</a>
+      </li>
+      <li>
+        <a class="pagination-link is-current" aria-label="Current page" aria-current="page" *ngIf="totalPages > 0">C {{currentPage}}</a>
+      </li>
+      <li>
+        <a class="pagination-link" aria-label="Goto next page" *ngIf="totalPages > 3 && currentPage < totalPages - 1">+1 {{currentPage + 1}}</a>
+      </li>
+      <li>
+        <span class="pagination-ellipsis" *ngIf="totalPages > 3 && currentPage < totalPages - 2">&hellip;</span>
+      </li>
+      <li>
+        <a class="pagination-link" aria-label="Goto last page" *ngIf="totalPages > 4 && currentPage < totalPages">T {{totalPages}}</a>
+      </li>
+    </ul>
+  </nav>

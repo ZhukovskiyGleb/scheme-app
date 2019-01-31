@@ -5,14 +5,17 @@
         <img src="../../../assets/images/logo.png">
       </a>
 
-      <a id="burger" role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarMain" (click)="onBurgerClick()">
+      <a id="burger" role="button" class="navbar-burger burger"
+      [ngClass]="{'is-active': isActivated}"
+      aria-label="menu" aria-expanded="false" data-target="navbarMain" (click)="onBurgerClick()">
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
       </a>
     </div>
 
-    <div id="navbarMain" class="navbar-menu">
+    <div id="navbarMain" class="navbar-menu"
+    [ngClass]="{'is-active': isActivated}">
       <div class="navbar-start">
         <a routerLink="/parts" class="navbar-item">
           Список деталей
@@ -32,7 +35,7 @@
         </div>
         <div class="navbar-item has-dropdown is-hoverable" *ngIf="auth.isUserLogged">
           <a class="navbar-link">
-            {{currentUser.userName}}
+            {{currentUser.userName | name}}
           </a>
           <div class="navbar-dropdown is-boxed">
             <a class="navbar-item" (click)="onLogoutClick()">

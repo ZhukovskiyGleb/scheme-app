@@ -6,7 +6,7 @@ import { UserModel } from 'src/app/core/models/user-model';
 @Injectable({
   providedIn: 'root'
 })
-export class FireDbService implements OnInit{
+export class FireDbService implements OnInit {
 
   private db = firebase.firestore();
 

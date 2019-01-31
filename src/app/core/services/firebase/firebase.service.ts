@@ -7,8 +7,8 @@ import { catchError, map } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class FirebaseService {
-  constructor() { 
-    
+  constructor() {
+
   }
 
   getLastUser(): Observable<firebase.User> {
@@ -17,14 +17,14 @@ export class FirebaseService {
     return observer;
   }
 
-  createUserWithEmailAndPassword(email:string, password: string): Observable<firebase.auth.UserCredential> {
+  createUserWithEmailAndPassword(email: string, password: string): Observable<firebase.auth.UserCredential> {
     return from(firebase.auth().createUserWithEmailAndPassword(email, password))
     .pipe(
       catchError(this.handleError())
     );
   }
 
-  signInWithEmailAndPassword(email:string, password: string): Observable<firebase.auth.UserCredential> {
+  signInWithEmailAndPassword(email: string, password: string): Observable<firebase.auth.UserCredential> {
     return from(firebase.auth().signInWithEmailAndPassword(email, password))
     .pipe(
       catchError(this.handleError())
@@ -45,25 +45,7 @@ export class FirebaseService {
 
   private handleError () {
     return (error: any): Observable<firebase.auth.UserCredential> => {
-      switch (error.code) {
-            case ('auth/user-not-found'):
-              alert('Пользователь не найден');
-              break;
-            case ('auth/wrong-password'):
-            alert('Неверный пароль');
-              break;
-            case ('auth/invalid-email'):
-              alert('Некорректный почтовый адрес');
-              break;
-            case ('auth/email-already-in-use'):
-              alert('Данный почтовый адрес уже используется');
-              break;
-            default:
-              alert('Ошибка');
-              break;
-          }
-
-        throw error
+      throw error;
     };
   }
 

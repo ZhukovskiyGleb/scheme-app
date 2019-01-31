@@ -1,8 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from 'src/app/core/services/auth/auth.service';
 import {Router} from '@angular/router';
-import {LoginValidators} from '../shared/login-validators';
+import { LoginValidators } from '../../shared/login-validators';
+import { ErrorModalService } from 'src/app/core/services/error-modal/error-modal.service';
+import { LoginErrorHandlerModel } from '../../shared/login-error-handler.model';
 
 @Component({
   selector: 'app-register',
@@ -15,7 +17,8 @@ export class RegisterComponent implements OnInit {
 
   constructor(private auth: AuthService,
               private navigation: Router,
-              private fb: FormBuilder) { }
+              private fb: FormBuilder,
+              private errorModal: ErrorModalService) { }
 
   ngOnInit() {
     this.initForm();
@@ -25,12 +28,12 @@ export class RegisterComponent implements OnInit {
     this.editForm = this.fb.group({
       name: [null, Validators.required],
       email: [null, [
-        Validators.required, 
+        Validators.required,
         Validators.email
       ]],
       password: this.fb.group({
         new: [null, [
-          Validators.required, 
+          Validators.required,
           LoginValidators.checkLength
         ]],
         confirm: [null, Validators.required]
@@ -38,7 +41,7 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  
+
 
   submitForm() {
     if (this.editForm.valid) {
@@ -47,7 +50,8 @@ export class RegisterComponent implements OnInit {
       this.auth.registerNewUser(email, password.new, name)
       .subscribe( () => {
         this.navigation.navigate(['/home']);
-      }, () => {
+      }, (error) => {
+        this.errorModal.showMessage(LoginErrorHandlerModel.getErrorMessage(error));
         this.editForm.enable();
       });
     }
