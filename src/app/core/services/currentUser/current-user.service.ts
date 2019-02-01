@@ -21,4 +21,8 @@ export class CurrentUserService {
   get userName(): string {
     return this.user ? this.user.username : '';
   }
+
+  get uid(): string {
+    return this.user ? this.user.uid : '';
+  }
 }

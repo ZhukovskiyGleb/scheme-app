@@ -1,9 +1,22 @@
 <section class="hero is-fullheight-with-navbar is-primary is-bold">
   <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title">
-        УСПЕХ
-      </h1>
+    <div class="container">
+      <table class="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th><span>#</span></th>
+            <th><span>Название</span></th>
+            <th><span>Описание</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let part of partsCollection | async" appRightClick>
+            <th>{{part.id + 1}}</th>
+            <td>{{part.title}}</td>
+            <td>{{part.description}}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
   <app-pagination></app-pagination>

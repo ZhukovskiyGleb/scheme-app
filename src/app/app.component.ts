@@ -4,6 +4,8 @@ import { AuthService } from './core/services/auth/auth.service';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
+import { FireDbService } from './core/services/fire-db/fire-db.service';
+import { PartModel } from './core/models/part-model';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +19,9 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    const bd = this.injector.get(FireDbService);
+    bd.updateCounters();
+
     const auth = this.injector.get(AuthService);
     auth.loadLastUser()
     .subscribe((value) => {

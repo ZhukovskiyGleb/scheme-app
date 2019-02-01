@@ -13,7 +13,6 @@ import { FirebaseService } from '../firebase/firebase.service';
 export class AuthService {
   private token: string;
   private isLogged = false;
-  private uid: string;
 
   constructor(private firebase: FirebaseService,
               private fireDB: FireDbService,
@@ -23,19 +22,22 @@ export class AuthService {
     return this.firebase.createUserWithEmailAndPassword(email, password)
     .pipe(
       switchMap((userCred: firebase.auth.UserCredential) => {
-        this.uid = userCred.user.uid;
-        return from(userCred.user.getIdToken());
+        const uid = userCred.user.uid;
+        return from(userCred.user.getIdToken())
+        .pipe(
+          switchMap((token: string) => {
+            this.token = token;
+            this.isLogged = true;
+            return this.fireDB.createNewUser(uid, name);
+          }),
+          map(() => {
+            return uid;
+          })
+        );
       }),
-      map((token: string) => {
-        this.token = token;
-        this.isLogged = true;
-        return this.uid;
-      }),
-      switchMap((uid) => {
-        return this.fireDB.createNewUser(uid, name);
-      }),
-      tap(() => {
-        this.currentUser.setCurrentUser(new UserModel(name));
+      map((uid: string) => {
+        this.currentUser.setCurrentUser(new UserModel(uid, name));
+        return;
       }),
       catchError(error => {
         console.log('AuthService -> registerNewUser -> ', error);
@@ -48,13 +50,15 @@ export class AuthService {
     return this.firebase.signInWithEmailAndPassword(email, password)
     .pipe(
       switchMap((userCred: firebase.auth.UserCredential) => {
-        this.uid = userCred.user.uid;
-        return from(userCred.user.getIdToken());
-      }),
-      map((token: string) => {
-        this.token = token;
-        this.isLogged = true;
-        return this.uid;
+        const uid = userCred.user.uid;
+        return from(userCred.user.getIdToken())
+        .pipe(
+          switchMap((token: string) => {
+            this.token = token;
+            this.isLogged = true;
+            return uid;
+          })
+        );
       }),
       switchMap((uid) => {
         return this.fireDB.getUserByUid(uid);
@@ -80,24 +84,24 @@ export class AuthService {
     return this.firebase.getLastUser()
     .pipe(
       take(1),
-      tap((user: firebase.User) => {
+      switchMap((user: firebase.User) => {
         if (!user) {
           throw ('no user');
         }
-      }),
-      switchMap((user: firebase.User) => {
-        this.uid = user.uid;
-        return from(user.getIdToken());
-      }),
-      map((token: string) => {
-        this.token = token;
-        this.isLogged = true;
-        return this.uid;
+        const uid = user.uid;
+        return from(user.getIdToken())
+        .pipe(
+          map((token: string) => {
+            this.token = token;
+            this.isLogged = true;
+            return uid;
+          })
+        );
       }),
       switchMap((uid) => {
         return this.fireDB.getUserByUid(uid);
       }),
-      map( (user: UserModel) => {
+      map((user: UserModel) => {
         this.currentUser.setCurrentUser(user);
         return true;
       }),
