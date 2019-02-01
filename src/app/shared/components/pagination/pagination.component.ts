@@ -13,7 +13,7 @@ export class PaginationComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.totalPages = 5;
+    this.totalPages = 2;
     this.currentPage = 3;
   }
 
