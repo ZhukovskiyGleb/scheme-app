@@ -10,7 +10,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let part of partsCollection | async" appRightClick>
+          <tr *ngFor="let part of partsCollection | async" appRightClick (click)="onTableClick($event)">
             <th>{{part.id + 1}}</th>
             <td>{{part.title}}</td>
             <td>{{part.description}}</td>

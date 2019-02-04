@@ -35,7 +35,7 @@ export class PartsListComponent implements OnDestroy, AfterContentInit {
   }
 
   onTableClick(event: Event) {
-    console.log(event);
+    console.log(event.currentTarget);
   }
 
   ngOnDestroy() {
