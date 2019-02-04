@@ -53,7 +53,7 @@ export class AuthService {
         const uid = userCred.user.uid;
         return from(userCred.user.getIdToken())
         .pipe(
-          switchMap((token: string) => {
+          map((token: string) => {
             this.token = token;
             this.isLogged = true;
             return uid;

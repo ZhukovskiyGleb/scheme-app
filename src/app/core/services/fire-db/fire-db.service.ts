@@ -3,6 +3,7 @@ import * as firebase from 'firebase';
 import { from, Observable, of } from 'rxjs';
 import { UserModel } from 'src/app/core/models/user-model';
 import { PartModel } from '../../models/part-model';
+import { DocumentReference } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { PartModel } from '../../models/part-model';
 export class FireDbService{
 
   private db = firebase.firestore();
-  private partsCount: number;
+  partsCount: number;
 
   constructor() {
     // this.db.settings({
@@ -18,8 +19,8 @@ export class FireDbService{
     // });
   }
 
-  updateCounters():Promise<void> {
-    return this.db.collection('system').doc('counters').get()
+  updateCounters():Observable<void> {
+    return from(this.db.collection('system').doc('counters').get()
     .then(
       (doc) => {
         if (doc.exists) {
@@ -27,26 +28,13 @@ export class FireDbService{
           return;
         }
       }
-    );
+    ));
   }
-
-  
 
   private updatePartsCount(count: number): void {
     this.db.collection('system').doc('counters').set({
       parts: this.partsCount
     }, {merge: true});
-  }
-
-  get totalParts(): Observable<number> {
-    if (this.partsCount)
-      return of(this.partsCount);
-    return from(this.updateCounters()
-    .then(
-      () => {
-        return this.partsCount;
-      }
-    ));
   }
 
   createNewUser(uid: string, name: string): Observable<void> {
@@ -61,7 +49,7 @@ export class FireDbService{
     );
   }
 
-  getUserByUid(uid): Observable<UserModel> {
+  getUserByUid(uid: string): Observable<UserModel> {
     return from(
       this.db.collection('users').doc(uid).get()
       .then((user) => {
@@ -88,7 +76,6 @@ export class FireDbService{
     }
 
     if (start < 0 && end < 1) {
-      console.log(start, end);
       return from(null);
     }
 
@@ -99,16 +86,49 @@ export class FireDbService{
           let result: PartModel[] = [];
           query.forEach(doc => {
             result.push(PartModel.create(doc.data()));
+
+            // this.db.collection('parts').doc(doc.data().id.toString()).set(
+            //   {...doc.data(),
+            //   owner: this.uid}
+            //   );
           });
           return result;
         }
       )
       .catch (
         (error) => {
-          console.log(error);
+          console.log('FireDbService -> getPartsCollection ->', error);
           return null;
         }
       )
+    );
+  }
+
+  getPartById(id: number): Observable<PartModel> {
+    return from(
+      this.db.collection('parts').where('id', '==', id).limit(1).get()
+    .then(
+      query => {
+        let part: PartModel;
+        query.forEach(doc => {
+          part = PartModel.create(doc.data());
+        });
+        return part;
+      }
+    )
+    .catch (
+      (error) => {
+        console.log('FireDbService -> getPartsCollection ->', error);
+        return null;
+      }
+    )
+    );
+  }
+
+  setPartById(part: PartModel, id: number): void {
+    this.db.collection('parts').doc(id.toString()).set(
+      {...part},
+      {merge: true}
     );
   }
 }

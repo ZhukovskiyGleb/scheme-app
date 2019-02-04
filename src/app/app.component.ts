@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { FireDbService } from './core/services/fire-db/fire-db.service';
 import { PartModel } from './core/models/part-model';
+import { PartsService } from './core/services/parts/parts.service';
 
 @Component({
   selector: 'app-root',
@@ -19,12 +20,13 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    const bd = this.injector.get(FireDbService);
-    bd.updateCounters();
-
     const auth = this.injector.get(AuthService);
     auth.loadLastUser()
     .subscribe((value) => {
+      if (value) {
+        const partsService = this.injector.get(PartsService);
+        partsService.init(); 
+      }
       // this.navigation.navigate(['/parts']);
     });
   }

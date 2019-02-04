@@ -1,3 +1,6 @@
 .is-selected {
     background-color: teal !important;
 }
+.notification {
+    color: black;
+}

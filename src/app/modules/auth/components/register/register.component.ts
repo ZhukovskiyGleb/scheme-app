@@ -12,8 +12,7 @@ import { LoginErrorHandlerModel } from '../../shared/login-error-handler.model';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-
-  editForm: FormGroup;
+  protected editForm: FormGroup;
 
   constructor(private auth: AuthService,
               private navigation: Router,
@@ -26,7 +25,11 @@ export class RegisterComponent implements OnInit {
 
   initForm() {
     this.editForm = this.fb.group({
-      name: [null, Validators.required],
+      name: [null, [
+        Validators.required,
+        Validators.maxLength(10)
+        ]
+      ],
       email: [null, [
         Validators.required,
         Validators.email

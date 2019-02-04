@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild, AfterViewInit, AfterContentInit, OnDestroy, ElementRef } from '@angular/core';
+import { Component, ViewChild, AfterContentInit, OnDestroy } from '@angular/core';
 import { PaginationComponent } from 'src/app/shared/components/pagination/pagination.component';
-import { FireDbService } from 'src/app/core/services/fire-db/fire-db.service';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { PartModel } from 'src/app/core/models/part-model';
+import { PartsService } from 'src/app/core/services/parts/parts.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-parts-list',
@@ -12,14 +13,17 @@ import { PartModel } from 'src/app/core/models/part-model';
 export class PartsListComponent implements OnDestroy, AfterContentInit {
   readonly partsPerPage = 10;
   private paginationSubscription: Subscription;
-  protected partsCollection: Observable<PartModel[]>;
+  
+  protected partsCollection: PartModel[];
+  protected isBusy: boolean = true;
 
   @ViewChild(PaginationComponent) pagination: PaginationComponent;
 
-  constructor(protected fireDB: FireDbService) { }
+  constructor(private partsService: PartsService,
+              private navigation: Router) { }
 
   ngAfterContentInit() {
-    this.fireDB.totalParts.subscribe(
+    this.partsService.totalParts.subscribe(
       (partsCount: number) => {
         const totalPages = Math.ceil(partsCount / this.partsPerPage);
         this.pagination.init(totalPages);
@@ -30,12 +34,19 @@ export class PartsListComponent implements OnDestroy, AfterContentInit {
   }
 
   updatePartCollection(currentPage: number):void {
+    this.isBusy = true;
     const start = (currentPage - 1) * this.partsPerPage;
-    this.partsCollection = this.fireDB.getPartsCollection(start, start + this.partsPerPage);
+    this.partsService.loadPartsCollection(start, start + this.partsPerPage)
+    .subscribe(
+      (result: PartModel[]) => {
+        this.partsCollection = result;
+        this.isBusy = false;
+      }
+    );
   }
 
-  onTableClick(event: Event) {
-    console.log(event.currentTarget);
+  onTableClick(id: number) {
+    this.navigation.navigate(['parts', id])
   }
 
   ngOnDestroy() {
