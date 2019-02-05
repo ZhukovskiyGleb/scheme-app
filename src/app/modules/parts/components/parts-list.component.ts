@@ -14,8 +14,8 @@ export class PartsListComponent implements OnDestroy, AfterContentInit {
   readonly partsPerPage = 10;
   private paginationSubscription: Subscription;
   
-  protected partsCollection: PartModel[];
-  protected isBusy: boolean = true;
+  public partsCollection: PartModel[];
+  public isBusy: boolean = true;
 
   @ViewChild(PaginationComponent) pagination: PaginationComponent;
 
@@ -23,12 +23,13 @@ export class PartsListComponent implements OnDestroy, AfterContentInit {
               private navigation: Router) { }
 
   ngAfterContentInit() {
+    this.paginationSubscription = this.pagination.pageEvent.subscribe(this.updatePartCollection.bind(this));
+
     this.partsService.totalParts.subscribe(
       (partsCount: number) => {
         const totalPages = Math.ceil(partsCount / this.partsPerPage);
+        console.log('total pages updated', totalPages);
         this.pagination.init(totalPages);
-        this.updatePartCollection(1);
-        this.paginationSubscription = this.pagination.pageEvent.subscribe(this.updatePartCollection.bind(this));
       }
     );
   }

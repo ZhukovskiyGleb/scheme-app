@@ -60,7 +60,7 @@ export class AuthService {
           })
         );
       }),
-      switchMap((uid) => {
+      switchMap((uid: string) => {
         return this.fireDB.getUserByUid(uid);
       }),
       map( (user: UserModel) => {
@@ -98,7 +98,7 @@ export class AuthService {
           })
         );
       }),
-      switchMap((uid) => {
+      switchMap((uid: string) => {
         return this.fireDB.getUserByUid(uid);
       }),
       map((user: UserModel) => {
@@ -106,7 +106,7 @@ export class AuthService {
         return true;
       }),
       catchError((error) => {
-        if (error == 'no user') {
+        if (error === 'no user') {
           return of(false);
         }
         console.log('AuthService -> loadLastUser -> ', error);

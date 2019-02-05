@@ -1,35 +1,53 @@
 import { Injectable } from '@angular/core';
 import { FireDbService } from '../fire-db/fire-db.service';
-import { Observable, of } from 'rxjs';
+import { Observable, of, from } from 'rxjs';
 import { PartModel } from '../../models/part-model';
 import { map } from 'rxjs/operators';
+import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PartsService {
   private partsCollection: PartModel[];
+  private partsCount: number;
 
-  constructor(protected fireDB: FireDbService) { }
-
-  init(): void {
-    this.fireDB.updateCounters();
-  }
+  constructor(public fireDB: FireDbService) { }
 
   get totalParts(): Observable<number> {
-    if (this.fireDB.partsCount)
-      return of(this.fireDB.partsCount);
-    return this.fireDB.updateCounters()
+    if (this.partsCount)
+      return of(this.partsCount);
+
+    return this.fireDB.updateSystem()
     .pipe(
       map(
-        () => {
-          return this.fireDB.partsCount;
+        (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
+          query.forEach(
+            (doc: QueryDocumentSnapshot<any>) => {
+            switch (doc.id) {
+              case 'counters':
+                this.partsCount = doc.data().parts;
+                break;
+            }
+          });
+          return this.partsCount;
         }
       )
     );
   }
 
   loadPartsCollection(start: number, end: number): Observable<PartModel[]> {
+    if (end > this.partsCount) {
+      end = this.partsCount;
+    }
+    if (start >= end) {
+      start = end;
+    }
+
+    if (start < 0 && end < 1) {
+      return from(null);
+    }
+    
     return this.fireDB.getPartsCollection(start, end)
     .pipe(
       map(
@@ -62,9 +80,12 @@ export class PartsService {
   }
 
   addNewPart(part: PartModel): void {
-    const id = this.fireDB.partsCount + 1;
+    this.partsCount += 1;
 
-    part = {...part, id: id};
-    this.fireDB.setPartById(part, id);
+    const id = this.partsCount;
+
+    this.fireDB.setPartById({...part, id: id}, id);
+
+    this.fireDB.updatePartsCount(this.partsCount);
   }
 }

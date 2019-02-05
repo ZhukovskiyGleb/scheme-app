@@ -13,6 +13,7 @@ import { FirebaseService } from './core/services/firebase/firebase.service';
 import { ErrorModalService } from './core/services/error-modal/error-modal.service';
 import { SharedModule } from './shared/shared.module';
 import { PartsService } from './core/services/parts/parts.service';
+import { TypesService } from './core/services/types/types.service';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { PartsService } from './core/services/parts/parts.service';
     FirebaseService,
     FireDbService,
     PartsService,
+    TypesService,
     CurrentUserService,
     AuthService,
     ErrorModalService

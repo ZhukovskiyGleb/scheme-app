@@ -3,7 +3,8 @@ import * as firebase from 'firebase';
 import { from, Observable, of } from 'rxjs';
 import { UserModel } from 'src/app/core/models/user-model';
 import { PartModel } from '../../models/part-model';
-import { DocumentReference } from '@angular/fire/firestore';
+import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
+import { ITypes } from '../types/types.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,29 +12,23 @@ import { DocumentReference } from '@angular/fire/firestore';
 export class FireDbService{
 
   private db = firebase.firestore();
-  partsCount: number;
+
+  private systemObservable: Observable<firebase.firestore.QuerySnapshot>;
 
   constructor() {
-    // this.db.settings({
-    //   timestampsInSnapshots: true
-    // });
+    this.updateSystem();
   }
 
-  updateCounters():Observable<void> {
-    return from(this.db.collection('system').doc('counters').get()
-    .then(
-      (doc) => {
-        if (doc.exists) {
-          this.partsCount = doc.data().parts;
-          return;
-        }
-      }
-    ));
+  updateSystem():Observable<firebase.firestore.QuerySnapshot> {
+    if (!this.systemObservable) {
+      this.systemObservable = from(this.db.collection('system').get());
+    }
+    return this.systemObservable;
   }
 
-  private updatePartsCount(count: number): void {
+  updatePartsCount(count: number): void {
     this.db.collection('system').doc('counters').set({
-      parts: this.partsCount
+      parts: count
     }, {merge: true});
   }
 
@@ -67,24 +62,13 @@ export class FireDbService{
   }
 
   getPartsCollection(start: number, end: number): Observable<PartModel[]> {
-    
-    if (end > this.partsCount) {
-      end = this.partsCount;
-    }
-    if (start >= end) {
-      start = end;
-    }
-
-    if (start < 0 && end < 1) {
-      return from(null);
-    }
-
     return from(
       this.db.collection('parts').orderBy('id').where('id', '>=', start).limit(end - start).get()
       .then(
-        query => {
+        (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
           let result: PartModel[] = [];
-          query.forEach(doc => {
+          query.forEach(
+            (doc: QueryDocumentSnapshot<any>) => {
             result.push(PartModel.create(doc.data()));
 
             // this.db.collection('parts').doc(doc.data().id.toString()).set(
@@ -108,9 +92,10 @@ export class FireDbService{
     return from(
       this.db.collection('parts').where('id', '==', id).limit(1).get()
     .then(
-      query => {
+      (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
         let part: PartModel;
-        query.forEach(doc => {
+        query.forEach(
+          (doc: QueryDocumentSnapshot<any>) => {
           part = PartModel.create(doc.data());
         });
         return part;
@@ -130,5 +115,9 @@ export class FireDbService{
       {...part},
       {merge: true}
     );
+  }
+
+  updateTypes(types: ITypes): void {
+    this.db.collection('system').doc('types').set(types);
   }
 }

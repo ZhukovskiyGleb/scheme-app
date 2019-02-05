@@ -12,7 +12,7 @@ import { LoginErrorHandlerModel } from '../../shared/login-error-handler.model';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  protected editForm: FormGroup;
+  public editForm: FormGroup;
 
   constructor(private auth: AuthService,
               private navigation: Router,

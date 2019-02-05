@@ -14,6 +14,30 @@
         </div>
         <p class="help is-warning" *ngIf="editForm.get('title').touched && editForm.hasError('required', ['title'])">Название не должно быть пустым</p>
       </div>
+      <div class="field is-grouped" style="margin-top: 10px">
+        <div class="field">
+          <label class="label">Тип</label>
+          <div class="control">
+            <div class="select">
+              <select formControlName="type">
+                <option disabled value=-1>Выберите тип</option>
+                <option *ngFor="let field of availableTypes; let i = index" [value]="i">{{field}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field" style="margin-left: 10px" *ngIf="editForm && editForm.get('type').value >= 0 && availableSubtypes.length > 0">
+          <label class="label">Подтип</label>
+          <div class="control">
+            <div class="select">
+              <select formControlName="subtype">
+                  <option disabled value=-1>Без подтипа</option>
+                  <option *ngFor="let field of availableSubtypes; let i = index" [value]="i">{{field}}</option>
+                </select>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="field" formArrayName="properties" *ngIf="(propertiesList != null && propertiesList.length > 0 ) || isEditMode" style="margin-top: 10px">
         <label class="label">Параметры</label>
         <div class="field has-addons" *ngFor="let property of propertiesList; let i = index">

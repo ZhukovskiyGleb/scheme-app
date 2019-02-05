@@ -26,6 +26,9 @@
       </div>
 
       <div class="navbar-end">
+        <a routerLink="/admin" class="navbar-item" *ngIf="currentUser.isAdmin">
+          Админ
+        </a>
         <div class="navbar-item" *ngIf="!auth.isUserLogged">
           <div class="buttons">
             <a routerLink="/login" class="button is-warning">

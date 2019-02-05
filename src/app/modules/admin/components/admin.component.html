@@ -1,0 +1,132 @@
+<section class="hero is-fullheight-with-navbar is-dark is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">
+          Настройки типов и параметров
+        </h1>
+        <form [formGroup]="editForm" (ngSubmit)="submitForm()">
+            <div class="field" formArrayName="types" *ngIf="typesList">
+              <div class="field" *ngFor="let type of typesList; let i = index" [formGroupName]="i">
+                <div class="field is-grouped">
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input class="input" type="text" formControlName="value" placeholder="Архетип">
+                    </div>
+                    <div class="control">
+                      <a class="button is-danger" (click)="onDeleteTypeClick(i)">
+                        X
+                      </a>
+                    </div>
+                  </div>
+                  <div class="field" formArrayName="subtypes" *ngIf="subtypesList(i)">
+                      <div class="control" style="margin-top: 5px; margin-left: 10px; margin-bottom: 10px">
+                        <label class="label">Подтипы:</label>
+                      </div>
+                    <div class="field" *ngFor="let subtype of subtypesList(i); let j = index" [formGroupName]="j" style="margin-left: 10px">
+                      <div class="field has-addons" >
+                        <div class="control">
+                          <input class="input" type="text" formControlName="value" placeholder="Подтип">
+                        </div>
+                        <div class="control">
+                          <a class="button is-danger" (click)="onDeleteSubtypeClick(i, j)">
+                            X
+                          </a>
+                        </div>
+                      </div>
+                      <div class="field is-grouped">
+                        <div class="control">
+                          <label class="label">Параметры подтипа: </label>
+                        </div>
+                        <div class="field" formArrayName="properties" *ngIf="subtypesPropertiesList(i, j)">
+                          <div class="field" *ngFor="let property of subtypesPropertiesList(i, j); let k = index"  style="margin-left: 10px">
+                            <div class="field has-addons">
+                              <div class="control">
+                                <input class="input" type="text" [formControlName]="k" placeholder="Параметр">
+                              </div>
+                              <div class="control">
+                                <a class="button is-danger" (click)="onDeleteSubtypePropertyClick(i, j, k)">
+                                  X
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="control" style="margin-left: 20px">
+                          <a class="button is-warning" (click)="onAddSubtypePropertyClick(i, j)">
+                            +
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    <a class="button is-warning" (click)="onAddSubtypeClick(i)" style="margin-left: 10px">
+                      Добавить подтип
+                    </a>
+                  </div>
+                </div>
+                <div class="field is-grouped">
+                  <div class="control">
+                    <label class="label">Параметры типа: </label>
+                  </div>
+                  <div class="field" formArrayName="properties" *ngIf="typesPropertiesList(i)">
+                    <div class="field" *ngFor="let property of typesPropertiesList(i); let k = index" style="margin-left: 10px">
+                      <div class="field has-addons">
+                        <div class="control">
+                          <input class="input" type="text" [formControlName]="k" placeholder="Параметр">
+                        </div>
+                        <div class="control">
+                          <a class="button is-danger" (click)="onDeleteTypePropertyClick(i, k)">
+                            X
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="control" style="margin-left: 20px">
+                    <a class="button is-warning" (click)="onAddTypePropertyClick(i)">
+                      +
+                    </a>
+                  </div>
+                </div>
+                <hr>
+              </div>
+              <a class="button is-warning" (click)="onAddTypeClick()">
+                Добавить архетип
+              </a>
+            </div>
+            <div class="field is-grouped" style="margin-top: 10px">
+              <div class="control">
+                <label class="label">Глобальные параметры: </label>
+              </div>
+              <div class="field" formArrayName="properties" *ngIf="propertiesList">
+                <div class="field" *ngFor="let property of propertiesList; let k = index" style="margin-left: 10px">
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input class="input" type="text" [formControlName]="k" placeholder="Параметр">
+                    </div>
+                    <div class="control">
+                      <a class="button is-danger" (click)="onDeletePropertyClick(k)">
+                        X
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="control" style="margin-left: 20px">
+                <a class="button is-warning" (click)="onAddPropertyClick()">
+                  +
+                </a>
+              </div>
+            </div>
+            <div class="field is-grouped" style="margin-top: 10px">
+              <div class="control">
+                <button type="submit" class="button is-link" [disabled]="!editForm.dirty || !editForm.valid">Сохранить</button>
+              </div>
+              <div class="control">
+                  <button type="button" class="button" [disabled]="!editForm.dirty" (click)="onCancelClick()">Отмена</button>
+                </div>
+            </div>
+          </form>
+      </div>
+    </div>
+  </section>
+  

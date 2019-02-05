@@ -25,4 +25,8 @@ export class CurrentUserService {
   get uid(): string {
     return this.user ? this.user.uid : '';
   }
+
+  get isAdmin(): boolean {
+    return this.user ? this.user.admin : false;
+  }
 }
