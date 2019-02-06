@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators, AbstractControl, FormArray, FormBui
 import { TypesService, IType, ISubtype, ITypes } from 'src/app/core/services/types/types.service';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 
 @Component({
   selector: 'app-admin',
@@ -10,7 +11,8 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./admin.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AdminComponent implements OnInit, OnDestroy {
+@AutoUnsubscribe
+export class AdminComponent implements OnInit {
   public editForm: FormGroup;
 
   private listOfTypes: ITypes;
@@ -36,10 +38,6 @@ export class AdminComponent implements OnInit, OnDestroy {
         this.initForm();
       }
     );
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
   }
 
   initForm() {

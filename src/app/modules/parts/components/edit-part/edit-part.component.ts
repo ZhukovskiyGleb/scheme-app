@@ -1,20 +1,23 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, Input, ElementRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl, FormControl } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { PartsService } from 'src/app/core/services/parts/parts.service';
 import { PartModel } from 'src/app/core/models/part-model';
 import { CurrentUserService } from 'src/app/core/services/currentUser/current-user.service';
-import { switchMap, filter, take, map, tap } from 'rxjs/operators';
+import { switchMap, filter, tap } from 'rxjs/operators';
 import { ChangeDetectionStrategy } from '@angular/compiler/src/core';
 import { TypesService, ITypes, IType, ISubtype } from 'src/app/core/services/types/types.service';
+import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 
 @Component({
   selector: 'app-edit-part',
   templateUrl: './edit-part.component.html',
-  styleUrls: ['./edit-part.component.css']
+  styleUrls: ['./edit-part.component.css'],
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EditPartComponent implements OnInit, OnDestroy {
+@AutoUnsubscribe
+export class EditPartComponent implements OnInit {
   public editForm: FormGroup;
   public isEditMode: boolean = false;
 
@@ -32,7 +35,7 @@ export class EditPartComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.initForm();
-
+    
     this.routeSubscription = this.router.params
     .pipe(
       switchMap(
@@ -44,7 +47,6 @@ export class EditPartComponent implements OnInit, OnDestroy {
       filter(
         value => !!value
       ),
-      take(1),
       tap(
         (part: PartModel) => {
           this.selectedPart = part;
@@ -139,10 +141,6 @@ export class EditPartComponent implements OnInit, OnDestroy {
     );
 
     this.editForm.markAsDirty();
-  }
-
-  ngOnDestroy() {
-    this.routeSubscription.unsubscribe();
   }
 
   onEditClick() {

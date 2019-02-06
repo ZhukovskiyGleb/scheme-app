@@ -4,13 +4,15 @@ import { Subscription } from 'rxjs';
 import { PartModel } from 'src/app/core/models/part-model';
 import { PartsService } from 'src/app/core/services/parts/parts.service';
 import { Router } from '@angular/router';
+import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 
 @Component({
   selector: 'app-parts-list',
   templateUrl: './parts-list.component.html',
   styleUrls: ['./parts-list.component.css']
 })
-export class PartsListComponent implements OnDestroy, AfterContentInit {
+@AutoUnsubscribe
+export class PartsListComponent implements AfterContentInit {
   readonly partsPerPage = 10;
   private paginationSubscription: Subscription;
   
@@ -48,12 +50,6 @@ export class PartsListComponent implements OnDestroy, AfterContentInit {
 
   onTableClick(id: number) {
     this.navigation.navigate(['parts', id])
-  }
-
-  ngOnDestroy() {
-    if (this.paginationSubscription) {
-      this.paginationSubscription.unsubscribe();
-    }
   }
 
 }
