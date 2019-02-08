@@ -7,27 +7,24 @@
           <tr>
             <th><span>#</span></th>
             <th><span>Название</span></th>
+            <th><span>Тип</span></th>
             <th><span>Описание</span></th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let part of partsCollection" appRightClick (click)="onTableClick(part.id)" style="cursor: pointer">
+          <tr *ngFor="let part of partsCollection; let i = index" appRightClick (click)="onTableClick(part.id)" style="cursor: pointer">
             <th>{{part.id + 1}}</th>
             <td>{{part.title}}</td>
+            <td>{{getTypeValue(part.type)}}</td>
             <td>{{part.description | stringCutter}}</td>
           </tr>
         </tbody>
       </table>
+      <div class="field">
+        <button type="button" class="button is-warning" (click)="onAddPartClick()">Добавить</button>
+      </div>
       <app-pagination></app-pagination>
     </div>
   </div>
-  <div class="modal"
-  [ngClass]="{'is-active': isBusy}">
-    <div class="modal-background" [ngStyle]="{opacity: .3}"></div>
-    <div class="modal-content has-text-centered">
-        <div class="notification">
-          <strong>Загрузка</strong>
-        </div>
-    </div>
-  </div>
+  <app-loading-modal [isActive]="isBusy"></app-loading-modal>
 </section>

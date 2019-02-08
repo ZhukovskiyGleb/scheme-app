@@ -6,7 +6,8 @@ import { EditPartComponent } from './components/edit-part/edit-part.component';
 const routes: Routes = [
   {path: '', component: PartsListComponent, children: [
     // {path: '', component: null},
-    {path: ':id', component: EditPartComponent}
+    {path: ':id', component: EditPartComponent},
+    {path: 'new', component: EditPartComponent},
   ]},
 ];
 

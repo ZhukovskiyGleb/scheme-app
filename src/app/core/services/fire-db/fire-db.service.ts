@@ -4,7 +4,7 @@ import { from, Observable, of } from 'rxjs';
 import { UserModel } from 'src/app/core/models/user-model';
 import { PartModel } from '../../models/part-model';
 import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { ITypes } from '../types/types.service';
+import { ITypesList } from '../types/types.service';
 
 @Injectable({
   providedIn: 'root'
@@ -117,7 +117,7 @@ export class FireDbService{
     );
   }
 
-  updateTypes(types: ITypes): void {
-    this.db.collection('system').doc('types').set(types);
+  updateTypes(types: ITypesList): void {
+    this.db.collection('system').doc('types').set({...types});
   }
 }

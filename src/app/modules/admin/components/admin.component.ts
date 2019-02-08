@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { FormGroup, FormControl, Validators, AbstractControl, FormArray, FormBuilder } from '@angular/forms';
-import { TypesService, IType, ISubtype, ITypes } from 'src/app/core/services/types/types.service';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { FormGroup, AbstractControl, FormArray, FormBuilder } from '@angular/forms';
+import { TypesService, IType, ISubtype, ITypesList } from 'src/app/core/services/types/types.service';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import { AdminHelper } from '../shared/admin-helper';
 
 @Component({
   selector: 'app-admin',
@@ -14,27 +15,21 @@ import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.deco
 @AutoUnsubscribe
 export class AdminComponent implements OnInit {
   public editForm: FormGroup;
+  isBusy: boolean = true;
 
-  private listOfTypes: ITypes;
   private subscription: Subscription;
 
   constructor(private fb: FormBuilder,
-              private types: TypesService,
+              private typesService: TypesService,
               private changeDetector: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.initForm();
 
-    this.subscription = this.types.typesList
-    .pipe(
-      map(
-        (list: ITypes) => {
-          this.listOfTypes = list;
-        }
-      )
-    )
+    this.subscription = this.typesService.waitListReady()
     .subscribe(
       () => {
+        this.isBusy = false;
         this.initForm();
       }
     );
@@ -43,26 +38,19 @@ export class AdminComponent implements OnInit {
   initForm() {
     const tList = [];
     const pList = [];
-    if (this.listOfTypes) {
-      this.listOfTypes.types.forEach(
+    let maxTypeId: number = 0;
+    if (this.typesService.list) {
+      maxTypeId = this.typesService.list.maxTypeId;
+      this.typesService.list.types.forEach(
         (type: IType) => {
-          const subtypes = [];
-          type.subtypes.forEach(
-            (subtype: ISubtype) => {
-              subtypes.push(
-                this.createSubtypeControl(
-                    subtype.value, 
-                    this.createPropertiesList(subtype.properties)
-                  )
-                );
-            }
-          );
-          tList.push(this.createTypeControl(
+          tList.push(AdminHelper.createTypeControl(
+            type.id,
+            type.maxSubtypeId,
             type.value,
-            subtypes,
-            this.createPropertiesList(type.properties)));
+            type.subtypes,
+            type.properties));
       });
-      this.listOfTypes.properties.forEach(
+      this.typesService.list.properties.forEach(
         (property: string) => {
           pList.push(property);
         }
@@ -71,45 +59,16 @@ export class AdminComponent implements OnInit {
 
     this.editForm = this.fb.group({
       types: this.fb.array(tList),
-      properties: this.fb.array(pList)
+      properties: this.fb.array(pList),
+      maxTypeId: AdminHelper.createPropertyControl(maxTypeId)
     });
 
     this.changeDetector.detectChanges();
-  }
-
-  createPropertiesList(properties: string[]): FormControl[] {
-    const list: FormControl[] = [];
-    properties.forEach(
-      (property: string) => {
-        list.push(this.createPropertyControl(property));
-      }
-    );
-    return list;
-  }
-
-  createPropertyControl(value: string = ''): FormControl {
-    return this.fb.control(value, Validators.required);
-  }
-
-  createSubtypeControl(value: string = '', properties: FormControl[] = []): FormGroup {
-    return this.fb.group({
-      value: [value, Validators.required],
-      properties: this.fb.array(properties)
-    });
-  }
-
-  createTypeControl(value: string = '', subtypes: FormGroup[] = [], properties: FormControl[] = []): FormGroup {
-    return this.fb.group({
-      value: [value, Validators.required],
-      subtypes: this.fb.array(subtypes),
-      properties: this.fb.array(properties)
-    });
-  }
+  }  
 
   submitForm() {
     if (this.editForm.valid) {
-      const list: ITypes = this.editForm.value;
-      this.types.updateTypes(list);
+      this.typesService.updateTypes(this.editForm.value);
 
       this.editForm.markAsPristine();
     }
@@ -123,24 +82,29 @@ export class AdminComponent implements OnInit {
     return (this.editForm.get('types') as FormArray).controls;
   }
 
-  get propertiesList(): AbstractControl[] {
-    return (this.editForm.get('properties') as FormArray).controls;
-  }
-  
-  typesPropertiesList(type: number): AbstractControl[] {
-    return (this.typesList[type].get('properties') as FormArray).controls;
-  }
-
   subtypesList(type: number): AbstractControl[] {
     return (this.typesList[type].get('subtypes') as FormArray).controls;
   }
 
-  subtypesPropertiesList(type: number, subtype): AbstractControl[] {
-    return (this.subtypesList(type)[subtype].get('properties') as FormArray).controls;
+  get propertiesList(): FormArray {
+    return this.editForm.get('properties') as FormArray;
+  }
+  
+  typesPropertiesList(type: number): FormArray {
+    return this.typesList[type].get('properties') as FormArray;
+  }
+
+  subtypesPropertiesList(type: number, subtype: number): FormArray {
+    return this.subtypesList(type)[subtype].get('properties') as FormArray;
   }
 
   onDeleteTypeClick(id: number): void {
     const types: FormArray = this.editForm.get('types') as FormArray;
+    
+    this.typesService.deleteTypeCacheById(
+      types.value[id].id
+    );
+
     types.removeAt(id);
 
     this.editForm.markAsDirty();
@@ -149,14 +113,25 @@ export class AdminComponent implements OnInit {
   onAddTypeClick(): void {
     const types: FormArray = this.editForm.get('types') as FormArray;
     types.push(
-     this.createTypeControl()
+      AdminHelper.createTypeControl(this.getNewTypeId())
     );
 
     this.editForm.markAsDirty();
   }
 
   onDeleteSubtypeClick(type: number, id: number): void {
+    const types: FormArray = this.editForm.get('types') as FormArray;
     const subtypes: FormArray = this.typesList[type].get('subtypes') as FormArray;
+    
+    this.typesService.deleteTypeCacheById(
+      types.value[type].id
+    );
+
+    this.typesService.deleteSubtypeCacheById(
+      types.value[type].id, 
+      subtypes.value[id].id
+    );
+
     subtypes.removeAt(id);
 
     this.editForm.markAsDirty();
@@ -165,59 +140,23 @@ export class AdminComponent implements OnInit {
   onAddSubtypeClick(type: number): void {
     const subtypes: FormArray = this.typesList[type].get('subtypes') as FormArray;
     subtypes.push(
-      this.createSubtypeControl()
+      AdminHelper.createSubtypeControl(this.getNewSubtypeId(type))
     );
 
     this.editForm.markAsDirty();
   }
 
-  onDeleteSubtypePropertyClick(type: number, subtype: number, id: number): void {
-    const properties: FormArray = this.subtypesList(type)[subtype].get('properties') as FormArray;
-    properties.removeAt(id);
+  getNewTypeId(): number {
+    const id: number = this.editForm.value.maxTypeId;
+    this.editForm.get('maxTypeId').setValue(id + 1);
 
-    this.editForm.markAsDirty();
+    return id;
   }
 
-  onAddSubtypePropertyClick(type: number, subtype: number): void {
-    const properties: FormArray = this.subtypesList(type)[subtype].get('properties') as FormArray;
-    properties.push(
-      this.createPropertyControl()
-    );
-
-    this.editForm.markAsDirty();
-  }
-
-  onDeleteTypePropertyClick(type: number, id: number): void {
-    const properties: FormArray = this.typesList[type].get('properties') as FormArray;
-    properties.removeAt(id);
-
-    this.editForm.markAsDirty();
-  }
-
-  onAddTypePropertyClick(type: number): void {
-    const properties: FormArray = this.typesList[type].get('properties') as FormArray;
-    properties.push(
-      this.createPropertyControl()
-    );
-
-    this.editForm.markAsDirty();
-  }
-
-  onDeletePropertyClick(id: number): void {
-    const properties: FormArray = this.editForm.get('properties') as FormArray;
-    properties.removeAt(id);
-
-    this.editForm.markAsDirty();
-  }
-
-  onAddPropertyClick(): void {
-    const properties: FormArray = this.editForm.get('properties') as FormArray;
-    
-    properties.push(
-      this.createPropertyControl()
-    );
-
-    this.editForm.markAsDirty();
+  getNewSubtypeId(type: number): number {
+    const id: number = this.editForm.value.types[type].maxSubtypeId;
+    this.editForm.get(['types', type, 'maxSubtypeId']).setValue(id + 1);
+    return id;
   }
 
 }

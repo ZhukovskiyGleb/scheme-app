@@ -1,18 +1,23 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { FireDbService } from '../fire-db/fire-db.service';
 import { Observable, of, from } from 'rxjs';
 import { PartModel } from '../../models/part-model';
 import { map } from 'rxjs/operators';
 import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
+import { CurrentUserService } from '../currentUser/current-user.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PartsService {
+
+  newPartAddedEvent = new EventEmitter<number>();
+
   private partsCollection: PartModel[];
   private partsCount: number;
 
-  constructor(public fireDB: FireDbService) { }
+  constructor(public fireDB: FireDbService,
+              private currentUser: CurrentUserService) { }
 
   get totalParts(): Observable<number> {
     if (this.partsCount)
@@ -69,8 +74,11 @@ export class PartsService {
     return this.fireDB.getPartById(id);
   }
 
+  createPartModel(): Observable<PartModel> {
+    return of(new PartModel({}));
+  }
+
   updatePartById(part: PartModel, id: number): void {
-    console.log(part);
     const index = this.partsCollection.findIndex(value => value.id === id);
     if (index) {
       this.partsCollection[index] = part;
@@ -80,12 +88,17 @@ export class PartsService {
   }
 
   addNewPart(part: PartModel): void {
-    this.partsCount += 1;
-
     const id = this.partsCount;
 
-    this.fireDB.setPartById({...part, id: id}, id);
+    this.partsCount += 1;
+
+    part.owner = this.currentUser.uid;
+    part.id = id;
+
+    this.fireDB.setPartById(part, id);
 
     this.fireDB.updatePartsCount(this.partsCount);
+
+    this.newPartAddedEvent.emit(this.partsCount);
   }
 }

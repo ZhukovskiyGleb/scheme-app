@@ -1,15 +1,15 @@
-<div class="field is-grouped">
+<div [formGroup]="group" class="field is-grouped">
   <div class="control">
-    <label class="label">{{title}}</label>
+    <label class="label" style="margin-top: 5px">{{title}}</label>
   </div>
-  <div class="field" formArrayName="properties" *ngIf="subtypesPropertiesList(i, j)">
-    <div class="field" *ngFor="let property of subtypesPropertiesList(i, j); let k = index"  style="margin-left: 10px">
+  <div class="field" formArrayName="properties" *ngIf="list">
+    <div class="field" *ngFor="let property of list; let i = index"  style="margin-left: 10px">
       <div class="field has-addons">
         <div class="control">
-          <input class="input" type="text" [formControlName]="k" placeholder="Параметр">
+          <input class="input" type="text" [formControlName]="i" placeholder="Параметр">
         </div>
         <div class="control">
-          <a class="button is-danger" (click)="onDeleteSubtypePropertyClick(i, j, k)">
+          <a class="button is-danger" (click)="onDeleteClick(i)">
             X
           </a>
         </div>
@@ -17,7 +17,7 @@
     </div>
   </div>
   <div class="control" style="margin-left: 20px">
-    <a class="button is-warning" (click)="onAddSubtypePropertyClick(i, j)">
+    <a class="button is-warning" (click)="onAddClick()">
       +
     </a>
   </div>

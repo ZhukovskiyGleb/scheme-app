@@ -4,13 +4,15 @@ import { NamePipe } from './pipes/name.pipe';
 import { PaginationComponent } from './components/pagination/pagination.component';
 import { RightClickDirective } from './directives/right-click.directive';
 import { StringCutterPipe } from './pipes/string-cutter.pipe';
+import { LoadingModalComponent } from './modal/loading-modal/loading-modal.component';
 
 @NgModule({
   declarations: [
     NamePipe,
     PaginationComponent,
     RightClickDirective,
-    StringCutterPipe
+    StringCutterPipe,
+    LoadingModalComponent
   ],
   imports: [
     CommonModule
@@ -19,7 +21,8 @@ import { StringCutterPipe } from './pipes/string-cutter.pipe';
     NamePipe,
     PaginationComponent,
     RightClickDirective,
-    StringCutterPipe
+    StringCutterPipe,
+    LoadingModalComponent
   ]
 })
 export class SharedModule { }
