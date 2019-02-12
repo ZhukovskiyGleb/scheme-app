@@ -1,9 +1,9 @@
-import { Component, ViewChild, AfterContentInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, AfterContentInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@angular/core';
 import { PaginationComponent } from 'src/app/shared/components/pagination/pagination.component';
 import { Subscription } from 'rxjs';
 import { PartModel } from 'src/app/core/models/part-model';
 import { PartsService } from 'src/app/core/services/parts/parts.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 import { TypesService, IType } from 'src/app/core/services/types/types.service';
 
@@ -21,9 +21,12 @@ export class PartsListComponent implements AfterContentInit {
   private totalPageSubscription: Subscription;
   private collectionSubscription: Subscription;
   private newPartSubscription: Subscription;
+  private routeSubscription: Subscription;
+  private searchSubscription: Subscription;
   
-  public partsCollection: PartModel[];
-  public isBusy: boolean = true;
+  partsCollection: PartModel[];
+  isBusy: boolean = true;
+  inSearchMode: boolean = false;
 
   @ViewChild(PaginationComponent) pagination: PaginationComponent;
 
@@ -49,6 +52,9 @@ export class PartsListComponent implements AfterContentInit {
         this.updatePagination(partsCount);
       }
     );
+
+    this.searchSubscription = this.partsService.searchPartEvent
+    .subscribe(this.searchPartByTitle.bind(this));
   }
 
   updatePagination(partsCount: number): void {    
@@ -59,6 +65,7 @@ export class PartsListComponent implements AfterContentInit {
   updatePartCollection(currentPage: number):void {
     this.currentPage = currentPage;
     this.isBusy = true;
+    this.inSearchMode = false;
     const start = (currentPage - 1) * this.partsPerPage;
     
     if (this.collectionSubscription) {
@@ -66,6 +73,31 @@ export class PartsListComponent implements AfterContentInit {
     }
 
     this.collectionSubscription = this.partsService.loadPartsCollection(start, start + this.partsPerPage)
+    .subscribe(
+      (result: PartModel[]) => {
+        this.partsCollection = result;
+        this.isBusy = false;
+
+        this.changeDetector.detectChanges();
+      }
+    );
+  }
+
+  searchPartByTitle(search: string):void {
+    if (!search || search.length == 0) {
+      this.updatePartCollection(this.currentPage);
+      return;
+    }
+
+    this.currentPage = 1;
+    this.isBusy = true;
+    this.inSearchMode = true;
+    
+    if (this.collectionSubscription) {
+      this.collectionSubscription.unsubscribe();
+    }
+
+    this.collectionSubscription = this.partsService.searchpartsByTitle(search, this.partsPerPage)
     .subscribe(
       (result: PartModel[]) => {
         this.partsCollection = result;
@@ -90,6 +122,10 @@ export class PartsListComponent implements AfterContentInit {
 
   onAddPartClick() {
     this.navigation.navigate(['parts', 'new'])
+  }
+
+  onCancelSearchClick() {
+    this.updatePartCollection(this.currentPage);
   }
 
 }

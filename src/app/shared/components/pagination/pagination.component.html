@@ -1,4 +1,4 @@
-<nav class="pagination is-centered" role="navigation" aria-label="pagination" (click)="onPageClick($event)">
+<nav class="pagination is-centered" role="navigation" aria-label="pagination" (click)="onPageClick($event)" *ngIf="isVisible">
   <button class="pagination-previous" label="prev" title="Предыдущая страница" [disabled]="!prevButtonAvailable()">Предыдущая</button>
   <button class="pagination-next" label="next" title="Следущая страница" [disabled]="!nextButtonAvailable()">Следующая</button>
   <ul class="pagination-list">

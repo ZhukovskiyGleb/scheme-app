@@ -70,11 +70,10 @@ export class FireDbService{
           query.forEach(
             (doc: QueryDocumentSnapshot<any>) => {
             result.push(PartModel.create(doc.data()));
-
-            // this.db.collection('parts').doc(doc.data().id.toString()).set(
-            //   {...doc.data(),
-            //   owner: this.uid}
-            //   );
+            // this.db.collection('parts').doc(doc.id).set({
+            //   ...doc.data(),
+            //   search: this.generateSerchWords(doc.data().title)
+            // });
           });
           return result;
         }
@@ -82,6 +81,30 @@ export class FireDbService{
       .catch (
         (error) => {
           console.log('FireDbService -> getPartsCollection ->', error);
+          return null;
+        }
+      )
+    );
+  }
+
+  searchPartsByTitle(search: string, limit: number): Observable<PartModel[]> {
+    const searchWord: string = search.toLowerCase();
+    return from(
+      // this.db.collection('parts').orderBy('title').startAt(searchWord).endAt(searchWord + "\uf8ff").limit(10).get()
+      this.db.collection('parts').where('search', 'array-contains', searchWord).limit(limit).get()
+      .then(
+        (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
+          let result: PartModel[] = [];
+          query.forEach(
+            (doc: QueryDocumentSnapshot<any>) => {
+            result.push(PartModel.create(doc.data()));
+          });
+          return result;
+        }
+      )
+      .catch (
+        (error) => {
+          console.log('FireDbService -> searchPartsByTitle ->', error);
           return null;
         }
       )
@@ -112,12 +135,41 @@ export class FireDbService{
 
   setPartById(part: PartModel, id: number): void {
     this.db.collection('parts').doc(id.toString()).set(
-      {...part},
+      {
+        ...part,
+        search: this.generateSerchWords(part.title)
+      },
       {merge: true}
     );
   }
 
   updateTypes(types: ITypesList): void {
     this.db.collection('system').doc('types').set({...types});
+  }
+
+  generateSerchWords(title: string): string[] {
+    let mainWord:string = title.toLowerCase();
+    const result: string[] = [];
+    result.push(mainWord);
+
+    let split: string[] = mainWord.split(/-| |\(|\)|_|\\|\//);
+    if (split.length > 1) {
+      split.forEach(
+        value => {
+          if(value.length > 0) result.push(value);
+        }
+      )
+      mainWord = split.join('');
+      result.push(mainWord);
+    }
+
+    let i: number;
+    const max: number = Math.min(mainWord.length, 11 - result.length);
+    for (i = 1; i < max; i++) {
+      result.push(mainWord.substr(0, i));
+    }
+
+    console.log(result);
+    return result;
   }
 }

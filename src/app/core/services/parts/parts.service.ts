@@ -11,6 +11,7 @@ import { CurrentUserService } from '../currentUser/current-user.service';
 })
 export class PartsService {
 
+  searchPartEvent = new EventEmitter<string>();
   newPartAddedEvent = new EventEmitter<number>();
 
   private partsCollection: PartModel[];
@@ -54,6 +55,22 @@ export class PartsService {
     }
     
     return this.fireDB.getPartsCollection(start, end)
+    .pipe(
+      map(
+        (result: PartModel[]) => {
+          this.partsCollection = result;
+          return result;
+        }
+      )
+    );
+  }
+
+  searchpartsByTitle(title: string, limit: number): Observable<PartModel[]> {
+    if (!title || title.length == 0) {
+      return of(null);
+    }
+
+    return this.fireDB.searchPartsByTitle(title, limit)
     .pipe(
       map(
         (result: PartModel[]) => {

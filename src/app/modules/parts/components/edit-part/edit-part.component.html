@@ -40,6 +40,7 @@
           </div>
         </div>
       </div>
+      <p class="help is-warning" *ngIf="editForm.hasError('dropdown', ['type'])">Выберите тип</p>
       <div class="field" formArrayName="properties" *ngIf="(propertiesList != null && propertiesList.length > 0 ) || isEditMode" style="margin-top: 10px">
         <label class="label">Параметры</label>
         <div class="field has-addons" *ngFor="let property of propertiesList; let i = index" [formGroupName]="i">
@@ -61,23 +62,26 @@
           </div>
         </div>
         <a class="button is-warning" (click)="onAddPropertyClick()" *ngIf="isEditMode">
-          Добавить
+          +
         </a>
       </div>
-      <div class="field">
+      <div class="field" *ngIf="isEditMode || editForm.get('description').value">
         <label class="label">Описание</label>
         <div class="control">
-          <textarea class="textarea" type="password" formControlName="description" placeholder="Описание"></textarea>
+          <textarea class="textarea" type="text" formControlName="description" placeholder="Описание"></textarea>
         </div>
       </div>
+
       <div class="field is-grouped">
-        <div class="control">
+        <div class="control is-expanded">
           <button type="submit" class="button is-link" *ngIf="isEditMode" [disabled]="!editForm.dirty || editForm.invalid">Сохранить</button>
+          <button type="button" class="button is-text" *ngIf="isEditMode" (click)="onCancelClick()">Отмена</button>
         </div>
-        <div class="control">
-            <button type="button" class="button is-text" *ngIf="isEditMode" (click)="onCancelClick()">Отмена</button>
-          </div>
+        <div class="control is-right">
+          <button type="button" class="button is-warning" (click)="onCloseClick()">Закрыть</button>
+        </div>
       </div>
+      
     </form>
-    <br>
+    <hr>
   </div>

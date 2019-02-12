@@ -8,6 +8,7 @@ import { Subject } from 'rxjs';
 })
 export class PaginationComponent implements OnInit {
 
+  @Input() isVisible: boolean = true;
   pageEvent = new Subject<number>();
 
   public totalPages: number = 1;

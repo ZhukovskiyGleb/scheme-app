@@ -2,6 +2,9 @@
   <div class="hero-body">
     <div class="container">
       <router-outlet></router-outlet>
+      <div class="buttons is-centered" *ngIf="inSearchMode">
+        <button type="button" class="button is-warning" (click)="onCancelSearchClick()">Закрыть поиск</button>
+      </div>
       <table class="table is-striped is-fullwidth">
         <thead>
           <tr>
@@ -20,10 +23,10 @@
           </tr>
         </tbody>
       </table>
-      <div class="field">
+      <div class="buttons is-centered" *ngIf="!inSearchMode">
         <button type="button" class="button is-warning" (click)="onAddPartClick()">Добавить</button>
       </div>
-      <app-pagination></app-pagination>
+      <app-pagination [isVisible]="!inSearchMode"></app-pagination>
     </div>
   </div>
   <app-loading-modal [isActive]="isBusy"></app-loading-modal>

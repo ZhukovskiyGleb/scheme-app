@@ -29,7 +29,7 @@ export class EditPartComponent implements OnInit {
   private subtypeSubscription: Subscription;
   
   constructor(private fb: FormBuilder,
-              private router: ActivatedRoute,
+              private route: ActivatedRoute,
               private navigation: Router,
               private partsService: PartsService,
               private currentuser: CurrentUserService,
@@ -39,7 +39,7 @@ export class EditPartComponent implements OnInit {
   ngOnInit() {
     this.initForm();
     
-    this.routeSubscription = this.router.params
+    this.routeSubscription = this.route.params
     .pipe(
       switchMap(
         (params: Params) => {
@@ -142,6 +142,7 @@ export class EditPartComponent implements OnInit {
       this.editForm.enable();
     }
     else {
+      this.isEditMode = false;
       this.editForm.disable();
     }
   }
@@ -198,14 +199,19 @@ export class EditPartComponent implements OnInit {
 
   onCancelClick() {
     if (this.isNew) {
-      this.isNew = false;
-      this.navigation.navigate(['/parts']);
+      this.onCloseClick();
+      return;
     }
 
     this.isEditMode = false;
     this.editForm.disable();
 
     this.initForm();
+  }
+
+  onCloseClick() {
+    this.isNew = false;
+    this.navigation.navigate(['/parts']);
   }
 
   get propertiesList(): AbstractControl[] {
