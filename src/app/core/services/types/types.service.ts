@@ -5,13 +5,13 @@ import { map } from 'rxjs/operators';
 import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 
-export class ISubtype {
+export interface ISubtype {
   id: number;
   value: string;
   properties: string[];
 }
 
-export class IType {
+export interface IType {
   id: number;
   value: string; 
   maxSubtypeId: number;
