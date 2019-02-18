@@ -5,7 +5,7 @@ import { UserModel } from 'src/app/core/models/user-model';
 import { PartModel } from '../../models/part-model';
 import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { ITypesList } from '../types/types.service';
-import { StorageModel, IBoxStorage } from '../../models/storage-model';
+import { IBoxStorage, StorageModel } from '../../models/storage-model';
 
 @Injectable({
   providedIn: 'root'
@@ -174,6 +174,7 @@ export class FireDbService{
   }
 
   getStorage(uid: string): Observable<StorageModel> {
+    console.log(uid);
     return from(
       this.db.collection('storage').doc(uid).get()
       .then(
