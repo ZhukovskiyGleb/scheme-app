@@ -2,20 +2,28 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { FireDbService } from '../fire-db/fire-db.service';
 import { Observable, of, from } from 'rxjs';
 import { PartModel } from '../../models/part-model';
-import { map } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { CurrentUserService } from '../currentUser/current-user.service';
+
+export interface IPartShortInfo {
+  title: string,
+  description: string
+}
+
+interface InfoCache {
+  [key: number]: IPartShortInfo;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class PartsService {
-
-  searchPartEvent = new EventEmitter<string>();
   newPartAddedEvent = new EventEmitter<number>();
 
   private partsCollection: PartModel[];
   private partsCount: number;
+  private infoCache: InfoCache = {};
 
   constructor(public fireDB: FireDbService,
               private currentUser: CurrentUserService) { }
@@ -65,7 +73,7 @@ export class PartsService {
     );
   }
 
-  searchpartsByTitle(title: string, limit: number): Observable<PartModel[]> {
+  searchPartsByTitle(title: string, limit: number): Observable<PartModel[]> {
     if (!title || title.length == 0) {
       return of(null);
     }
@@ -88,7 +96,48 @@ export class PartsService {
     if (part) {
       return of(part);
     }
-    return this.fireDB.getPartById(id);
+    return this.fireDB.getPartById(id)
+    .pipe(
+      tap(
+        (part: PartModel) => {
+          if (!this.partsCollection) {
+            this.partsCollection = [];
+          }
+          this.partsCollection.push(part);
+        }
+      )
+    );
+  }
+
+  updateCacheForId(part:PartModel, id: number): void {
+    this.infoCache[id] = {
+      title: part.title,
+      description: part.description
+    };
+  }
+
+  getShortInfoById(id: number): Observable<IPartShortInfo> {
+    if (this.infoCache[id]) {
+      return of(this.infoCache[id]);
+    }
+
+    const part: PartModel = this.partsCollection ?
+      this.partsCollection.find((value: PartModel) => value.id === id) :
+      null;
+    if (part) {
+      this.updateCacheForId(part, id);
+      return of(this.infoCache[id]);
+    }
+
+    return this.fireDB.getPartById(id)
+    .pipe(
+      switchMap(
+        (part: PartModel) => {
+          this.updateCacheForId(part, id);
+          return of(this.infoCache[id]);
+        }
+      )
+    );
   }
 
   createPartModel(): Observable<PartModel> {
@@ -101,6 +150,8 @@ export class PartsService {
       this.partsCollection[index] = part;
     }
     
+    this.updateCacheForId(part, id);
+
     this.fireDB.setPartById(part, id);
   }
 

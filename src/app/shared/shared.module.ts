@@ -5,24 +5,29 @@ import { PaginationComponent } from './components/pagination/pagination.componen
 import { RightClickDirective } from './directives/right-click.directive';
 import { StringCutterPipe } from './pipes/string-cutter.pipe';
 import { LoadingModalComponent } from './modal/loading-modal/loading-modal.component';
+import { SearchComponent } from './components/search/search.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
     NamePipe,
     PaginationComponent,
+    SearchComponent,
+    LoadingModalComponent,
     RightClickDirective,
-    StringCutterPipe,
-    LoadingModalComponent
+    StringCutterPipe
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    ReactiveFormsModule
   ],
   exports: [
     NamePipe,
     PaginationComponent,
+    SearchComponent,
+    LoadingModalComponent,
     RightClickDirective,
-    StringCutterPipe,
-    LoadingModalComponent
+    StringCutterPipe
   ]
 })
 export class SharedModule { }

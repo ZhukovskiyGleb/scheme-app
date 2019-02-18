@@ -40,7 +40,7 @@
           </div>
         </div>
       </div>
-      <p class="help is-warning" *ngIf="editForm.hasError('dropdown', ['type'])">Выберите тип</p>
+      <p class="help is-warning" *ngIf="editForm && editForm.hasError('dropdown', ['type'])">Выберите тип</p>
       <div class="field" formArrayName="properties" *ngIf="(propertiesList != null && propertiesList.length > 0 ) || isEditMode" style="margin-top: 10px">
         <label class="label">Параметры</label>
         <div class="field has-addons" *ngFor="let property of propertiesList; let i = index" [formGroupName]="i">

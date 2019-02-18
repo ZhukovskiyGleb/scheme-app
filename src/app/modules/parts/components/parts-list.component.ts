@@ -6,6 +6,7 @@ import { PartsService } from 'src/app/core/services/parts/parts.service';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 import { TypesService, IType } from 'src/app/core/services/types/types.service';
+import { SearchService } from 'src/app/core/services/search/search.service';
 
 @Component({
   selector: 'app-parts-list',
@@ -16,12 +17,10 @@ import { TypesService, IType } from 'src/app/core/services/types/types.service';
 @AutoUnsubscribe
 export class PartsListComponent implements AfterContentInit {
   readonly partsPerPage = 10;
-  currentPage: number;
   private paginationSubscription: Subscription;
   private totalPageSubscription: Subscription;
   private collectionSubscription: Subscription;
   private newPartSubscription: Subscription;
-  private routeSubscription: Subscription;
   private searchSubscription: Subscription;
   
   partsCollection: PartModel[];
@@ -33,7 +32,9 @@ export class PartsListComponent implements AfterContentInit {
   constructor(private partsService: PartsService,
               private navigation: Router,
               private typesService: TypesService,
-              private changeDetector: ChangeDetectorRef) { }
+              private changeDetector: ChangeDetectorRef,
+              private search: SearchService,
+              private route: ActivatedRoute) { }
 
   ngAfterContentInit() {
     this.paginationSubscription = this.pagination.pageEvent
@@ -53,7 +54,7 @@ export class PartsListComponent implements AfterContentInit {
       }
     );
 
-    this.searchSubscription = this.partsService.searchPartEvent
+    this.searchSubscription = this.search.searchPartEvent
     .subscribe(this.searchPartByTitle.bind(this));
   }
 
@@ -63,7 +64,6 @@ export class PartsListComponent implements AfterContentInit {
   }
 
   updatePartCollection(currentPage: number):void {
-    this.currentPage = currentPage;
     this.isBusy = true;
     this.inSearchMode = false;
     const start = (currentPage - 1) * this.partsPerPage;
@@ -71,7 +71,7 @@ export class PartsListComponent implements AfterContentInit {
     if (this.collectionSubscription) {
       this.collectionSubscription.unsubscribe();
     }
-
+    
     this.collectionSubscription = this.partsService.loadPartsCollection(start, start + this.partsPerPage)
     .subscribe(
       (result: PartModel[]) => {
@@ -85,11 +85,11 @@ export class PartsListComponent implements AfterContentInit {
 
   searchPartByTitle(search: string):void {
     if (!search || search.length == 0) {
-      this.updatePartCollection(this.currentPage);
+      this.updatePartCollection(this.pagination.currentPage);
       return;
     }
 
-    this.currentPage = 1;
+    this.pagination.currentPage = 1;
     this.isBusy = true;
     this.inSearchMode = true;
     
@@ -97,7 +97,7 @@ export class PartsListComponent implements AfterContentInit {
       this.collectionSubscription.unsubscribe();
     }
 
-    this.collectionSubscription = this.partsService.searchpartsByTitle(search, this.partsPerPage)
+    this.collectionSubscription = this.partsService.searchPartsByTitle(search, this.partsPerPage)
     .subscribe(
       (result: PartModel[]) => {
         this.partsCollection = result;
@@ -125,7 +125,7 @@ export class PartsListComponent implements AfterContentInit {
   }
 
   onCancelSearchClick() {
-    this.updatePartCollection(this.currentPage);
+    this.updatePartCollection(this.pagination.currentPage);
   }
 
 }

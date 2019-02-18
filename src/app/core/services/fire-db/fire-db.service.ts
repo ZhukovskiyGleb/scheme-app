@@ -5,6 +5,8 @@ import { UserModel } from 'src/app/core/models/user-model';
 import { PartModel } from '../../models/part-model';
 import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { ITypesList } from '../types/types.service';
+import { StorageModel, IBoxStorage } from '../../models/storage-model';
+import { forEach } from '@angular/router/src/utils/collection';
 
 @Injectable({
   providedIn: 'root'
@@ -169,7 +171,36 @@ export class FireDbService{
       result.push(mainWord.substr(0, i));
     }
 
-    console.log(result);
     return result;
+  }
+
+  getStorage(uid: string): Observable<StorageModel> {
+    return from(
+      this.db.collection('storage').doc(uid).get()
+      .then(
+        (doc: QueryDocumentSnapshot<any>) => {
+          let result: StorageModel = new StorageModel();
+          if (doc.exists)
+          {
+            const storage: IBoxStorage[] = doc.data().storage;
+            storage.forEach(
+              (box: IBoxStorage) => {
+                result.addBox(box);
+              }
+            );
+          }
+          return result;
+        }
+      ).catch((error) => {
+        console.log('FireDbService -> getStorage ->', error);
+        return null;
+      })
+    );
+  }
+
+  setStorage(storage: StorageModel, uid: string): void {
+    this.db.collection('storage').doc(uid).set(
+      {...storage}
+    );
   }
 }

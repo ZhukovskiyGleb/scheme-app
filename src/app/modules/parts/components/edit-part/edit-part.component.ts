@@ -8,8 +8,8 @@ import { CurrentUserService } from 'src/app/core/services/currentUser/current-us
 import { switchMap, filter, tap, combineLatest } from 'rxjs/operators';
 import { TypesService, ITypesList, IType, ISubtype } from 'src/app/core/services/types/types.service';
 import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import { PartsValidators } from '../../shared/parts-validators';
 import { isNumber } from 'util';
+import { PartsValidators } from 'src/app/modules/parts/shared/parts-validators';
 
 @Component({
   selector: 'app-edit-part',
@@ -59,7 +59,7 @@ export class EditPartComponent implements OnInit {
             return true;
           }
           else {
-            this.navigation.navigate(['/parts']);
+            this.navigation.navigate(['../'], {relativeTo: this.route});
           }
         }
       ),
@@ -184,7 +184,7 @@ export class EditPartComponent implements OnInit {
       if (this.isNew) {
         this.isNew = false;
         this.partsService.addNewPart(this.selectedPart);
-        this.navigation.navigate(['/parts', this.selectedPart.id]);
+        this.navigation.navigate(['../', this.selectedPart.id], {relativeTo: this.route});
       }
       else {
         this.partsService.updatePartById(this.selectedPart, this.selectedPart.id);
@@ -211,7 +211,7 @@ export class EditPartComponent implements OnInit {
 
   onCloseClick() {
     this.isNew = false;
-    this.navigation.navigate(['/parts']);
+    this.navigation.navigate(['../'], {relativeTo: this.route});
   }
 
   get propertiesList(): AbstractControl[] {

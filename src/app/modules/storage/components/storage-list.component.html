@@ -1,3 +1,33 @@
-<p>
-  storage-list works!
-</p>
+<section class="hero is-fullheight-with-navbar is-primary is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <router-outlet></router-outlet>
+      <div class="columns is-gapless is-multiline is-mobile" *ngIf="boxList">
+        <div class="column is-4" *ngFor="let box of boxList">
+          <nav class="panel">
+            <p class="panel-heading" style="cursor: pointer">
+              <strong>{{box.title}}</strong>
+            </p>
+            <a class="panel-block" *ngFor="let case of box.cases; trackBy: trackByCaseId" (click)="onCaseClick($event, case.id)" title="{{getDescriptionById(case.id) | async}}">
+              <!-- <div class="field has-addons">
+                <span class="field is-left is-fullwidth">
+                  {{getTitleById(case.id) | async}}
+                </span>
+                <span class="field is-right" style="margin-left: 10px">
+                  <[x{{case.amount}}]>
+                </span>
+              </div> -->
+              <div class="control">
+                <p class="heading"><strong>{{getTitleById(case.id) | async}}</strong></p>
+                <p class="title">
+                  <input class="input is-small" type="number" [value]="case.amount" (change)="onCaseChanged(case, input.value)" #input>
+                </p>
+              </div>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+  <app-loading-modal [isActive]="isBusy"></app-loading-modal>
+</section>

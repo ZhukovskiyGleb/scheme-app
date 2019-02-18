@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { from, Observable, of, throwError } from 'rxjs';
+import { from, Observable, of, throwError, Subject } from 'rxjs';
 import { map, tap, switchMap, catchError, take } from 'rxjs/operators';
 import { FireDbService } from '../fire-db/fire-db.service';
 import { CurrentUserService } from '../currentUser/current-user.service';
@@ -27,7 +27,6 @@ export class AuthService {
         .pipe(
           switchMap((token: string) => {
             this.token = token;
-            this.isLogged = true;
             return this.fireDB.createNewUser(uid, name);
           }),
           map(() => {
@@ -37,6 +36,7 @@ export class AuthService {
       }),
       map((uid: string) => {
         this.currentUser.setCurrentUser(new UserModel(uid, name));
+        this.isLogged = true;
         return;
       }),
       catchError(error => {
@@ -55,7 +55,6 @@ export class AuthService {
         .pipe(
           map((token: string) => {
             this.token = token;
-            this.isLogged = true;
             return uid;
           })
         );
@@ -65,6 +64,7 @@ export class AuthService {
       }),
       map( (user: UserModel) => {
         this.currentUser.setCurrentUser(user);
+        this.isLogged = true;
       }),
       catchError((error) => {
         console.log('AuthService -> login -> ', error);
@@ -93,7 +93,6 @@ export class AuthService {
         .pipe(
           map((token: string) => {
             this.token = token;
-            this.isLogged = true;
             return uid;
           })
         );
@@ -103,6 +102,7 @@ export class AuthService {
       }),
       map((user: UserModel) => {
         this.currentUser.setCurrentUser(user);
+        this.isLogged = true;
         return true;
       }),
       catchError((error) => {
@@ -128,9 +128,5 @@ export class AuthService {
         throw error;
       })
     );
-  }
-
-  get isUserLogged(): boolean {
-    return this.isLogged;
   }
 }
