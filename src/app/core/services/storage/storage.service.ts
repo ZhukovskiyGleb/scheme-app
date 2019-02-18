@@ -34,8 +34,6 @@ export class StorageService {
         (storage: StorageModel) => {
           this.storage = storage;
 
-          console.log(storage);
-
           this.storage.addBox(
             {
               title: 'Box 1',

@@ -174,7 +174,6 @@ export class FireDbService{
   }
 
   getStorage(uid: string): Observable<StorageModel> {
-    console.log(uid);
     return from(
       this.db.collection('storage').doc(uid).get()
       .then(

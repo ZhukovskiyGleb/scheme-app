@@ -3,27 +3,32 @@
     <div class="container">
       <router-outlet></router-outlet>
       <div class="columns is-gapless is-multiline is-mobile" *ngIf="boxList">
-        <div class="column is-4" *ngFor="let box of boxList">
+        <div class="column is-4" *ngFor="let box of boxList; index as i">
           <nav class="panel">
             <p class="panel-heading" style="cursor: pointer">
               <strong>{{box.title}}</strong>
             </p>
-            <a class="panel-block" *ngFor="let case of box.cases; trackBy: trackByCaseId" (click)="onCaseClick($event, case.id)" title="{{getDescriptionById(case.id) | async}}">
-              <!-- <div class="field has-addons">
-                <span class="field is-left is-fullwidth">
-                  {{getTitleById(case.id) | async}}
-                </span>
-                <span class="field is-right" style="margin-left: 10px">
-                  <[x{{case.amount}}]>
-                </span>
-              </div> -->
+            <a class="panel-block" *ngFor="let case of box.cases; index as j; trackBy: trackByCaseId" (click)="onCaseClick($event, i, j, case)" title="{{getDescriptionById(case.id) | async}}">
               <div class="control">
-                <p class="heading"><strong>{{getTitleById(case.id) | async}}</strong></p>
-                <p class="title">
-                  <input class="input is-small" type="number" [value]="case.amount" (change)="onCaseChanged(case, input.value)" #input>
+                <p class="heading">
+                  <strong>{{getTitleById(case.id) | async}}</strong>
                 </p>
+                <div class="field is-grouped" *ngIf="selectedCase == case; else notSelected">
+                  <input class="input is-small" type="number" [value]="case.amount" (change)="onCaseChanged(case, input.value)" #input>
+                  <button type="button" class="button is-warning is-small" style="margin-left: 10px">Удалить</button>
+                </div>
+                <ng-template #notSelected>
+                  [x{{case.amount}}]
+                </ng-template>
               </div>
             </a>
+          </nav>
+        </div>
+        <div class="column is-4">
+          <nav class="panel">
+            <p class="panel-heading" style="cursor: pointer">
+              <strong>Добавить хранилище</strong>
+            </p>
           </nav>
         </div>
       </div>

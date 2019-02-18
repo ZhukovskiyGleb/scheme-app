@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
 @AutoUnsubscribe
 export class StorageListComponent implements OnInit, OnDestroy {
   boxList: IBoxStorage[];
+  selectedCase: ICaseStorage;
 
   isBusy: boolean = false;
 
@@ -46,8 +47,6 @@ export class StorageListComponent implements OnInit, OnDestroy {
         (storage:StorageModel) => {
           this.boxList = storage.boxList;
 
-          console.log('init', this.boxList);
-
           this.isBusy = false;
           this.changeDetector.detectChanges();
         }
@@ -57,12 +56,16 @@ export class StorageListComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('click') onMouseClick() {
-    console.log('clicked');
+    this.selectedCase = null;
   }
 
-  onCaseClick(event: Event, id: number) {
+  onCaseClick(event: Event, boxID: number, caseID: number, selected: ICaseStorage) {
     event.preventDefault();
     event.stopImmediatePropagation();
+
+    if (this.selectedCase == selected) return;
+
+    this.selectedCase = selected;
   }
 
   onCaseChanged(item: ICaseStorage, value: number): void {
