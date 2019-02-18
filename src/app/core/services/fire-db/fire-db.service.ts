@@ -5,8 +5,12 @@ import { UserModel } from 'src/app/core/models/user-model';
 import { PartModel } from '../../models/part-model';
 import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
 import { ITypesList } from '../types/types.service';
+<<<<<<< HEAD
 import { StorageModel, IBoxStorage } from '../../models/storage-model';
 import { forEach } from '@angular/router/src/utils/collection';
+=======
+import { IBoxStorage } from '../storage/storage.service';
+>>>>>>> de6bffe5508e7b05fe0521649e1509a8a06f18bf
 
 @Injectable({
   providedIn: 'root'
@@ -174,6 +178,7 @@ export class FireDbService{
     return result;
   }
 
+<<<<<<< HEAD
   getStorage(uid: string): Observable<StorageModel> {
     return from(
       this.db.collection('storage').doc(uid).get()
@@ -193,14 +198,33 @@ export class FireDbService{
         }
       ).catch((error) => {
         console.log('FireDbService -> getStorage ->', error);
+=======
+  getStorage(uid: string): Observable<IBoxStorage[]> {
+    return from(
+      this.db.collection('storage').get()
+      .then(
+        (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
+          let result: IBoxStorage[] = [];
+          query.forEach(
+            (doc: QueryDocumentSnapshot<any>) => {
+            // result.push()PartModel.create(doc.data());
+          });
+          return result;
+        }
+      ).catch((error) => {
+        console.log('FireDbService -> getUserByUid ->', error);
+>>>>>>> de6bffe5508e7b05fe0521649e1509a8a06f18bf
         return null;
       })
     );
   }
+<<<<<<< HEAD
 
   setStorage(storage: StorageModel, uid: string): void {
     this.db.collection('storage').doc(uid).set(
       {...storage}
     );
   }
+=======
+>>>>>>> de6bffe5508e7b05fe0521649e1509a8a06f18bf
 }
