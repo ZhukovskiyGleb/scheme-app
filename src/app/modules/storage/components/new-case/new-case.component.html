@@ -1,0 +1,41 @@
+<div class="modal"
+  [ngClass]="{'is-active': isActive}"
+  *ngIf="selectedCase">
+    <div class="modal-background" [ngStyle]="{opacity: .5}"></div>
+    <div class="modal-content has-text-centered" style="min-width: 200px;">
+      <!-- <nav class="panel"> -->
+      <div class="message is-dark">
+        <div class="message-header">
+          <strong>Новая ячейка</strong>
+        </div>
+        <div class="message-body">
+          <form [formGroup]="caseForm">
+            <div class="field is-grouped">
+              <label class="label">Название</label>
+              <div class="dropdown is-active">
+                <div class="control is-expanded">
+                  <input class="input is-small" type="text" value="" style="margin-left: 5px" placeholder="Поиск" formControlName="title" #newTitle>
+                </div>
+                <div class="dropdown-menu is-small" role="menu" *ngIf="isTitleSelected">
+                  <div class="dropdown-content" *ngIf="searchList && searchList.length > 0">
+                    <a class="dropdown-item" *ngFor="let part of searchList" (click)="onPartSelected(part)">
+                      {{part.title}}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field is-grouped">
+              <label class="label">Количество</label>
+              <input class="input is-small" type="number" [value]="selectedCase.amount" min="0" (change)="onCaseChanged(newAmount.value)" formControlName="amount" #newAmount style="margin-left: 5px">
+            </div>
+          </form>
+          <div class="buttons is-centered">
+            <button class="button is-danger" (click)="onConfirmClick()">Добавить</button>
+            <button class="button" (click)="onCancelClick()">Отмена</button>
+          </div>
+        </div>
+      <!-- </nav> -->
+      </div>
+    </div>
+  </div>

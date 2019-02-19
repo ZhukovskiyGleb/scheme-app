@@ -4,6 +4,7 @@ export interface ICaseStorage {
   }
   
 export interface IBoxStorage {
+    id: number,
     title: string;
     cases: ICaseStorage[];
   }

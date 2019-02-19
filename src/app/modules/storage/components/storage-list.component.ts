@@ -8,6 +8,8 @@ import { CurrentUserService } from 'src/app/core/services/currentUser/current-us
 import { PartsService, IPartShortInfo } from 'src/app/core/services/parts/parts.service';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
+import { SearchService } from 'src/app/core/services/search/search.service';
+import { async } from 'q';
 
 @Component({
   selector: 'app-storage-list',
@@ -18,22 +20,32 @@ import { Router } from '@angular/router';
 @AutoUnsubscribe
 export class StorageListComponent implements OnInit, OnDestroy {
   boxList: IBoxStorage[];
+
+  selectedBox: IBoxStorage;
   selectedCase: ICaseStorage;
 
   isBusy: boolean = false;
+  isWarningVisibility: boolean = false;
+  isAddingNewCaseVisibility: boolean = false;
+  inSearchMode: boolean = false;
 
   private storageSubscription: Subscription;
+  private searchSubscription: Subscription;
 
   constructor(private currentUser: CurrentUserService,
               private navigation: Router,
               private storage: StorageService,
               private partsService: PartsService,
-              private changeDetector: ChangeDetectorRef) { }
+              private changeDetector: ChangeDetectorRef,
+              private search: SearchService) { }
 
   ngOnInit() {
     this.isBusy = true;
 
     this.loadStorage();
+
+    this.searchSubscription = this.search.searchPartEvent
+    .subscribe(this.searchPartByTitle.bind(this));
   }
 
   loadStorage():void {
@@ -55,21 +67,103 @@ export class StorageListComponent implements OnInit, OnDestroy {
     .subscribe();
   }
 
+  onCancelSearchClick(): void {
+    this.inSearchMode = false;
+
+    this.loadStorage();
+  }
+
+  searchPartByTitle(search: string):void {
+    if (!search || search.length <= 0) {
+      this.onCancelSearchClick();
+
+      return;
+    }
+
+    this.isBusy = true;
+
+    if (this.storageSubscription) {
+      this.storageSubscription.unsubscribe();
+    }
+
+    search = search.toLowerCase();
+    this.inSearchMode = true;
+
+    const searchResult: IBoxStorage[] = [];
+    this.storage.cache.forEach(
+      (curBox: IBoxStorage) => {
+        let newBox: IBoxStorage = {
+          id: curBox.id,
+          title: curBox.title,
+          cases: []
+        };
+
+        if (curBox.title.toLowerCase().search(search) >= 0) {
+          newBox.cases = [...curBox.cases];
+        }
+        else {
+          let cases: ICaseStorage[] = curBox.cases;
+          cases.forEach(
+            (curCase: ICaseStorage) => {
+              let info: IPartShortInfo = this.partsService.getCachedInfoById(curCase.id);
+              if (info && info.title.toLowerCase().search(search) >= 0) {
+                newBox.cases.push(curCase);
+              }
+            }
+          );
+        }
+
+        if (newBox.cases.length > 0) {
+          searchResult.push(newBox);
+        }
+      }
+    );
+
+    this.boxList = searchResult;
+
+    this.isBusy = false;
+  }
+
   @HostListener('click') onMouseClick() {
+    this.deselectAll();
+  }
+
+  @HostListener('document:keypress', ['$event']) onKeyDown(event: KeyboardEvent): void {
+    if (event.keyCode === 13 && !this.isAddingNewCaseVisibility) {
+      this.deselectAll();
+    }
+  }
+
+  deselectAll(): void {
     this.selectedCase = null;
+    this.selectedBox = null;
   }
 
-  onCaseClick(event: Event, boxID: number, caseID: number, selected: ICaseStorage) {
-    event.preventDefault();
-    event.stopImmediatePropagation();
+  onBoxClick(curBox: IBoxStorage) {
+    this.onPreventClick();
 
-    if (this.selectedCase == selected) return;
+    if (this.selectedBox == curBox && !this.selectedCase) return;
 
-    this.selectedCase = selected;
+    this.deselectAll();
+    this.selectedBox = curBox;
   }
 
-  onCaseChanged(item: ICaseStorage, value: number): void {
-    item.amount = value;
+  onCaseClick(curBox: IBoxStorage, curCase: ICaseStorage) {
+    this.onPreventClick();
+
+    if (this.selectedCase == curCase) return;
+
+    this.deselectAll();
+    this.selectedBox = curBox;
+    this.selectedCase = curCase;
+  }
+
+  onCaseChanged(value: number): void {
+    this.selectedCase.amount = value >= 0 ? value : this.selectedCase.amount;
+  }
+  
+  onBoxChanged(value: string): void {
+    this.selectedBox.title = value || this.selectedBox.title;
   }
 
   getTitleById(id: number): Observable<string> {
@@ -82,6 +176,31 @@ export class StorageListComponent implements OnInit, OnDestroy {
         }
       )
     );
+  }
+
+  onAddStorageClick(): void {
+    this.onPreventClick();
+
+    const box: IBoxStorage = this.storage.addNewBox();
+
+    this.deselectAll();
+    this.selectedBox = box;
+  }
+
+  onAddCaseClick(box: IBoxStorage): void {
+    this.onPreventClick();
+
+    const newCase: ICaseStorage = {
+      id: -1,
+      amount: 0
+    };
+
+    this.selectedCase = newCase;
+
+    this.isAddingNewCaseVisibility = true;
+    // box.cases.push({
+
+    // });
   }
 
   getDescriptionById(id: number): Observable<string> {
@@ -103,5 +222,61 @@ export class StorageListComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     // console.log('save me!');
     console.log('destroy', this.boxList);
+  }
+
+  onDeleteBoxClick(): void {
+    this.isWarningVisibility = true;
+  }
+
+  onDeleteCaseClick(): void {
+    this.onPreventClick();
+
+    this.isWarningVisibility = true;
+  }
+
+  onDeleteCancelClick = () => {
+    this.isWarningVisibility = false;
+  }
+
+  onDeleteConfirmClick = () => {
+    this.isWarningVisibility = false;
+
+    if (this.selectedCase) {
+      const index = this.selectedBox.cases.indexOf(this.selectedCase);
+
+      if (index != -1) {
+        this.selectedBox.cases.splice(index, 1);
+
+        if (this.inSearchMode) {
+          this.storage.removeCaseFromBoxById(this.selectedBox.id, this.selectedCase);
+        }
+      }
+    }
+    else {
+      const index = this.boxList.indexOf(this.selectedBox);
+
+      if (index != -1) {
+        this.boxList.splice(index, 1);
+
+        if (this.inSearchMode) {
+          this.storage.removeBoxById(this.selectedBox.id);
+        }
+      }
+    }
+
+    this.deselectAll();
+  }
+
+  onPreventClick(): void {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+
+  onAddNewCaseConfirmClicked = () => {
+    this.isAddingNewCaseVisibility = false;
+  }
+
+  onAddNewCaseCancelClicked = () => {
+    this.isAddingNewCaseVisibility = false;
   }
 }

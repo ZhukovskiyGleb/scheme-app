@@ -1,0 +1,18 @@
+<div class="modal"
+  [ngClass]="{'is-active': isActive}">
+    <div class="modal-background" [ngStyle]="{opacity: .5}"></div>
+    <div class="modal-content has-text-centered">
+      <article class="message is-warning">
+        <div class="message-header">
+          <p>Удаление</p>
+        </div>
+        <div class="message-body">
+          Вы уверены, что хотите удалить {{caseSelected ? 'выбранную ячейку' : 'выбранное хранилище'}} ?
+        </div>
+        <div class="buttons is-centered" style="margin: 10px">
+          <button class="button is-danger" (click)="onConfirmClick()">Да</button>
+          <button class="button" (click)="onCancelClick()">Нет</button>
+        </div>
+      </article>
+    </div>
+  </div>

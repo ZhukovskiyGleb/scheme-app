@@ -116,6 +116,13 @@ export class PartsService {
     };
   }
 
+  getCachedInfoById(id: number): IPartShortInfo {
+    if (this.infoCache[id]) {
+      return this.infoCache[id];
+    }
+    return null;
+  }
+
   getShortInfoById(id: number): Observable<IPartShortInfo> {
     if (this.infoCache[id]) {
       return of(this.infoCache[id]);
