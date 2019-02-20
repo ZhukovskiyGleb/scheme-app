@@ -96,7 +96,7 @@ export class EditPartComponent implements OnInit {
 
   clear(): void {
     console.log('cleared');
-    this.disableForm();
+    // this.disableForm();
     this.isNew = false;
     this.selectedPart = null;
   }
@@ -134,7 +134,7 @@ export class EditPartComponent implements OnInit {
       description: [description],
       properties: properties
     });
-    console.log('form inited');
+
     if (!this.isReady) return;
 
     if (this.typeSubscription) {
@@ -171,7 +171,6 @@ export class EditPartComponent implements OnInit {
     console.log('disabled');
     this.isEditMode = false;
     this.editForm.disable();
-    this.editForm.get('title').disable();
 
     this.changeDetector.markForCheck();
   }
@@ -180,7 +179,8 @@ export class EditPartComponent implements OnInit {
     console.log('enabled');
     this.isEditMode = true;
     this.editForm.enable();
-    this.editForm.get('title').enable();
+
+    console.log(document.getElementsByClassName('input'));
 
     this.changeDetector.markForCheck();
   }
