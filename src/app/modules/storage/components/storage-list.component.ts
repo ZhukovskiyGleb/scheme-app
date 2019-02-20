@@ -1,15 +1,13 @@
-import { Component, OnInit, ChangeDetectorRef, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
-import { StorageService } from 'src/app/core/services/storage/storage.service';
-import { Observable, Subscription, of } from 'rxjs';
-import { IBoxStorage, StorageModel, ICaseStorage } from 'src/app/core/models/storage-model';
-import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import { filter, switchMap, tap, map } from 'rxjs/operators';
-import { CurrentUserService } from 'src/app/core/services/currentUser/current-user.service';
-import { PartsService, IPartShortInfo } from 'src/app/core/services/parts/parts.service';
-import { ChangeDetectionStrategy } from '@angular/core';
-import { Router } from '@angular/router';
-import { SearchService } from 'src/app/core/services/search/search.service';
-import { async } from 'q';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {StorageService} from 'src/app/core/services/storage/storage.service';
+import {Observable, Subscription} from 'rxjs';
+import {IBoxStorage, ICaseStorage, StorageModel} from 'src/app/core/models/storage-model';
+import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import {map, tap} from 'rxjs/operators';
+import {CurrentUserService} from 'src/app/core/services/currentUser/current-user.service';
+import {IPartShortInfo, PartsService} from 'src/app/core/services/parts/parts.service';
+import {Router} from '@angular/router';
+import {SearchService} from 'src/app/core/services/search/search.service';
 
 @Component({
   selector: 'app-storage-list',
@@ -40,20 +38,20 @@ export class StorageListComponent implements OnInit, OnDestroy {
               private search: SearchService) { }
 
   ngOnInit() {
-    this.isBusy = true;
-
     this.loadStorage();
 
     this.searchSubscription = this.search.searchPartEvent
     .subscribe(this.searchPartByTitle.bind(this));
   }
 
-  loadStorage():void {
+  loadStorage(refresh: boolean = false):void {
+    this.isBusy = true;
+
     if (this.storageSubscription) {
       this.storageSubscription.unsubscribe();
     }
 
-    this.storageSubscription = this.storage.loadStorage()
+    this.storageSubscription = this.storage.loadStorage(refresh)
     .pipe(
       tap(
         (storage:StorageModel) => {
@@ -129,9 +127,24 @@ export class StorageListComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('document:keypress', ['$event']) onKeyDown(event: KeyboardEvent): void {
-    if (event.keyCode === 13 && !this.isAddingNewCaseVisibility) {
-      this.deselectAll();
+    if (!this.isAddingNewCaseVisibility && !this.isWarningVisibility) {
+      if (event.code === 'Enter') {
+        const value: string = (document.activeElement as HTMLInputElement).value;
+        if(value) {
+          if (this.selectedCase) {
+            this.onCaseChanged(+value);
+          }
+          else if (this.selectedBox) {
+            this.onBoxChanged(value);
+          }
+        }
+        this.deselectAll();
+      }
     }
+  }
+
+  @HostListener('window:beforeunload') beforeUnload() {
+    this.saveStorage();
   }
 
   deselectAll(): void {
@@ -159,11 +172,17 @@ export class StorageListComponent implements OnInit, OnDestroy {
   }
 
   onCaseChanged(value: number): void {
-    this.selectedCase.amount = value >= 0 ? value : this.selectedCase.amount;
+    if (this.selectedCase) {
+      this.selectedCase.amount = value >= 0 ? value : this.selectedCase.amount;
+      this.storage.markAsChanged();
+    }
   }
   
   onBoxChanged(value: string): void {
-    this.selectedBox.title = value || this.selectedBox.title;
+    if (this.selectedBox) {
+      this.selectedBox.title = value || this.selectedBox.title;
+      this.storage.markAsChanged();
+    }
   }
 
   getTitleById(id: number): Observable<string> {
@@ -185,9 +204,11 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
     this.deselectAll();
     this.selectedBox = box;
+
+    this.storage.markAsChanged();
   }
 
-  onAddCaseClick(box: IBoxStorage): void {
+  onAddCaseClick(): void {
     this.onPreventClick();
 
     const newCase: ICaseStorage = {
@@ -198,9 +219,6 @@ export class StorageListComponent implements OnInit, OnDestroy {
     this.selectedCase = newCase;
 
     this.isAddingNewCaseVisibility = true;
-    // box.cases.push({
-
-    // });
   }
 
   getDescriptionById(id: number): Observable<string> {
@@ -220,8 +238,13 @@ export class StorageListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // console.log('save me!');
-    console.log('destroy', this.boxList);
+    if (this.storage.hasChanges()) {
+      this.saveStorage();
+    }
+  }
+
+  saveStorage(): void {
+    this.storage.saveStorage();
   }
 
   onDeleteBoxClick(): void {
@@ -265,6 +288,8 @@ export class StorageListComponent implements OnInit, OnDestroy {
     }
 
     this.deselectAll();
+
+    this.storage.markAsChanged();
   }
 
   onPreventClick(): void {
@@ -274,9 +299,19 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
   onAddNewCaseConfirmClicked = () => {
     this.isAddingNewCaseVisibility = false;
+
+    this.selectedBox.cases.push(this.selectedCase);
+
+    this.storage.markAsChanged();
   }
 
   onAddNewCaseCancelClicked = () => {
     this.isAddingNewCaseVisibility = false;
+
+    this.selectedCase = null;
+  }
+
+  hasChanges(): boolean {
+    return this.storage.hasChanges()
   }
 }

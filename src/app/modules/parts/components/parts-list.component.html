@@ -15,7 +15,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let part of partsCollection; let i = index" appRightClick (click)="onTableClick(part.id)" style="cursor: pointer">
+          <tr *ngFor="let part of partsCollection" appRightClick (click)="onTableClick(part.id)" style="cursor: pointer">
             <th>{{part.id + 1}}</th>
             <td>{{part.title}}</td>
             <td>{{getTypeValue(part.type)}}</td>

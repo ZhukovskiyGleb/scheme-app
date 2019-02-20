@@ -1,10 +1,10 @@
 <div class="container">
-    <form [formGroup]="editForm" (ngSubmit)="submitForm()">
+    <form [formGroup]="editForm" (ngSubmit)="submitForm()" *ngIf="isReady">
       <div class="is-grouped">
         <label class="label">Название</label>
         <div class="field has-addons">
           <div class="control is-expanded">
-            <input class="input" type="text" formControlName="title" placeholder="Название">
+            <input class="input" type="text" formControlName="title" placeholder="Название" [readOnly]="!isEditMode">
           </div>
           <div class="control" *ngIf="isEditAvailable()">
             <a class="button is-info" (click)="onEditClick()">

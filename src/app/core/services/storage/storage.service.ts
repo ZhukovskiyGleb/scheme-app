@@ -17,11 +17,15 @@ export class StorageService {
 
   private maxBoxId: number;
 
+  private isChanged: boolean = false;
+
   constructor(private fireDB: FireDbService,
               private currentUser: CurrentUserService) { }
 
-  loadStorage(): Observable<StorageModel> {
-    if (this.storage) {
+  loadStorage(refresh: boolean): Observable<StorageModel> {
+    this.isChanged = false;
+
+    if (this.storage && !refresh) {
       return of(this.storage);
     }
 
@@ -38,54 +42,6 @@ export class StorageService {
       map(
         (storage: StorageModel) => {
           this.storage = storage;
-
-          this.storage.addBox(
-            {
-              id: 0,
-              title: 'Box 1',
-              cases: [
-                {id: 0, amount: 5},
-                {id: 1, amount: 3}
-              ]
-            }
-          );
-
-          this.storage.addBox(
-            {
-              id: 1,
-              title: 'Box 2',
-              cases: [
-                {id: 3, amount: 5},
-                {id: 6, amount: 3}
-              ]
-            }
-          );
-
-          this.storage.addBox(
-            {
-              id: 2,
-              title: 'Box 3',
-              cases: [
-                {id: 10, amount: 5},
-                {id: 11, amount: 1},
-                {id: 12, amount: 3},
-                {id: 13, amount: 2},
-                {id: 14, amount: 7},
-                {id: 15, amount: 5},
-              ]
-            }
-          );
-
-          this.storage.addBox(
-            {
-              id: 3,
-              title: 'Box 4',
-              cases: [
-                {id: 19, amount: 5},
-                {id: 20, amount: 3}
-              ]
-            }
-          );
 
           this.updateCache();
 
@@ -124,6 +80,7 @@ export class StorageService {
   saveStorage(): void
   {
     this.fireDB.setStorage(this.storage, this.currentUser.uid);
+    this.isChanged = false;
   }
 
   addNewBox(): IBoxStorage {
@@ -185,5 +142,13 @@ export class StorageService {
         }
       }
     );
+  }
+
+  markAsChanged(): void {
+    this.isChanged = true;
+  }
+
+  hasChanges(): boolean {
+    return this.isChanged;
   }
 }

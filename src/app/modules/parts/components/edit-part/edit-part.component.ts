@@ -1,20 +1,21 @@
-import { Component, OnInit, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray, AbstractControl, FormControl } from '@angular/forms';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { PartsService } from 'src/app/core/services/parts/parts.service';
-import { PartModel, IPartProperty } from 'src/app/core/models/part-model';
-import { CurrentUserService } from 'src/app/core/services/currentUser/current-user.service';
-import { switchMap, filter, tap, combineLatest } from 'rxjs/operators';
-import { TypesService, ITypesList, IType, ISubtype } from 'src/app/core/services/types/types.service';
-import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import { isNumber } from 'util';
-import { PartsValidators } from 'src/app/modules/parts/shared/parts-validators';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {ActivatedRoute, Params, Router} from '@angular/router';
+import {Subscription} from 'rxjs';
+import {PartsService} from 'src/app/core/services/parts/parts.service';
+import {IPartProperty, PartModel} from 'src/app/core/models/part-model';
+import {CurrentUserService} from 'src/app/core/services/currentUser/current-user.service';
+import {filter, switchMap, tap} from 'rxjs/operators';
+import {ISubtype, IType, TypesService} from 'src/app/core/services/types/types.service';
+import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import {isNumber} from 'util';
+import {PartsValidators} from 'src/app/modules/parts/shared/parts-validators';
 
 @Component({
   selector: 'app-edit-part',
   templateUrl: './edit-part.component.html',
-  styleUrls: ['./edit-part.component.css']
+  styleUrls: ['./edit-part.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 @AutoUnsubscribe
 export class EditPartComponent implements OnInit {
@@ -23,26 +24,39 @@ export class EditPartComponent implements OnInit {
 
   public isNew: boolean = false;
   private selectedPart: PartModel;
+  private isReady: boolean = false;
 
   private routeSubscription: Subscription;
   private typeSubscription: Subscription;
   private subtypeSubscription: Subscription;
-  
+  private loginSubscription: Subscription;
+
   constructor(private fb: FormBuilder,
               private route: ActivatedRoute,
               private navigation: Router,
               private partsService: PartsService,
-              private currentuser: CurrentUserService,
+              private currentUser: CurrentUserService,
               public typesService: TypesService,
               private changeDetector: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.initForm();
-    
+
+    // this.disableForm();
+
+    this.loginSubscription = this.currentUser.isUserLogged
+      .subscribe(
+        () => {
+          this.changeDetector.detectChanges();
+        }
+      );
+
     this.routeSubscription = this.route.params
     .pipe(
       switchMap(
         (params: Params) => {
+          this.clear();
+
           const id = +params['id'];
           if (isNumber(id) && !isNaN(id)) {
             return this.partsService.getPartById(id);
@@ -74,9 +88,17 @@ export class EditPartComponent implements OnInit {
     )
     .subscribe(
       () => {
-        this.initForm()
+        this.isReady = true;
+        this.initForm();
       }
     );
+  }
+
+  clear(): void {
+    console.log('cleared');
+    this.disableForm();
+    this.isNew = false;
+    this.selectedPart = null;
   }
 
   initForm() {
@@ -101,14 +123,6 @@ export class EditPartComponent implements OnInit {
       }
     }
 
-    if (this.typeSubscription) {
-      this.typeSubscription.unsubscribe();
-    }
-
-    if (this.subtypeSubscription) {
-      this.subtypeSubscription.unsubscribe();
-    }
-
     this.editForm = this.fb.group({
       title: [title, [
         Validators.required
@@ -120,6 +134,16 @@ export class EditPartComponent implements OnInit {
       description: [description],
       properties: properties
     });
+    console.log('form inited');
+    if (!this.isReady) return;
+
+    if (this.typeSubscription) {
+      this.typeSubscription.unsubscribe();
+    }
+
+    if (this.subtypeSubscription) {
+      this.subtypeSubscription.unsubscribe();
+    }
 
     this.typeSubscription = this.editForm.get('type').valueChanges
     .subscribe(
@@ -134,17 +158,31 @@ export class EditPartComponent implements OnInit {
         this.subtypeSelectUpdated();
       }
     );
-    
-    this.changeDetector.detectChanges();
 
     if (this.isNew) {
-      this.isEditMode = true; 
-      this.editForm.enable();
+      this.enableForm();
     }
     else {
-      this.isEditMode = false;
-      this.editForm.disable();
+      this.disableForm();
     }
+  }
+
+  disableForm(): void {
+    console.log('disabled');
+    this.isEditMode = false;
+    this.editForm.disable();
+    this.editForm.get('title').disable();
+
+    this.changeDetector.markForCheck();
+  }
+
+  enableForm(): void {
+    console.log('enabled');
+    this.isEditMode = true;
+    this.editForm.enable();
+    this.editForm.get('title').enable();
+
+    this.changeDetector.markForCheck();
   }
 
   typeSelectUpdated() {
@@ -190,10 +228,7 @@ export class EditPartComponent implements OnInit {
         this.partsService.updatePartById(this.selectedPart, this.selectedPart.id);
       }
 
-      this.isEditMode = false;
-      this.editForm.disable();
-
-      this.changeDetector.detectChanges();
+      this.disableForm();
     }
   }
 
@@ -203,8 +238,7 @@ export class EditPartComponent implements OnInit {
       return;
     }
 
-    this.isEditMode = false;
-    this.editForm.disable();
+    this.disableForm();
 
     this.initForm();
   }
@@ -235,15 +269,14 @@ export class EditPartComponent implements OnInit {
   }
 
   onEditClick() {
-    this.isEditMode = true; 
-    this.editForm.enable();
+    this.enableForm();
   }
 
   isEditAvailable(): boolean {
     return  !this.isEditMode 
-            && (this.selectedPart 
-                && this.currentuser.uid === this.selectedPart.owner 
-                || this.currentuser.isAdmin);
+            && (this.selectedPart
+                && this.currentUser.uid === this.selectedPart.owner
+                || this.currentUser.isAdmin);
   }
 
   get availableTypes(): IType[] {

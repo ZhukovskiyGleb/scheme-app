@@ -1,17 +1,17 @@
-.panel {
+.card {
     background-color: antiquewhite;
     color: brown;
 }
-.title {
-    color: darkslategray !important;
+.card-header-title {
+    color: white;
 }
-.panel-heading {
-    background-color: dimgray;
+.card-header {
+    background-color: dimgrey;
     color: white;
     min-height: 50px;
     cursor: pointer;
 }
 
-.panel-block {
+.card-content {
     min-height: 65px;
 }

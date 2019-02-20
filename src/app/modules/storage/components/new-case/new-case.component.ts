@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, AfterViewInit, AfterContentInit, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { noop, Observable, Subscription, from, of } from 'rxjs';
-import { ICaseStorage } from 'src/app/core/models/storage-model';
-import { PartsService } from 'src/app/core/services/parts/parts.service';
-import { PartModel } from 'src/app/core/models/part-model';
-import { tap, map, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import { FormControl, FormGroup } from '@angular/forms';
+import {ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
+import {noop, of, Subscription} from 'rxjs';
+import {ICaseStorage} from 'src/app/core/models/storage-model';
+import {PartsService} from 'src/app/core/services/parts/parts.service';
+import {PartModel} from 'src/app/core/models/part-model';
+import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
+import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import {FormControl, FormGroup} from '@angular/forms';
 
 @Component({
   selector: 'app-new-case',
@@ -23,10 +23,11 @@ export class NewCaseComponent implements OnInit {
   @ViewChild('newTitle') title: ElementRef;
     
   private searchSubscription: Subscription;
-  caseForm: FormGroup;
 
+  caseForm: FormGroup;
   searchList: PartModel[];
-  // searchList$: Observable<PartModel[]>;
+
+  titleWasFocused: boolean = false;
 
   constructor(private partsService: PartsService,
               private cd: ChangeDetectorRef) { }
@@ -44,7 +45,7 @@ export class NewCaseComponent implements OnInit {
       switchMap(
         (value: string) => {
           if (value && value.length > 0) {
-            return this.partsService.searchPartsByTitle(value, 5);
+            return this.partsService.searchPartsByTitle(value, 10);
           } 
           else {
             return of([]);
@@ -63,14 +64,23 @@ export class NewCaseComponent implements OnInit {
   }
 
   onPartSelected(part: PartModel): void {
-    console.log('olol');
-
     this.selectedCase.id = part.id;
     this.caseForm.get('title').setValue(part.title);
-    // this.cd.detectChanges();
+
+    this.searchList = [];
+
+    this.titleWasFocused = false;
   }
-  
+
+  @HostListener('document:keypress', ['$event']) onKeyDown(event: KeyboardEvent): void {
+    if (this.isActive && event.code === 'Enter' && this.selectedCase.id >= 0) {
+      this.onConfirmClick();
+    }
+  }
+
   onConfirmClick(): void {
+    this.selectedCase.amount = +this.caseForm.get('amount').value;
+
     this.clear();
 
     this.onConfirmCallback();
@@ -82,16 +92,22 @@ export class NewCaseComponent implements OnInit {
     this.onCancelCallback();
   }
 
-  clear(): void {
-    this.caseForm.get('title').setValue('');
-    this.caseForm.get('title').setValue('');
+  onModalClick(): void {
+
   }
 
-  onCaseChanged(value: number): void {
-    this.selectedCase.amount = value >= 0 ? value : this.selectedCase.amount;
+  clear(): void {
+    this.caseForm.get('title').setValue('');
+    this.caseForm.get('amount').setValue(0);
   }
 
   get isTitleSelected(): boolean {
-    return this.title ? document.activeElement == this.title.nativeElement : false;
+    const isFocused: boolean = this.title ? document.activeElement == this.title.nativeElement : false;
+
+    if (isFocused) {
+      this.titleWasFocused = true;
+    }
+
+    return this.titleWasFocused || isFocused;
   }
 }

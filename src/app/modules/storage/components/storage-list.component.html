@@ -33,7 +33,7 @@
                 </ng-template>
               </div>
             </a>
-            <a class="panel-block" (click)="onAddCaseClick(box)" style="min-height: 30px" *ngIf="selectedBox == box">
+            <a class="panel-block" (click)="onAddCaseClick()" style="min-height: 30px" *ngIf="selectedBox == box">
               <button type="button" class="button is-warning is-small is-fullwidth">
                 <strong>Добавить ячейку</strong>
               </button>
@@ -50,6 +50,16 @@
           </nav>
         </div>
       </div>
+      <article class="message is-warning has-text-centered" *ngIf="hasChanges()">
+        <div class="message-body" style="background-color: antiquewhite">
+          <strong style="color: dodgerblue; margin-top: 5px">Сохранить изменения?</strong>
+          <div class="buttons is-centered" style="margin-top: 10px">
+            <button type="button" class="button is-success" (click)="saveStorage()">Да</button>
+            <button type="button" class="button is-danger" (click)="loadStorage(true)">Нет</button>
+          </div>
+          <p class="help">* Изменения будут автоматически сохранены при переходе на другую вкладку</p>
+        </div>
+      </article>
     </div>
   </div>
   <app-loading-modal [isActive]="isBusy"></app-loading-modal>

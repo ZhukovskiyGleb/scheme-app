@@ -20,14 +20,15 @@
         <a routerLink="/parts" class="navbar-item">
           Каталог
         </a>
-        <a routerLink="/storage" class="navbar-item" *ngIf="currentUser.isUserLogged | async">
-          Хранилище
+        <a routerLink="/storage" class="navbar-item" *ngIf="currentUser.isUserLogged | async"
+           [style.color]="storage.hasChanges() ? 'orange' : 'white'">
+          Хранилище{{storage.hasChanges() ? '*' : ''}}
         </a>
       </div>
 
       <div class="navbar-end">
         <a routerLink="/admin" class="navbar-item" *ngIf="currentUser.isAdmin">
-          Админ
+          Система
         </a>
         <div class="navbar-item" *ngIf="!(currentUser.isUserLogged | async)">
           <div class="buttons">

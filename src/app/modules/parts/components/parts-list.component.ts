@@ -7,6 +7,7 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 import { TypesService, IType } from 'src/app/core/services/types/types.service';
 import { SearchService } from 'src/app/core/services/search/search.service';
+import {tap} from "rxjs/operators";
 
 @Component({
   selector: 'app-parts-list',

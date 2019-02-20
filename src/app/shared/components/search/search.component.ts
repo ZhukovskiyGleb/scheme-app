@@ -1,7 +1,5 @@
-import { Component, OnInit, Output, Input, ViewChild, ElementRef, HostListener } from '@angular/core';
-import { Subject } from 'rxjs';
-import { PartsService } from 'src/app/core/services/parts/parts.service';
-import { SearchService } from 'src/app/core/services/search/search.service';
+import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
+import {SearchService} from 'src/app/core/services/search/search.service';
 
 @Component({
   selector: 'app-search',
@@ -21,7 +19,7 @@ export class SearchComponent implements OnInit {
   }
 
   @HostListener('document:keypress', ['$event']) onKeyDown(event: KeyboardEvent): void {
-    if (event.keyCode === 13 && document.activeElement === this.title.nativeElement) {
+    if (event.code === 'Enter' && document.activeElement === this.title.nativeElement) {
       this.activateSearch();
     }
   }

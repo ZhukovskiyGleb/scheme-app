@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { CurrentUserService } from 'src/app/core/services/currentUser/current-user.service';
 import { Router } from '@angular/router';
+import {StorageService} from "../../services/storage/storage.service";
 
 @Component({
   selector: 'app-header',
@@ -14,7 +15,8 @@ export class HeaderComponent implements OnInit {
 
   constructor(public auth: AuthService,
               public currentUser: CurrentUserService,
-              private navigation: Router) { }
+              private navigation: Router,
+              public storage: StorageService) { }
 
   ngOnInit() {
 

@@ -57,6 +57,7 @@ export class FireDbService{
         }
       }).catch((error) => {
         console.log('FireDbService -> getUserByUid ->', error);
+        throw error;
         return null;
       })
     );
@@ -181,7 +182,7 @@ export class FireDbService{
           let result: StorageModel = new StorageModel();
           if (doc.exists)
           {
-            const storage: IBoxStorage[] = doc.data().storage;
+            const storage: IBoxStorage[] = doc.data().boxes;
             storage.forEach(
               (box: IBoxStorage) => {
                 result.addBox(box);

@@ -10,7 +10,7 @@ export interface IBoxStorage {
   }
 
 export class StorageModel {
-    private boxes: IBoxStorage[];
+    private readonly boxes: IBoxStorage[];
 
     constructor() {
         this.boxes = [];

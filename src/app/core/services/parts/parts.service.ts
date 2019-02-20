@@ -58,16 +58,18 @@ export class PartsService {
       start = end;
     }
 
-    if (start < 0 && end < 1) {
-      return from(null);
+    if (start < 0 || end < 1) {
+      this.partsCollection = [];
+      return of(this.partsCollection);
     }
-    
+
     return this.fireDB.getPartsCollection(start, end)
     .pipe(
       map(
         (result: PartModel[]) => {
+          // console.log(result);
           this.partsCollection = result;
-          return result;
+          return this.partsCollection;
         }
       )
     );
