@@ -84,6 +84,10 @@ export class TypesService {
   updateTypes(list: ITypesList): void {
     this.typesList = list;
     this.fireDB.updateTypes(this.typesList);
+
+    this.typesCache = {};
+    this.subtypesCache = {};
+    this.propertiesListCache = [];
   }
 
   deleteTypeCacheById(id: number): void {
@@ -141,7 +145,7 @@ export class TypesService {
     if (!this.typesList) return [];
     
     const type: IType = this.getTypeById(typeId);
-    
+
     return !type ?
     [] :
     type.subtypes;

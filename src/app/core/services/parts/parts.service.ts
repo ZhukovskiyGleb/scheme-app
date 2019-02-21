@@ -29,8 +29,9 @@ export class PartsService {
               private currentUser: CurrentUserService) { }
 
   get totalParts(): Observable<number> {
-    if (this.partsCount)
+    if (this.partsCount) {
       return of(this.partsCount);
+    }
 
     return this.fireDB.updateSystem()
     .pipe(
@@ -67,7 +68,6 @@ export class PartsService {
     .pipe(
       map(
         (result: PartModel[]) => {
-          // console.log(result);
           this.partsCollection = result;
           return this.partsCollection;
         }
@@ -99,16 +99,6 @@ export class PartsService {
       return of(part);
     }
     return this.fireDB.getPartById(id)
-    .pipe(
-      tap(
-        (part: PartModel) => {
-          if (!this.partsCollection) {
-            this.partsCollection = [];
-          }
-          this.partsCollection.push(part);
-        }
-      )
-    );
   }
 
   updateCacheForId(part:PartModel, id: number): void {
