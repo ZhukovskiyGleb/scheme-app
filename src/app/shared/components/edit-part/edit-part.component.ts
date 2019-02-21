@@ -42,15 +42,13 @@ export class EditPartComponent implements OnInit {
   ngOnInit() {
     this.initForm();
 
-    // this.disableForm();
-
     this.loginSubscription = this.currentUser.isUserLogged
       .subscribe(
         () => {
           this.changeDetector.detectChanges();
         }
       );
-
+        
     this.routeSubscription = this.route.params
     .pipe(
       switchMap(
@@ -267,6 +265,7 @@ export class EditPartComponent implements OnInit {
 
   isEditAvailable(): boolean {
     return  !this.isEditMode 
+            && this.navigation.url.search('storage') == -1
             && (this.selectedPart
                 && this.currentUser.uid === this.selectedPart.owner
                 || this.currentUser.isAdmin);

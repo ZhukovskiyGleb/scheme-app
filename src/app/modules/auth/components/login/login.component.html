@@ -6,9 +6,9 @@
       </h1>
       <form [formGroup]="editForm" (ngSubmit)="submitForm()">
         <div class="field">
-          <label class="label">Почтовый адрес</label>
+          <label class="label">E-mail адрес</label>
           <div class="control">
-            <input class="input" type="email" formControlName="email" placeholder="Введите ваш почтовый адрес">
+            <input class="input" type="email" formControlName="email" placeholder="Введите ваш e-mail">
           </div>
           <p class="help is-danger" *ngIf="editForm.get('email').touched && editForm.hasError('required', ['email'])">Почтовый адрес не должен быть пустым</p>
           <p class="help is-danger" *ngIf="editForm.get('email').touched && editForm.hasError('email', ['email'])">Почтовый адрес введен неверно</p>
