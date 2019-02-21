@@ -15,3 +15,7 @@
 .panel-block {
     min-height: 65px;
 }
+
+.hero-body {
+  background-color: lightsteelblue;
+}
