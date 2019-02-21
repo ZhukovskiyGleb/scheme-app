@@ -16,7 +16,7 @@
                 </div>
               </div>
               <ng-template #notSelectedBox>
-                <strong>Хранилище {{box.title}}</strong>
+                <strong>{{box.title ? box.title : 'Хранилище'}}</strong>
               </ng-template>
             </div>
             <a class="panel-block" *ngFor="let case of box.cases" (click)="onCaseClick(box, case)">
