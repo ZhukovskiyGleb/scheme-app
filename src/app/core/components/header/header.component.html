@@ -20,8 +20,7 @@
         <a routerLink="/parts" class="navbar-item">
           Каталог
         </a>
-        <a routerLink="/storage" class="navbar-item" *ngIf="currentUser.isUserLogged | async"
-           [style.color]="storage.hasChanges() ? 'orange' : 'white'">
+        <a routerLink="/storage" class="navbar-item" *ngIf="currentUser.isUserLogged | async">
           Хранилище{{storage.hasChanges() ? '*' : ''}}
         </a>
       </div>

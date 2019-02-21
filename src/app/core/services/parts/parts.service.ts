@@ -144,9 +144,11 @@ export class PartsService {
   }
 
   updatePartById(part: PartModel, id: number): void {
-    const index = this.partsCollection.findIndex(value => value.id === id);
-    if (index) {
-      this.partsCollection[index] = part;
+    if (this.partsCollection) {
+      const index = this.partsCollection.findIndex(value => value.id === id);
+      if (index) {
+        this.partsCollection[index] = part;
+      }
     }
     
     this.updateCacheForId(part, id);

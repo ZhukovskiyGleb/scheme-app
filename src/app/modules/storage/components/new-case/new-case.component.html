@@ -3,7 +3,7 @@
      *ngIf="selectedCase"
      (click)="onModalClick()">
   <div class="modal-background" [ngStyle]="{opacity: .5}"></div>
-  <div class="card has-text-centered" style="width: 25%">
+  <div class="card" style="width: 25%">
     <div class="card-header">
       <p class="card-header-title">
         <strong>Новая ячейка</strong>
@@ -14,16 +14,23 @@
         <form [formGroup]="caseForm">
           <div class="field is-grouped">
             <label class="label">Название</label>
-            <input class="input is-small" type="text" value="" style="margin-left: 5px" placeholder="Поиск" formControlName="title" #newTitle autofocus>
+            <input class="input is-small" type="text" value="" style="margin-left: 5px" placeholder="Название ячейки" formControlName="title"autofocus>
           </div>
-          <div class="field is-grouped is-grouped-multiline" *ngIf="isTitleSelected && searchList && searchList.length > 0">
+          <div class="control" *ngFor="let model of parts">
+            <label class="label">{{model.title}}</label>
+            <div class="field has-addons">
+              <input class="input is-small" type="number" [value]="model.part.amount" min="0" (change)="onAmountChanged(model, partAmount.value)" placeholder="Количество" #partAmount>
+              <button type="button" class="button is-danger is-small" (click)="onDeletePartClick(model)">X</button>
+            </div>
+          </div>
+          <div class="field">
+              <label class="label">Добавить деталь</label>
+              <input class="input is-small" type="text" value="" placeholder="Поиск" formControlName="search" #searchField autofocus>
+            </div>
+          <div class="field is-grouped is-grouped-multiline" *ngIf="isSearchSelected && searchList && searchList.length > 0">
             <div class="field" *ngFor="let part of searchList" (click)="onPartSelected(part)">
               <button type="button" class="button is-small is-text">{{part.title}}</button>
             </div>
-          </div>
-          <div class="field is-grouped">
-            <label class="label">Количество</label>
-            <input class="input is-small" type="number" [value]="selectedCase.amount" min="0" formControlName="amount" style="margin-left: 5px">
           </div>
         </form>
       </div>
@@ -31,92 +38,10 @@
     <div class="card-footer">
       <div class="card-footer-item">
         <div class="buttons is-centered">
-          <button class="button is-primary" (click)="onConfirmClick()" [disabled]="selectedCase.id < 0">Добавить</button>
+          <button class="button is-primary" (click)="onConfirmClick()" [disabled]="selectedCase.parts.length == 0 || caseForm.invalid">Добавить</button>
           <button class="button is-right" (click)="onCancelClick()">Отмена</button>
         </div>
       </div>
     </div>
   </div>
 </div>
-<!--<div class="modal"-->
-  <!--[ngClass]="{'is-active': isActive}"-->
-  <!--*ngIf="selectedCase">-->
-    <!--<div class="modal-background" [ngStyle]="{opacity: .5}"></div>-->
-    <!--<div class="modal-content has-text-centered" style="width: 20%">-->
-      <!--<div class="card is-dark">-->
-        <!--<div class="card-header">-->
-          <!--<p class="card-header-title">-->
-            <!--<strong>Новая ячейка</strong>-->
-          <!--</p>-->
-        <!--</div>-->
-        <!--<div class="card-content">-->
-          <!--<form [formGroup]="caseForm">-->
-            <!--<div class="field is-grouped">-->
-              <!--<label class="label">Название</label>-->
-              <!--<div class="dropdown is-active">-->
-                <!--<div class="control">-->
-                  <!--<input class="input is-small" type="text" value="" style="margin-left: 5px" placeholder="Поиск" formControlName="title" #newTitle>-->
-                <!--</div>-->
-                <!--<div class="dropdown-menu is-small" role="menu" *ngIf="isTitleSelected" (click)="onPartSelected(null)">-->
-                  <!--<div class="dropdown-content" *ngIf="searchList && searchList.length > 0">-->
-                    <!--<a class="dropdown-item" *ngFor="let part of searchList" (click)="onPartSelected(part)">-->
-                      <!--{{part.title}}-->
-                    <!--</a>-->
-                  <!--</div>-->
-                <!--</div>-->
-              <!--</div>-->
-            <!--</div>-->
-            <!--<div class="field is-grouped">-->
-              <!--<label class="label">Количество</label>-->
-              <!--<input class="input is-small" type="number" [value]="selectedCase.amount" min="0" formControlName="amount" style="margin-left: 5px">-->
-            <!--</div>-->
-          <!--</form>-->
-          <!--<div class="buttons is-centered">-->
-            <!--<button class="button is-danger" (click)="onConfirmClick()">Добавить</button>-->
-            <!--<button class="button" (click)="onCancelClick()">Отмена</button>-->
-          <!--</div>-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</div>-->
-  <!--</div>-->
-<!--<div class="modal"-->
-     <!--[ngClass]="{'is-active': isActive}"-->
-     <!--*ngIf="selectedCase">-->
-  <!--<div class="modal-background" [ngStyle]="{opacity: .5}"></div>-->
-  <!--<div class="modal-content has-text-centered" style="width: 20%">-->
-    <!--&lt;!&ndash; <nav class="panel"> &ndash;&gt;-->
-    <!--<div class="message is-dark">-->
-      <!--<div class="message-header">-->
-        <!--<strong>Новая ячейка</strong>-->
-      <!--</div>-->
-      <!--<div class="message-body">-->
-        <!--<form [formGroup]="caseForm">-->
-          <!--<div class="field is-grouped">-->
-            <!--<label class="label">Название</label>-->
-            <!--<div class="dropdown is-active">-->
-              <!--<div class="control is-expanded">-->
-                <!--<input class="input is-small" type="text" value="" style="margin-left: 5px" placeholder="Поиск" formControlName="title" #newTitle>-->
-              <!--</div>-->
-              <!--<div class="dropdown-menu is-small" role="menu" *ngIf="isTitleSelected">-->
-                <!--<div class="dropdown-content" *ngIf="searchList && searchList.length > 0">-->
-                  <!--<a class="dropdown-item" *ngFor="let part of searchList" (click)="onPartSelected(part)">-->
-                    <!--{{part.title}}-->
-                  <!--</a>-->
-                <!--</div>-->
-              <!--</div>-->
-            <!--</div>-->
-          <!--</div>-->
-          <!--<div class="field is-grouped">-->
-            <!--<label class="label">Количество</label>-->
-            <!--<input class="input is-small" type="number" [value]="selectedCase.amount" min="0" (change)="onCaseChanged(newAmount.value)" formControlName="amount" #newAmount style="margin-left: 5px">-->
-          <!--</div>-->
-        <!--</form>-->
-        <!--<div class="buttons is-centered">-->
-          <!--<button class="button is-danger" (click)="onConfirmClick()">Добавить</button>-->
-          <!--<button class="button" (click)="onCancelClick()">Отмена</button>-->
-        <!--</div>-->
-      <!--</div>-->
-      <!--&lt;!&ndash; </nav> &ndash;&gt;-->
-    <!--</div>-->
-  <!--</div>-->
-<!--</div>-->

@@ -54,9 +54,10 @@
                 <button type="submit" class="button is-link" [disabled]="!editForm.dirty || !editForm.valid">Сохранить</button>
               </div>
               <div class="control">
-                  <button type="button" class="button" [disabled]="!editForm.dirty" (click)="onCancelClick()">Отмена</button>
-                </div>
+                <button type="button" class="button" [disabled]="!editForm.dirty" (click)="onCancelClick()">Отмена</button>
+              </div>
             </div>
+            <p class="help" *ngIf='editForm.dirty && editForm.valid'>* Изменения будут автоматически сохранены при переходе на другую вкладку</p>
           </form>
       </div>
     </div>

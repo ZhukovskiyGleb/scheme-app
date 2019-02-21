@@ -5,9 +5,11 @@ import { PartModel } from 'src/app/core/models/part-model';
 import { PartsService } from 'src/app/core/services/parts/parts.service';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import { TypesService, IType } from 'src/app/core/services/types/types.service';
+import { TypesService, IType, ISubtype } from 'src/app/core/services/types/types.service';
 import { SearchService } from 'src/app/core/services/search/search.service';
 import {tap} from "rxjs/operators";
+import { IPartStorage } from 'src/app/core/models/storage-model';
+import { CurrentUserService } from 'src/app/core/services/currentUser/current-user.service';
 
 @Component({
   selector: 'app-parts-list',
@@ -23,6 +25,7 @@ export class PartsListComponent implements AfterContentInit {
   private collectionSubscription: Subscription;
   private newPartSubscription: Subscription;
   private searchSubscription: Subscription;
+  private readySubscription: Subscription;
   
   partsCollection: PartModel[];
   isBusy: boolean = true;
@@ -35,9 +38,19 @@ export class PartsListComponent implements AfterContentInit {
               private typesService: TypesService,
               private changeDetector: ChangeDetectorRef,
               private search: SearchService,
-              private route: ActivatedRoute) { }
+              private route: ActivatedRoute,
+              public currentUser: CurrentUserService) { }
 
   ngAfterContentInit() {
+    this.readySubscription = this.typesService.waitListReady()
+    .subscribe(
+      () => {
+        this.init();
+      }
+    );
+  }
+
+  init(): void {
     this.paginationSubscription = this.pagination.pageEvent
     .subscribe(this.updatePartCollection.bind(this));
 
@@ -62,6 +75,10 @@ export class PartsListComponent implements AfterContentInit {
   updatePagination(partsCount: number): void {    
     const totalPages = Math.ceil(partsCount / this.partsPerPage);
     this.pagination.init(totalPages);
+  }
+
+  trackByPartId(index: number, part: IPartStorage): number {
+    return part.id;
   }
 
   updatePartCollection(currentPage: number):void {
@@ -113,6 +130,14 @@ export class PartsListComponent implements AfterContentInit {
     if (isNaN(id)) return '';
             
     const type: IType = this.typesService.getTypeById(id);
+    
+    return type ? type.value : '';
+  }
+
+  getSubtypeValue(typeId: number, id: number): string {
+    if (isNaN(typeId) || isNaN(id)) return '';
+            
+    const type: ISubtype = this.typesService.getSubtypeById(typeId, id);
 
     return type ? type.value : '';
   }

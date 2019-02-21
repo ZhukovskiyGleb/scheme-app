@@ -92,7 +92,8 @@ export class FireDbService{
     const searchWord: string = search.toLowerCase();
     return from(
       // this.db.collection('parts').orderBy('title').startAt(searchWord).endAt(searchWord + "\uf8ff").limit(10).get()
-      this.db.collection('parts').where('search', 'array-contains', searchWord).limit(limit).get()
+      // this.db.collection('parts').where('search', 'array-contains', searchWord).limit(limit).get()
+      this.db.collection('parts').where('search', 'array-contains', searchWord).get()
       .then(
         (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
           let result: PartModel[] = [];
@@ -153,11 +154,22 @@ export class FireDbService{
     const result: string[] = [];
     result.push(mainWord);
 
-    let split: string[] = mainWord.split(/-| |\(|\)|_|\\|\//);
+    let split: string[];
+
+    split = mainWord.match(/[а-яА-Я]+|[a-zA-Z]+|[0-9]+/g);
     if (split.length > 1) {
       split.forEach(
         value => {
           if(value.length > 0) result.push(value);
+        }
+      );
+    }
+
+    split = mainWord.split(/-| |\(|\)|_|\\|\//);
+    if (split.length > 1) {
+      split.forEach(
+        value => {
+          if(value.length > 0 && result.indexOf(value) == -1) result.push(value);
         }
       )
       mainWord = split.join('');
@@ -167,9 +179,12 @@ export class FireDbService{
     let i: number;
     const max: number = Math.min(mainWord.length, 11 - result.length);
     for (i = 1; i < max; i++) {
-      result.push(mainWord.substr(0, i));
+      let word: string = mainWord.substr(0, i);
+      if (result.indexOf(word) == -1) {
+        result.push(word);
+      }
     }
-
+    
     return result;
   }
 

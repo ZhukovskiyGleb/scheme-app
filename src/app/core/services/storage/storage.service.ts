@@ -88,7 +88,7 @@ export class StorageService {
 
     const box: IBoxStorage = {
       id: this.nextBoxId,
-      title: 'new',
+      title: '',
       cases: []
     };
 

@@ -1,8 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { FormGroup, AbstractControl, FormArray, FormBuilder } from '@angular/forms';
-import { TypesService, IType, ISubtype, ITypesList } from 'src/app/core/services/types/types.service';
+import { TypesService, IType } from 'src/app/core/services/types/types.service';
 import { Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 import { AdminHelper } from '../shared/admin-helper';
 
@@ -13,7 +12,7 @@ import { AdminHelper } from '../shared/admin-helper';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 @AutoUnsubscribe
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, OnDestroy {
   public editForm: FormGroup;
   isBusy: boolean = true;
 
@@ -65,6 +64,10 @@ export class AdminComponent implements OnInit {
 
     this.changeDetector.detectChanges();
   }  
+
+  ngOnDestroy() {
+    this.submitForm();
+  }
 
   submitForm() {
     if (this.editForm.valid) {

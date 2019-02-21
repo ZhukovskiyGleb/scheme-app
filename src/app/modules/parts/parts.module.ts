@@ -5,10 +5,9 @@ import { PartsRoutingModule } from './parts-routing.module';
 import { PartsListComponent } from './components/parts-list.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { EditPartComponent } from './components/edit-part/edit-part.component';
 
 @NgModule({
-  declarations: [PartsListComponent, EditPartComponent],
+  declarations: [PartsListComponent],
   imports: [
     CommonModule,
     PartsRoutingModule,
