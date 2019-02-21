@@ -1,0 +1,81 @@
+<section class="hero is-fullheight-with-navbar is-primary is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <router-outlet></router-outlet>
+      <div class="buttons is-centered" *ngIf="inSearchMode">
+        <button type="button" class="button is-warning" (click)="onCancelSearchClick()">Закрыть поиск</button>
+      </div>
+      <div class="columns is-gapless is-multiline is-mobile" *ngIf="boxList">
+        <div class="column is-4" *ngFor="let box of boxList">
+          <nav class="panel" (click)="onBoxClick(box)">
+            <div class="panel-heading">
+              <div *ngIf="selectedBox == box && !selectedCase; else notSelectedBox">
+                <div class="field is-grouped">
+                  <input class="input is-small" type="text" [value]="box.title" (change)="onBoxChanged(inputTitle.value)" #inputTitle>
+                  <button type="button" class="button is-danger is-small" style="margin-left: 10px" (click)="onDeleteBoxClick()">Удалить</button>
+                </div>
+              </div>
+              <ng-template #notSelectedBox>
+                <strong>{{box.title}}</strong>
+              </ng-template>
+            </div>
+            <a class="panel-block" *ngFor="let case of box.cases; trackBy: trackByCaseId" (click)="onCaseClick(box, case)" title="{{getDescriptionById(case.id) | async}}">
+              <div class="control">
+                <p class="heading">
+                  <strong>{{(getTitleById(case.id) | async) || 'Загрузка'}}</strong>
+                </p>
+                <div class="field is-grouped" *ngIf="selectedCase == case; else notSelectedCase">
+                  <input class="input is-small" type="number" [value]="case.amount" min="0" (change)="onCaseChanged(inputAmount.value)" #inputAmount>
+                  <button type="button" class="button is-danger is-small" style="margin-left: 10px" (click)="onDeleteCaseClick()">Удалить</button>
+                </div>
+                <ng-template #notSelectedCase>
+                  {{case.amount > 0 ? 'x'+case.amount : 'пусто'}}
+                </ng-template>
+              </div>
+            </a>
+            <a class="panel-block" (click)="onAddCaseClick()" style="min-height: 30px" *ngIf="selectedBox == box">
+              <button type="button" class="button is-warning is-small is-fullwidth">
+                <strong>Добавить ячейку</strong>
+              </button>
+            </a>
+          </nav>
+        </div>
+        <div class="column is-4" *ngIf="!inSearchMode">
+          <nav class="panel" (click)="onAddStorageClick()">
+            <p class="panel-heading">
+              <button type="button" class="button is-warning is-small is-fullwidth">
+                <strong>Добавить хранилище</strong>
+              </button>
+            </p>
+          </nav>
+        </div>
+      </div>
+      <article class="message is-warning has-text-centered" *ngIf="hasChanges()">
+        <div class="message-body" style="background-color: antiquewhite">
+          <strong style="color: dodgerblue; margin-top: 5px">Сохранить изменения?</strong>
+          <div class="buttons is-centered" style="margin-top: 10px">
+            <button type="button" class="button is-success" (click)="saveStorage()">Да</button>
+            <button type="button" class="button is-danger" (click)="loadStorage(true)">Нет</button>
+          </div>
+          <p class="help">* Изменения будут автоматически сохранены при переходе на другую вкладку</p>
+        </div>
+      </article>
+    </div>
+  </div>
+  <app-loading-modal [isActive]="isBusy"></app-loading-modal>
+  
+  <app-delete-confirm 
+  [isActive]="isWarningVisibility"
+  [caseSelected]="!!selectedCase"
+  [onConfirmCallback]="onDeleteConfirmClick"
+  [onCancelCallback]="onDeleteCancelClick"
+  (click)="onPreventClick()"></app-delete-confirm>
+  
+  <app-new-case
+  [isActive]="isAddingNewCaseVisibility"
+  [selectedCase]="selectedCase"
+  [onConfirmCallback]="onAddNewCaseConfirmClicked"
+  [onCancelCallback]="onAddNewCaseCancelClicked"
+  (click)="onPreventClick()">
+  </app-new-case>
+</section>

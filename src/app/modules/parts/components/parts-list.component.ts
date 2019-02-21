@@ -1,47 +1,132 @@
-import { Component, OnInit, ViewChild, AfterViewInit, AfterContentInit, OnDestroy, ElementRef } from '@angular/core';
+import { Component, ViewChild, AfterContentInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@angular/core';
 import { PaginationComponent } from 'src/app/shared/components/pagination/pagination.component';
-import { FireDbService } from 'src/app/core/services/fire-db/fire-db.service';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { PartModel } from 'src/app/core/models/part-model';
+import { PartsService } from 'src/app/core/services/parts/parts.service';
+import { Router, ActivatedRoute, Params } from '@angular/router';
+import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import { TypesService, IType } from 'src/app/core/services/types/types.service';
+import { SearchService } from 'src/app/core/services/search/search.service';
+import {tap} from "rxjs/operators";
 
 @Component({
   selector: 'app-parts-list',
   templateUrl: './parts-list.component.html',
-  styleUrls: ['./parts-list.component.css']
+  styleUrls: ['./parts-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PartsListComponent implements OnDestroy, AfterContentInit {
+@AutoUnsubscribe
+export class PartsListComponent implements AfterContentInit {
   readonly partsPerPage = 10;
   private paginationSubscription: Subscription;
-  protected partsCollection: Observable<PartModel[]>;
+  private totalPageSubscription: Subscription;
+  private collectionSubscription: Subscription;
+  private newPartSubscription: Subscription;
+  private searchSubscription: Subscription;
+  
+  partsCollection: PartModel[];
+  isBusy: boolean = true;
+  inSearchMode: boolean = false;
 
   @ViewChild(PaginationComponent) pagination: PaginationComponent;
 
-  constructor(protected fireDB: FireDbService) { }
+  constructor(private partsService: PartsService,
+              private navigation: Router,
+              private typesService: TypesService,
+              private changeDetector: ChangeDetectorRef,
+              private search: SearchService,
+              private route: ActivatedRoute) { }
 
   ngAfterContentInit() {
-    this.fireDB.totalParts.subscribe(
+    this.paginationSubscription = this.pagination.pageEvent
+    .subscribe(this.updatePartCollection.bind(this));
+
+    this.newPartSubscription = this.partsService.newPartAddedEvent
+    .subscribe(
       (partsCount: number) => {
-        const totalPages = Math.ceil(partsCount / this.partsPerPage);
-        this.pagination.init(totalPages);
-        this.updatePartCollection(1);
-        this.paginationSubscription = this.pagination.pageEvent.subscribe(this.updatePartCollection.bind(this));
+        this.updatePagination(partsCount);
+      }
+    );
+
+    this.totalPageSubscription = this.partsService.totalParts
+    .subscribe(
+      (partsCount: number) => {
+        this.updatePagination(partsCount);
+      }
+    );
+
+    this.searchSubscription = this.search.searchPartEvent
+    .subscribe(this.searchPartByTitle.bind(this));
+  }
+
+  updatePagination(partsCount: number): void {    
+    const totalPages = Math.ceil(partsCount / this.partsPerPage);
+    this.pagination.init(totalPages);
+  }
+
+  updatePartCollection(currentPage: number):void {
+    this.isBusy = true;
+    this.inSearchMode = false;
+    const start = (currentPage - 1) * this.partsPerPage;
+    
+    if (this.collectionSubscription) {
+      this.collectionSubscription.unsubscribe();
+    }
+    
+    this.collectionSubscription = this.partsService.loadPartsCollection(start, start + this.partsPerPage)
+    .subscribe(
+      (result: PartModel[]) => {
+        this.partsCollection = result;
+        this.isBusy = false;
+
+        this.changeDetector.detectChanges();
       }
     );
   }
 
-  updatePartCollection(currentPage: number):void {
-    const start = (currentPage - 1) * this.partsPerPage;
-    this.partsCollection = this.fireDB.getPartsCollection(start, start + this.partsPerPage);
-  }
-
-  onTableClick(event: Event) {
-    console.log(event);
-  }
-
-  ngOnDestroy() {
-    if (this.paginationSubscription) {
-      this.paginationSubscription.unsubscribe();
+  searchPartByTitle(search: string):void {
+    if (!search || search.length == 0) {
+      this.updatePartCollection(this.pagination.currentPage);
+      return;
     }
+
+    this.pagination.currentPage = 1;
+    this.isBusy = true;
+    this.inSearchMode = true;
+    
+    if (this.collectionSubscription) {
+      this.collectionSubscription.unsubscribe();
+    }
+
+    this.collectionSubscription = this.partsService.searchPartsByTitle(search, this.partsPerPage)
+    .subscribe(
+      (result: PartModel[]) => {
+        this.partsCollection = result;
+        this.isBusy = false;
+
+        this.changeDetector.detectChanges();
+      }
+    );
+  }
+
+  getTypeValue(id: number): string {
+    if (isNaN(id)) return '';
+            
+    const type: IType = this.typesService.getTypeById(id);
+
+    return type ? type.value : '';
+  }
+
+  onTableClick(id: number) {
+    this.navigation.navigate(['parts', id])
+  }
+
+  onAddPartClick() {
+    this.navigation.navigate(['parts', 'new'])
+  }
+
+  onCancelSearchClick() {
+    this.updatePartCollection(this.pagination.currentPage);
   }
 
 }

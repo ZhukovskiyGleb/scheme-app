@@ -1,0 +1,17 @@
+.panel {
+    background-color: antiquewhite;
+    color: brown;
+}
+.title {
+    color: darkslategray !important;
+}
+.panel-heading {
+    background-color: dimgray;
+    color: white;
+    min-height: 50px;
+    cursor: pointer;
+}
+
+.panel-block {
+    min-height: 65px;
+}

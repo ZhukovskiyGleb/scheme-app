@@ -12,6 +12,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { FirebaseService } from './core/services/firebase/firebase.service';
 import { ErrorModalService } from './core/services/error-modal/error-modal.service';
 import { SharedModule } from './shared/shared.module';
+import { PartsService } from './core/services/parts/parts.service';
+import { TypesService } from './core/services/types/types.service';
 
 @NgModule({
   declarations: [
@@ -27,6 +29,8 @@ import { SharedModule } from './shared/shared.module';
   providers: [
     FirebaseService,
     FireDbService,
+    PartsService,
+    TypesService,
     CurrentUserService,
     AuthService,
     ErrorModalService

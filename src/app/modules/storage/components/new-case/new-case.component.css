@@ -1,0 +1,17 @@
+.card {
+    background-color: antiquewhite;
+    color: brown;
+}
+.card-header-title {
+    color: white;
+}
+.card-header {
+    background-color: dimgrey;
+    color: white;
+    min-height: 50px;
+    cursor: pointer;
+}
+
+.card-content {
+    min-height: 65px;
+}

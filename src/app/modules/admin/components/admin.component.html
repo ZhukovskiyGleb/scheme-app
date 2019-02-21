@@ -1,0 +1,65 @@
+<section class="hero is-fullheight-with-navbar is-dark is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">
+          Настройки типов и параметров
+        </h1>
+        <form [formGroup]="editForm" (ngSubmit)="submitForm()">
+            <div class="field" formArrayName="types" *ngIf="typesList">
+              <div class="field" *ngFor="let type of typesList; let i = index" [formGroupName]="i">
+                <div class="field is-grouped">
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input class="input" type="text" formControlName="value" placeholder="Архетип">
+                    </div>
+                    <div class="control">
+                      <a class="button is-danger" (click)="onDeleteTypeClick(i)">
+                        X
+                      </a>
+                    </div>
+                  </div>
+                  <div class="field" formArrayName="subtypes" *ngIf="subtypesList(i)">
+                    <div class="control" style="margin-top: 5px; margin-left: 10px; margin-bottom: 10px">
+                      <label class="label">Подтипы:</label>
+                    </div>
+                    <div class="field" *ngFor="let subtype of subtypesList(i); let j = index" [formGroupName]="j" style="margin-left: 10px">
+                      <div class="field has-addons" >
+                        <div class="control">
+                          <input class="input" type="text" formControlName="value" placeholder="Подтип">
+                        </div>
+                        <div class="control">
+                          <a class="button is-danger" (click)="onDeleteSubtypeClick(i, j)">
+                            X
+                          </a>
+                        </div>
+                      </div>
+                      <app-properties-list title="Параметры подтипа:" [properties]="subtypesPropertiesList(i, j)" [group]="subtype" [type]="type.value.id" [subtype]="subtype.value.id"></app-properties-list>
+                    </div>
+                    <a class="button is-warning" (click)="onAddSubtypeClick(i)" style="margin-left: 10px">
+                      Добавить подтип
+                    </a>
+                  </div>
+                </div>
+                <app-properties-list title="Параметры типа:" [properties]="typesPropertiesList(i)" [group]="type" [type]="type.value.id"></app-properties-list>
+                <hr>
+              </div>
+              <a class="button is-warning" (click)="onAddTypeClick()">
+                Добавить архетип
+              </a>
+            </div>
+            <hr>
+            <app-properties-list title="Глобальные параметры:" [properties]="propertiesList" [group]="editForm"></app-properties-list>
+            <div class="field is-grouped" style="margin-top: 10px">
+              <div class="control">
+                <button type="submit" class="button is-link" [disabled]="!editForm.dirty || !editForm.valid">Сохранить</button>
+              </div>
+              <div class="control">
+                  <button type="button" class="button" [disabled]="!editForm.dirty" (click)="onCancelClick()">Отмена</button>
+                </div>
+            </div>
+          </form>
+      </div>
+    </div>
+    <app-loading-modal [isActive]="isBusy"></app-loading-modal>
+  </section>
+  

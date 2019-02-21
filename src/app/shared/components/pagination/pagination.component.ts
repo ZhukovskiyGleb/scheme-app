@@ -8,21 +8,23 @@ import { Subject } from 'rxjs';
 })
 export class PaginationComponent implements OnInit {
 
+  @Input() isVisible: boolean = true;
   pageEvent = new Subject<number>();
 
-  protected totalPages: number = 1;
-  protected currentPage: number = 1;
+  public totalPages: number = 1;
+  public currentPage: number = 1;
 
   constructor() { }
 
   ngOnInit() {
   }
 
-  init(totalPages): void {
+  init(totalPages: number): void {
     this.totalPages = totalPages;
+    this.pageEvent.next(this.currentPage);
   }
 
-  protected onPageClick(event: Event): void {
+  public onPageClick(event: Event): void {
     const elem: Element = event.srcElement;
     const label = elem.attributes['label'];
     if (label) {
@@ -50,4 +52,31 @@ export class PaginationComponent implements OnInit {
     }
   }
 
+  prevButtonAvailable():boolean {
+     return (this.totalPages > 1 && this.currentPage > 1);
+  }
+  nextButtonAvailable():boolean {
+    return (this.totalPages > 1 && this.currentPage < this.totalPages);
+  }
+  firstPageAvailable():boolean {
+    return this.totalPages > 2 && this.currentPage > 2;
+  }
+  prevDotsAvailable():boolean {
+    return this.totalPages > 3 && this.currentPage > 3;
+  }
+  prevPageAvailable():boolean {
+    return this.totalPages > 1 && this.currentPage > 1;
+  }
+  currentPageAvailable():boolean {
+    return this.totalPages > 0;
+  }
+  nextPageAvailable():boolean {
+    return this.totalPages > 1 && this.currentPage <= this.totalPages - 1;
+  }
+  nextDotsAvailable():boolean {
+    return this.totalPages > 3 && this.currentPage < this.totalPages - 2;
+  }
+  lastPageAvailable():boolean {
+    return this.totalPages > 2 && this.currentPage < this.totalPages - 1;
+  }
 }

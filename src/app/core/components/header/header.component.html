@@ -18,22 +18,26 @@
     [ngClass]="{'is-active': isActivated}">
       <div class="navbar-start">
         <a routerLink="/parts" class="navbar-item">
-          Список деталей
+          Каталог
         </a>
-        <a routerLink="/parts" class="navbar-item" *ngIf="auth.isUserLogged">
-          Хранилище
+        <a routerLink="/storage" class="navbar-item" *ngIf="currentUser.isUserLogged | async"
+           [style.color]="storage.hasChanges() ? 'orange' : 'white'">
+          Хранилище{{storage.hasChanges() ? '*' : ''}}
         </a>
       </div>
 
       <div class="navbar-end">
-        <div class="navbar-item" *ngIf="!auth.isUserLogged">
+        <a routerLink="/admin" class="navbar-item" *ngIf="currentUser.isAdmin">
+          Система
+        </a>
+        <div class="navbar-item" *ngIf="!(currentUser.isUserLogged | async)">
           <div class="buttons">
             <a routerLink="/login" class="button is-warning">
               <strong>Войти</strong>
             </a>
           </div>
         </div>
-        <div class="navbar-item has-dropdown is-hoverable" *ngIf="auth.isUserLogged">
+        <div class="navbar-item has-dropdown is-hoverable" *ngIf="currentUser.isUserLogged | async">
           <a class="navbar-link">
             {{currentUser.userName | name}}
           </a>

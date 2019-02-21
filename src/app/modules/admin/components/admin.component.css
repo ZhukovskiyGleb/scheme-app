@@ -1,0 +1,7 @@
+.label {
+    color: white;
+}
+.input {
+    min-width: 100;
+    max-width: 100;
+}

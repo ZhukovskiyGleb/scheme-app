@@ -1,5 +1,6 @@
 export class LoginErrorHandlerModel {
     static getErrorMessage(error): string {
+      console.log(error.code)
         switch (error.code) {
             case ('auth/user-not-found'):
                 return 'Пользователь не найден';
