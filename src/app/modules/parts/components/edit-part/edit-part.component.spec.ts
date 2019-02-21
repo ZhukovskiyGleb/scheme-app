@@ -108,7 +108,6 @@ fdescribe('EditPartComponent', () => {
     fixture.whenStable().then(
       () => {
         const doc: Document = fixture.debugElement.nativeElement;
-        console.log(doc.getElementsByClassName('input')[0]);
         expect((doc.getElementsByClassName('input')[0] as HTMLInputElement).value).toEqual('Title');
       }
     );

@@ -58,7 +58,6 @@ export class FireDbService{
       }).catch((error) => {
         console.log('FireDbService -> getUserByUid ->', error);
         throw error;
-        return null;
       })
     );
   }

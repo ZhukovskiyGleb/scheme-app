@@ -21,10 +21,10 @@ import {PartsValidators} from 'src/app/modules/parts/shared/parts-validators';
 export class EditPartComponent implements OnInit {
   public editForm: FormGroup;
   public isEditMode: boolean = false;
-
+  public isReady: boolean = false;
   public isNew: boolean = false;
+
   private selectedPart: PartModel;
-  private isReady: boolean = false;
 
   private routeSubscription: Subscription;
   private typeSubscription: Subscription;
@@ -95,10 +95,21 @@ export class EditPartComponent implements OnInit {
   }
 
   clear(): void {
-    console.log('cleared');
-    // this.disableForm();
+    this.disableForm();
     this.isNew = false;
     this.selectedPart = null;
+  }
+
+  disableForm(): void {
+    this.isEditMode = false;
+
+    this.changeDetector.markForCheck();
+  }
+
+  enableForm(): void {
+    this.isEditMode = true;
+
+    this.changeDetector.markForCheck();
   }
 
   initForm() {
@@ -165,24 +176,6 @@ export class EditPartComponent implements OnInit {
     else {
       this.disableForm();
     }
-  }
-
-  disableForm(): void {
-    console.log('disabled');
-    this.isEditMode = false;
-    this.editForm.disable();
-
-    this.changeDetector.markForCheck();
-  }
-
-  enableForm(): void {
-    console.log('enabled');
-    this.isEditMode = true;
-    this.editForm.enable();
-
-    console.log(document.getElementsByClassName('input'));
-
-    this.changeDetector.markForCheck();
   }
 
   typeSelectUpdated() {
