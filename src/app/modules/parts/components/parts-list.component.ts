@@ -115,7 +115,7 @@ export class PartsListComponent implements AfterContentInit {
       this.collectionSubscription.unsubscribe();
     }
 
-    this.collectionSubscription = this.partsService.searchPartsByTitle(search, this.partsPerPage)
+    this.collectionSubscription = this.partsService.searchPartsByTitle(search, this.pagination.totalPages)
     .subscribe(
       (result: PartModel[]) => {
         this.partsCollection = result;

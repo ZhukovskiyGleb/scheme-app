@@ -12,7 +12,8 @@
       <a class="pagination-link" label="prev" title="Страница {{currentPage - 1}}" *ngIf="prevPageAvailable()">{{currentPage - 1}}</a>
     </li>
     <li>
-      <a class="pagination-link is-current" title="Текущая страница"  label="current" aria-current="page" *ngIf="currentPageAvailable()">{{currentPage}}</a>
+      <!--<a class="pagination-link is-current" title="Текущая страница"  label="current" aria-current="page" *ngIf="currentPageAvailable()">{{currentPage}}</a>-->
+      <input class="pagination-link is-current" title="Текущая страница"  label="current" aria-current="page" *ngIf="currentPageAvailable()" [value]="currentPage" (change)="onCurrentPageChanged(currentInput)" #currentInput>
     </li>
     <li>
       <a class="pagination-link" label="next" title="Страница {{currentPage + 1}}" *ngIf="nextPageAvailable()">{{currentPage + 1}}</a>

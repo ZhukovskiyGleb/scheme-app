@@ -43,12 +43,23 @@ export class PaginationComponent implements OnInit {
           this.currentPage = 1;
           break;
         case ('last'):
-          this.currentPage = this.totalPages
+          this.currentPage = this.totalPages;
           break;
         default:
           return;
       }
       this.pageEvent.next(this.currentPage);
+    }
+  }
+
+  onCurrentPageChanged(input: HTMLInputElement): void {
+    const value: number = +input.value;
+    if (value > 0 && value <= this.totalPages) {
+      this.currentPage = value;
+      this.pageEvent.next(this.currentPage);
+    }
+    else {
+      input.value = this.currentPage.toString();
     }
   }
 

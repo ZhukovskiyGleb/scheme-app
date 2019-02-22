@@ -92,8 +92,8 @@ export class FireDbService{
     const searchWord: string = search.toLowerCase();
     return from(
       // this.db.collection('parts').orderBy('title').startAt(searchWord).endAt(searchWord + "\uf8ff").limit(10).get()
-      // this.db.collection('parts').where('search', 'array-contains', searchWord).limit(limit).get()
-      this.db.collection('parts').where('search', 'array-contains', searchWord).get()
+      // this.db.collection('parts').where('search', 'array-contains', searchWord).get()
+      this.db.collection('parts').where('search', 'array-contains', searchWord).limit(limit).get()
       .then(
         (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
           let result: PartModel[] = [];
