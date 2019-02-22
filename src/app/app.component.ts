@@ -1,26 +1,28 @@
-import { Component, OnInit, Injector } from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector, OnInit} from '@angular/core';
 import * as firebase from 'firebase';
-import { AuthService } from './core/services/auth/auth.service';
-import { map, filter } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { environment } from 'src/environments/environment';
-import { FireDbService } from './core/services/fire-db/fire-db.service';
-import { PartModel } from './core/models/part-model';
-import { PartsService } from './core/services/parts/parts.service';
+import {AuthService} from './core/services/auth/auth.service';
+import {filter} from 'rxjs/operators';
+import {ActivatedRoute, Router} from '@angular/router';
+import {environment} from 'src/environments/environment';
+import {LocalizationService} from "./core/services/localization/localization.service";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
   constructor (private injector: Injector,
-              private navigation: Router) {
+               private navigation: Router,
+               private router: ActivatedRoute,
+               private changeDetector: ChangeDetectorRef,
+               public loc: LocalizationService) {
     firebase.initializeApp(environment.firebaseConfig);
   }
 
   ngOnInit() {
-    const auth = this.injector.get(AuthService);
+    const auth: AuthService = this.injector.get(AuthService);
     auth.loadLastUser()
     .pipe(
       filter(value => !!value)
@@ -28,5 +30,12 @@ export class AppComponent implements OnInit {
     .subscribe(() => {
       // this.navigation.navigate(['/parts']);
     });
+
+    this.loc.languageChanged.subscribe(
+      () => {
+        this.navigation.navigate([this.router.url])
+        this.changeDetector.markForCheck();
+      }
+    );
   }
 }

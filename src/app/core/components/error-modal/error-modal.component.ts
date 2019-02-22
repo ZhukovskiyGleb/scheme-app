@@ -1,10 +1,11 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ErrorModalService } from '../../services/error-modal/error-modal.service';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ErrorModalService} from '../../services/error-modal/error-modal.service';
 
 @Component({
   selector: 'app-login-modal',
   templateUrl: './error-modal.component.html',
-  styleUrls: ['./error-modal.component.css']
+  styleUrls: ['./error-modal.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ErrorModalComponent implements OnInit {
 

@@ -1,10 +1,12 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { Subject } from 'rxjs';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {Subject} from 'rxjs';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-pagination',
   templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.css']
+  styleUrls: ['./pagination.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PaginationComponent implements OnInit {
 
@@ -14,7 +16,8 @@ export class PaginationComponent implements OnInit {
   public totalPages: number = 1;
   public currentPage: number = 1;
 
-  constructor() { }
+  constructor(private changeDetector: ChangeDetectorRef,
+              public loc: LocalizationService) { }
 
   ngOnInit() {
   }
@@ -22,6 +25,8 @@ export class PaginationComponent implements OnInit {
   init(totalPages: number): void {
     this.totalPages = totalPages;
     this.pageEvent.next(this.currentPage);
+
+    this.changeDetector.detectChanges();
   }
 
   public onPageClick(event: Event): void {

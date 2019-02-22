@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-loading-modal',
@@ -9,7 +10,7 @@ export class LoadingModalComponent implements OnInit {
 
   @Input() isActive: boolean = false;
 
-  constructor() { }
+  constructor(public loc: LocalizationService) { }
 
   ngOnInit() {
   }

@@ -1,5 +1,4 @@
-import { Directive, ElementRef, HostListener } from '@angular/core';
-import { element } from '@angular/core/src/render3';
+import {Directive, ElementRef, HostListener} from '@angular/core';
 
 @Directive({
   selector: '[appRightClick]'
@@ -12,13 +11,18 @@ export class RightClickDirective {
 
   @HostListener('contextmenu', ['$event']) onRightClick(event: Event) {
     event.preventDefault();
+    event.stopImmediatePropagation();
   }
 
   @HostListener('mouseenter') onMouseEnter() {
+    event.preventDefault();
+    event.stopImmediatePropagation();
     this.element.nativeElement.classList.add('is-selected');
   }
 
   @HostListener('mouseout') onMouseOut() {
+    event.preventDefault();
+    event.stopImmediatePropagation();
     this.element.nativeElement.classList.remove('is-selected');
   }
 

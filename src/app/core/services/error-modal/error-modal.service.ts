@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import {LocalizationService} from "../localization/localization.service";
 
 @Injectable({
   providedIn: 'root'
@@ -7,11 +8,28 @@ import { Subject } from 'rxjs';
 export class ErrorModalService{
   updateEvent = new Subject<string>();
   
-  constructor() {
+  constructor(private loc: LocalizationService) {
     
   }
 
   showMessage(message: string): void {
-    this.updateEvent.next(message);
+    this.updateEvent.next(
+      this.getErrorMessage(message)
+    );
+  }
+
+  private getErrorMessage(error): string {
+    switch (error.code) {
+      case ('auth/user-not-found'):
+        return this.loc.byId('error_user_not_found');
+      case ('auth/wrong-password'):
+        return this.loc.byId('error_wrong_password');
+      case ('auth/invalid-email'):
+        return this.loc.byId('error_invalid_email');
+      case ('auth/email-already-in-use'):
+        return this.loc.byId('error_email_in_use');
+      default:
+        return this.loc.byId('error_error');
+    }
   }
 }

@@ -1,15 +1,15 @@
-import { Component, ViewChild, AfterContentInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@angular/core';
-import { PaginationComponent } from 'src/app/shared/components/pagination/pagination.component';
-import { Subscription } from 'rxjs';
-import { PartModel } from 'src/app/core/models/part-model';
-import { PartsService } from 'src/app/core/services/parts/parts.service';
-import { Router, ActivatedRoute, Params } from '@angular/router';
-import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import { TypesService, IType, ISubtype } from 'src/app/core/services/types/types.service';
-import { SearchService } from 'src/app/core/services/search/search.service';
-import {tap} from "rxjs/operators";
-import { IPartStorage } from 'src/app/core/models/storage-model';
-import { CurrentUserService } from 'src/app/core/services/currentUser/current-user.service';
+import {AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
+import {PaginationComponent} from 'src/app/shared/components/pagination/pagination.component';
+import {Subscription} from 'rxjs';
+import {PartModel} from 'src/app/core/models/part-model';
+import {PartsService} from 'src/app/core/services/parts/parts.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import {ISubtype, IType, TypesService} from 'src/app/core/services/types/types.service';
+import {SearchService} from 'src/app/core/services/search/search.service';
+import {IPartStorage} from 'src/app/core/models/storage-model';
+import {CurrentUserService} from 'src/app/core/services/currentUser/current-user.service';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-parts-list',
@@ -39,7 +39,8 @@ export class PartsListComponent implements AfterContentInit {
               private changeDetector: ChangeDetectorRef,
               private search: SearchService,
               private route: ActivatedRoute,
-              public currentUser: CurrentUserService) { }
+              public currentUser: CurrentUserService,
+              public loc: LocalizationService) { }
 
   ngAfterContentInit() {
     this.readySubscription = this.typesService.waitListReady()

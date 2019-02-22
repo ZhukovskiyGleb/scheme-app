@@ -10,6 +10,7 @@ import {ISubtype, IType, TypesService} from 'src/app/core/services/types/types.s
 import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 import {isNumber} from 'util';
 import {PartsValidators} from 'src/app/modules/parts/shared/parts-validators';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-edit-part',
@@ -37,7 +38,8 @@ export class EditPartComponent implements OnInit {
               private partsService: PartsService,
               private currentUser: CurrentUserService,
               public typesService: TypesService,
-              private changeDetector: ChangeDetectorRef) {}
+              private changeDetector: ChangeDetectorRef,
+              public loc: LocalizationService) {}
 
   ngOnInit() {
     this.initForm();

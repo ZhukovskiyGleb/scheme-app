@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {LocalizationService} from "../../services/localization/localization.service";
 
 @Component({
   selector: 'app-page-not-found',
   templateUrl: './page-not-found.component.html',
-  styleUrls: ['./page-not-found.component.css']
+  styleUrls: ['./page-not-found.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PageNotFoundComponent implements OnInit {
 
-  constructor() { }
+  constructor(public loc: LocalizationService) { }
 
   ngOnInit() {
   }

@@ -1,11 +1,21 @@
-import {ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import {noop, of, Subscription} from 'rxjs';
 import {ICaseStorage, IPartStorage} from 'src/app/core/models/storage-model';
 import {PartsService} from 'src/app/core/services/parts/parts.service';
 import {PartModel} from 'src/app/core/models/part-model';
 import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
 import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import {FormControl, FormGroup, FormArray, Validators} from '@angular/forms';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {LocalizationService} from "../../../../core/services/localization/localization.service";
 
 interface IPartInfo {
   title: string, part: IPartStorage
@@ -14,7 +24,8 @@ interface IPartInfo {
 @Component({
   selector: 'app-new-case',
   templateUrl: './new-case.component.html',
-  styleUrls: ['./new-case.component.css']
+  styleUrls: ['./new-case.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 @AutoUnsubscribe
 export class NewCaseComponent implements OnInit {
@@ -36,7 +47,8 @@ export class NewCaseComponent implements OnInit {
   titleWasFocused: boolean = false;
 
   constructor(private partsService: PartsService,
-              private changeDetector: ChangeDetectorRef) { }
+              private changeDetector: ChangeDetectorRef,
+              public loc: LocalizationService) { }
 
   ngOnInit() {
 

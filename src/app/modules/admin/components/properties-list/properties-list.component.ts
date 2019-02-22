@@ -1,23 +1,25 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { Title } from '@angular/platform-browser';
-import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
-import { AdminHelper } from '../../shared/admin-helper';
-import { TypesService } from 'src/app/core/services/types/types.service';
+import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
+import {AbstractControl, FormArray, FormGroup} from '@angular/forms';
+import {AdminHelper} from '../../shared/admin-helper';
+import {TypesService} from 'src/app/core/services/types/types.service';
+import {LocalizationService} from "../../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-properties-list',
   templateUrl: './properties-list.component.html',
-  styleUrls: ['./properties-list.component.css']
+  styleUrls: ['./properties-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PropertiesListComponent implements OnInit {
   @Input() group: FormGroup;
-  @Input() title: string;
+  @Input() label: string;
   @Input() properties: FormArray;
 
   @Input() type: number;
   @Input() subtype: number;
 
-  constructor(private typesService: TypesService) { }
+  constructor(private typesService: TypesService,
+              public loc: LocalizationService) { }
 
   ngOnInit() {
   }

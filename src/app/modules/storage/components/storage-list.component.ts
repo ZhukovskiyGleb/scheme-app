@@ -8,6 +8,7 @@ import {CurrentUserService} from 'src/app/core/services/currentUser/current-user
 import {IPartShortInfo, PartsService} from 'src/app/core/services/parts/parts.service';
 import {Router, ActivatedRoute} from '@angular/router';
 import {SearchService} from 'src/app/core/services/search/search.service';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-storage-list',
@@ -36,7 +37,8 @@ export class StorageListComponent implements OnInit, OnDestroy {
               private storage: StorageService,
               private partsService: PartsService,
               private changeDetector: ChangeDetectorRef,
-              private search: SearchService) { }
+              private search: SearchService,
+              public loc: LocalizationService) { }
 
   ngOnInit() {
     this.loadStorage();
@@ -132,6 +134,7 @@ export class StorageListComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('click') onMouseClick() {
+    this.onPreventClick();
     this.deselectAll();
   }
 
@@ -158,8 +161,10 @@ export class StorageListComponent implements OnInit, OnDestroy {
   }
 
   deselectAll(): void {
-    this.selectedCase = null;
-    this.selectedBox = null;
+    if (this.selectedBox || this.selectedCase) {
+      this.selectedCase = null;
+      this.selectedBox = null;
+    }
   }
 
   onBoxClick(curBox: IBoxStorage) {

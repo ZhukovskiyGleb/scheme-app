@@ -1,15 +1,16 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from 'src/app/core/services/auth/auth.service';
 import {Router} from '@angular/router';
-import { LoginValidators } from '../../shared/login-validators';
-import { ErrorModalService } from 'src/app/core/services/error-modal/error-modal.service';
-import { LoginErrorHandlerModel } from '../../shared/login-error-handler.model';
+import {LoginValidators} from '../../shared/login-validators';
+import {ErrorModalService} from 'src/app/core/services/error-modal/error-modal.service';
+import {LocalizationService} from "../../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent implements OnInit {
   public editForm: FormGroup;
@@ -17,7 +18,8 @@ export class LoginComponent implements OnInit {
   constructor(private auth: AuthService,
               private navigation: Router,
               private fb: FormBuilder,
-              private errorModal: ErrorModalService) { }
+              private errorModal: ErrorModalService,
+              public loc: LocalizationService) { }
 
   ngOnInit() {
     this.initForm();
@@ -44,10 +46,11 @@ export class LoginComponent implements OnInit {
       .subscribe(() => {
           this.navigation.navigate(['/home']);
       }, (error) => {
-        this.errorModal.showMessage(LoginErrorHandlerModel.getErrorMessage(error));
+        this.errorModal.showMessage(error);
         this.editForm.enable();
       });
     }
   }
+
 
 }
