@@ -28,7 +28,7 @@
               <input class="input is-small" type="text" value="" placeholder="{{loc.byId('storage_new_popup_add_hint')}}" formControlName="search" #searchField autofocus>
             </div>
           <div class="field is-grouped is-grouped-multiline" *ngIf="isSearchSelected && searchList && searchList.length > 0">
-            <div class="field" *ngFor="let part of searchList" (click)="onPartSelected(part)">
+            <div class="field" *ngFor="let part of searchList" (click)="onPartSelected(part)" style="margin: 0px !important">
               <button type="button" class="button is-small is-text">{{part.title}}</button>
             </div>
           </div>
@@ -38,7 +38,9 @@
     <div class="card-footer">
       <div class="card-footer-item">
         <div class="buttons is-centered">
-          <button class="button is-primary" (click)="onConfirmClick()" [disabled]="selectedCase.parts.length == 0 || caseForm.invalid">{{loc.byId('storage_new_popup_button_add')}}</button>
+          <button class="button is-primary" (click)="onConfirmClick()" [disabled]="selectedCase.parts.length == 0 || caseForm.invalid">
+            {{isNew ? loc.byId('storage_new_popup_button_add') : loc.byId('edit_button_save')}}
+          </button>
           <button class="button is-right" (click)="onCancelClick()">{{loc.byId('storage_new_popup_button_cancel')}}</button>
         </div>
       </div>

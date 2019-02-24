@@ -1,11 +1,23 @@
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import * as firebase from 'firebase';
-import { from, Observable, of } from 'rxjs';
-import { UserModel } from 'src/app/core/models/user-model';
-import { PartModel } from '../../models/part-model';
-import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { ITypesList } from '../types/types.service';
-import { IBoxStorage, StorageModel } from '../../models/storage-model';
+import {from, Observable} from 'rxjs';
+import {UserModel} from 'src/app/core/models/user-model';
+import {PartModel} from '../../models/part-model';
+import {QueryDocumentSnapshot, QuerySnapshot} from '@angular/fire/firestore';
+import {ITypesList} from '../types/types.service';
+import {IBoxStorage, StorageModel} from '../../models/storage-model';
+
+// export class ISystemOptions {
+//   types: {
+//     maxTypeId: number,
+//     types: [],
+//     properties: []
+//   };
+//   counters: {
+//     'parts': number
+//   };
+//   isReady: boolean = false;
+// }
 
 @Injectable({
   providedIn: 'root'
@@ -14,15 +26,15 @@ export class FireDbService{
 
   private db = firebase.firestore();
 
-  private systemObservable: Observable<firebase.firestore.QuerySnapshot>;
+  private systemObservable: Observable<any>;
 
   constructor() {
     this.updateSystem();
   }
 
-  updateSystem():Observable<firebase.firestore.QuerySnapshot> {
+  updateSystem():Observable<any> {
     if (!this.systemObservable) {
-      this.systemObservable = from(this.db.collection('system').get());
+       this.systemObservable = from(this.db.collection('system').get());
     }
     return this.systemObservable;
   }
@@ -93,7 +105,7 @@ export class FireDbService{
     return from(
       // this.db.collection('parts').orderBy('title').startAt(searchWord).endAt(searchWord + "\uf8ff").limit(10).get()
       // this.db.collection('parts').where('search', 'array-contains', searchWord).get()
-      this.db.collection('parts').where('search', 'array-contains', searchWord).limit(limit).get()
+      this.db.collection('parts').orderBy('title').where('search', 'array-contains', searchWord).limit(limit).get()
       .then(
         (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
           let result: PartModel[] = [];

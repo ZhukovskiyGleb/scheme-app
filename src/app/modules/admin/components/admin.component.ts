@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormGroup} from '@angular/forms';
 import {IType, TypesService} from 'src/app/core/services/types/types.service';
 import {Subscription} from 'rxjs';
@@ -65,7 +65,11 @@ export class AdminComponent implements OnInit, OnDestroy {
     });
 
     this.changeDetector.detectChanges();
-  }  
+  }
+
+  @HostListener('window:beforeunload') beforeUnload() {
+    // this.submitForm();
+  }
 
   ngOnDestroy() {
     this.submitForm();

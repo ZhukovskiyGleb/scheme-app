@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { FireDbService } from '../fire-db/fire-db.service';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import {Injectable} from '@angular/core';
+import {FireDbService} from '../fire-db/fire-db.service';
+import {Observable, of} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {QueryDocumentSnapshot, QuerySnapshot} from '@angular/fire/firestore';
+import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 
 export interface ISubtype {
   id: number;

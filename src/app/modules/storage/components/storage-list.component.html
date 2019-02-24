@@ -5,32 +5,39 @@
       <div class="buttons is-centered" *ngIf="inSearchMode">
         <button type="button" class="button is-warning" (click)="onCancelSearchClick()">{{loc.byId('search_close')}}</button>
       </div>
-      <div class="columns is-gapless is-multiline is-mobile" *ngIf="boxList">
-        <div class="column is-4" *ngFor="let box of boxList; index as i">
+      <div class="columns is-gapless is-multiline is-desktop" *ngIf="boxList">
+        <div class="column is-3 is-2-fullhd" *ngFor="let box of boxList; index as i">
           <nav class="panel" (click)="onBoxClick(box)">
             <div class="panel-heading">
               <div *ngIf="selectedBox === box && !selectedCase; else notSelectedBox">
-                <div class="field is-grouped">
+                <div class="field has-addons">
                   <input class="input is-small" type="text" [value]="box.title" (change)="onBoxChanged(inputBoxTitle.value)" #inputBoxTitle placeholder="{{loc.byId('storage_storage_hint')}}">
-                  <button type="button" class="button is-danger is-small" style="margin-left: 10px" (click)="onDeleteBoxClick()">{{loc.byId('storage_button_delete')}}</button>
+                  <button type="button" class="button is-danger is-small" (click)="onDeleteBoxClick()">{{loc.byId('storage_button_delete')}}</button>
+                </div>
+                <div class="buttons is-centered" style="margin-top: 5px">
+                  <button type="button" *ngIf="!inSearchMode && i > 0" class="button is-info is-small" (click)="onMoveLeftClick()" title="{{loc.byId('storage_move_left')}}">&#8592;</button>
+                  <button type="button" *ngIf="!inSearchMode && i < boxList.length - 1" class="button is-info is-small" (click)="onMoveRightClick()" title="{{loc.byId('storage_move_right')}}">&#8594;</button>
                 </div>
               </div>
               <ng-template #notSelectedBox>
                 <strong>{{box.title ? box.title : loc.byId('storage_storage') + ' ' + (i + 1)}}</strong>
               </ng-template>
             </div>
-            <a class="panel-block" *ngFor="let case of box.cases" (click)="onCaseClick(box, case)">
+            <a class="panel-block" *ngFor="let case of sortedCases(box)" (click)="onCaseClick(box, case)">
               <div class="control">
                 <div class="heading">
-                  <div class="field is-grouped" *ngIf="selectedCase === case; else notSelectedCase">
+                  <div class="field" *ngIf="selectedCase === case; else notSelectedCase">
                     <input class="input is-small" type="text" [value]="case.title" (change)="onCaseChanged(inputCaseAmount.value)" #inputCaseAmount>
-                    <button type="button" class="button is-danger is-small" style="margin-left: 10px" (click)="onDeleteCaseClick()">{{loc.byId('storage_button_delete')}}</button>
+                    <div class="buttons is-centered" style="margin-top: 5px">
+                      <button type="button" class="button is-info is-small" (click)="onEditCaseClick()">{{loc.byId('edit_button_edit')}}</button>
+                      <button type="button" class="button is-danger is-small" (click)="onDeleteCaseClick()">{{loc.byId('storage_button_delete')}}</button>
+                    </div>
                   </div>
                   <ng-template #notSelectedCase>
                       <strong>{{loc.byId('storage_case') + ' ' + case.title}}:</strong>
                   </ng-template>
                 </div>
-                <div class="control" *ngFor="let part of case.parts; trackBy: trackByPartId" title="{{getDescriptionById(part.id) | async}}">
+                <div class="control" *ngFor="let part of case.parts; trackBy: trackByPartId" title="{{getDescriptionById(part.id) | async}}" style="font-size: small !important">
                   - {{(getTitleById(part.id) | async) || loc.byId('loading')}}
                   <a (click)="onPartClick(part.id)" *ngIf="selectedCase === case">
                     <u style='margin-left: 5px'>({{loc.byId('storage_link_more')}})</u>
@@ -84,7 +91,8 @@
   
   <app-new-case
   [isActive]="isAddingNewCaseVisibility"
-  [selectedCase]="selectedCase"
+  [isNew]="!selectedCase"
+  [selectedCase]="editCase"
   [onConfirmCallback]="onAddNewCaseConfirmClicked"
   [onCancelCallback]="onAddNewCaseCancelClicked"
   (click)="onPreventClick()">

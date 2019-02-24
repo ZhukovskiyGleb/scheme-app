@@ -5,7 +5,9 @@ import {
   ElementRef,
   HostListener,
   Input,
+  OnChanges,
   OnInit,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
 import {noop, of, Subscription} from 'rxjs';
@@ -28,9 +30,10 @@ interface IPartInfo {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 @AutoUnsubscribe
-export class NewCaseComponent implements OnInit {
+export class NewCaseComponent implements OnInit, OnChanges {
 
   @Input() isActive: boolean = false;
+  @Input() isNew: boolean = false;
   @Input() selectedCase: ICaseStorage;
   @Input() onConfirmCallback: () => void = noop;
   @Input() onCancelCallback: () => void = noop;
@@ -50,14 +53,30 @@ export class NewCaseComponent implements OnInit {
               private changeDetector: ChangeDetectorRef,
               public loc: LocalizationService) { }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!this.selectedCase) return;
+
+    this.parts = [];
+
+    this.selectedCase.parts.forEach(
+      (part: IPartStorage) => {
+        this.parts.push({
+          title: this.partsService.getCachedInfoById(part.id).title,
+          part: part
+        });
+      }
+    );
+
+    this.caseForm.get('title').setValue(this.selectedCase.title);
+    this.caseForm.get('search').setValue('');
+  }
+
   ngOnInit() {
 
     this.caseForm = new FormGroup({
       title: new FormControl('', Validators.required),
       search: new FormControl('', {updateOn: 'change'}),
     });
-
-    this.clear();
 
     this.searchSubscription = this.caseForm.get('search').valueChanges
     .pipe(
@@ -66,7 +85,7 @@ export class NewCaseComponent implements OnInit {
       switchMap(
         (value: string) => {
           if (value && value.length > 0) {
-            return this.partsService.searchPartsByTitle(value, 10);
+            return this.partsService.searchPartsByTitle(value, 20);
           } 
           else {
             return of([]);
@@ -134,26 +153,15 @@ export class NewCaseComponent implements OnInit {
   onConfirmClick(): void {
     this.selectedCase.title = this.caseForm.get('title').value;
 
-    this.clear();
-
     this.onConfirmCallback();
   }
 
   onCancelClick(): void {
-    this.clear();
-
     this.onCancelCallback();
   }
 
   onModalClick(): void {
 
-  }
-
-  clear(): void {
-    this.parts = [];
-
-    this.caseForm.get('title').setValue('');
-    this.caseForm.get('search').setValue('');
   }
 
   get isSearchSelected(): boolean {

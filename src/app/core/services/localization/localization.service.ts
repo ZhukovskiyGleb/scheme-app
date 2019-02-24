@@ -76,7 +76,7 @@ export class LocalizationService {
       'storage_case': 'Case',
       'storage_button_add_storage': 'Add storage',
       'storage_button_delete': 'Remove',
-      'storage_link_more': 'more',
+      'storage_link_more': 'info',
       'storage_empty': 'empty',
       'storage_button_add_case': 'Add case',
       'storage_changes_title': 'Save changes?',
@@ -88,6 +88,8 @@ export class LocalizationService {
       'delete_hint': 'Remove',
 
       'storage_confirm_popup_title': 'Confirm removal',
+      'storage_move_left': 'Move left',
+      'storage_move_right': 'Move right',
       'storage_confirm_popup_storage': 'Are you sure that you want to remove selected case?',
       'storage_confirm_popup_case': 'Are you sure that you want to remove selected storage?',
 
@@ -210,6 +212,8 @@ export class LocalizationService {
       'delete_hint': 'Удалить',
 
       'storage_confirm_popup_title': 'Подтвердить удаление',
+      'storage_move_left': 'Переместить влево',
+      'storage_move_right': 'Переместить вправо',
       'storage_confirm_popup_storage': 'Вы уверены, что хотите удалить выбранную ячейку',
       'storage_confirm_popup_case': 'Вы уверены, что хотите удалить выбранное хранилище',
 
