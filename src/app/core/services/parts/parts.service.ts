@@ -2,7 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {FireDbService} from '../fire-db/fire-db.service';
 import {Observable, of} from 'rxjs';
 import {PartModel} from '../../models/part-model';
-import {filter, map, switchMap} from 'rxjs/operators';
+import {filter, map, switchMap, tap} from 'rxjs/operators';
 import {QueryDocumentSnapshot, QuerySnapshot} from '@angular/fire/firestore';
 import {CurrentUserService} from '../currentUser/current-user.service';
 
@@ -36,8 +36,8 @@ export class PartsService {
     return this.fireDB.updateSystem()
     .pipe(
       map(
-        (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
-          query.forEach(
+        (snapshot: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
+          snapshot.forEach(
             (doc: QueryDocumentSnapshot<any>) => {
             switch (doc.id) {
               case 'counters':
