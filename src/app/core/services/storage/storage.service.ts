@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { FireDbService } from '../fire-db/fire-db.service';
 import { map, filter, switchMap } from 'rxjs/operators';
 import { CurrentUserService } from '../currentUser/current-user.service';
 import { StorageModel, IBoxStorage, ICaseStorage } from '../../models/storage-model';
-import { registerContentQuery } from '@angular/core/src/render3';
+import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 
 @Injectable({
   providedIn: 'root'
 })
+@AutoUnsubscribe
 export class StorageService {
 
   private storage: StorageModel;
@@ -19,8 +20,23 @@ export class StorageService {
 
   private isChanged: boolean = false;
 
+  private logoutSubscription: Subscription;
+
   constructor(private fireDB: FireDbService,
-              private currentUser: CurrentUserService) { }
+              private currentUser: CurrentUserService) 
+  {
+    this.logoutSubscription = this.currentUser.isUserLogged
+    .pipe(
+      filter(
+        (result: boolean) => !result
+      )
+    )
+    .subscribe(
+      () => {
+        this.storage = null;
+      }
+    );
+  }
 
   loadStorage(refresh: boolean): Observable<StorageModel> {
     this.isChanged = false;

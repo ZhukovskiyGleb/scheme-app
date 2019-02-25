@@ -24,6 +24,7 @@ import {LocalizationService} from "./core/services/localization/localization.ser
     AppRoutingModule,
     HttpClientModule,
     AngularFirestoreModule,
+    HttpClientModule,
     CoreModule,
   ],
   providers: [

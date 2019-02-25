@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import * as firebase from 'firebase';
-import {from, Observable, Subject} from 'rxjs';
+import {from, Observable} from 'rxjs';
 import {UserModel} from 'src/app/core/models/user-model';
 import {PartModel} from '../../models/part-model';
 import {QueryDocumentSnapshot, QuerySnapshot} from '@angular/fire/firestore';

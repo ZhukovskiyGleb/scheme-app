@@ -4,6 +4,8 @@ import {Observable, of} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 import {QueryDocumentSnapshot, QuerySnapshot} from '@angular/fire/firestore';
 import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { resolve } from 'url';
 
 export interface ISubtype {
   id: number;
@@ -46,7 +48,21 @@ export class TypesService {
 
   private propertiesListCache: string[];
 
-  constructor(private fireDB: FireDbService) {}
+  constructor(private fireDB: FireDbService,
+              private http: HttpClient) {}
+
+  // testFunction(): void {
+  //   let headers = new HttpHeaders();
+  //   headers.set('parameter-name', 'parameter-value');
+  //   headers.set('Access-Control-Allow-Origin', '*');
+
+  //   this.http.get('https://us-central1-workbench-a10ea.cloudfunctions.net/addMessage.json', {headers: headers})
+  //   .subscribe(
+  //     (res: Response) => {
+  //       console.log(res);
+  //     }
+  //   );
+  // }
 
   get list(): ITypesList {
     return this.typesList;

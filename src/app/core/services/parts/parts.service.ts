@@ -2,7 +2,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {FireDbService} from '../fire-db/fire-db.service';
 import {Observable, of} from 'rxjs';
 import {PartModel} from '../../models/part-model';
-import {filter, map, switchMap, tap} from 'rxjs/operators';
+import {map, switchMap} from 'rxjs/operators';
 import {QueryDocumentSnapshot, QuerySnapshot} from '@angular/fire/firestore';
 import {CurrentUserService} from '../currentUser/current-user.service';
 

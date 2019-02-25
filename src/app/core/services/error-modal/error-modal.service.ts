@@ -12,14 +12,14 @@ export class ErrorModalService{
     
   }
 
-  showMessage(message: string): void {
+  showMessage(error: Partial<{code: string}>): void {
     this.updateEvent.next(
-      this.getErrorMessage(message)
+      this.getErrorMessage(error.code)
     );
   }
 
-  private getErrorMessage(error): string {
-    switch (error.code) {
+  private getErrorMessage(code: string): string {
+    switch (code) {
       case ('auth/user-not-found'):
         return this.loc.byId('error_user_not_found');
       case ('auth/wrong-password'):

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import {ErrorModalService} from '../../services/error-modal/error-modal.service';
 
 @Component({
@@ -12,13 +12,15 @@ export class ErrorModalComponent implements OnInit {
   message: string = "";
   isVisible: boolean = false;
 
-  constructor(private errorModal: ErrorModalService) { }
+  constructor(private errorModal: ErrorModalService,
+              private cd: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.errorModal.updateEvent.subscribe(
-      message => {
+      (message: string) => {
         this.message = message;
         this.isVisible = true;
+        this.cd.markForCheck();
       }
     );
   }

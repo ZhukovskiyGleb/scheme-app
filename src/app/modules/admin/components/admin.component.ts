@@ -36,6 +36,10 @@ export class AdminComponent implements OnInit, OnDestroy {
     );
   }
 
+  // onTestClick(): void {
+  //   this.typesService.testFunction();
+  // }
+
   initForm() {
     const tList = [];
     const pList = [];
