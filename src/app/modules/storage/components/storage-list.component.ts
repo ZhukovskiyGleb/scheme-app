@@ -242,8 +242,6 @@ export class StorageListComponent implements OnInit, OnDestroy {
     this.deselectAll();
     this.selectedBox = box;
 
-    // this.navigation.navigate(['storage']);
-
     this.storage.markAsChanged();
   }
 
@@ -371,8 +369,6 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
     this.deselectAll();
 
-    // this.navigation.navigate(['storage']);
-
     this.storage.markAsChanged();
   };
 
@@ -394,8 +390,6 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
     this.selectedCase = this.editCase;
     this.editCase = null;
-
-    // this.navigation.navigate(['storage']);
 
     this.storage.markAsChanged();
   };

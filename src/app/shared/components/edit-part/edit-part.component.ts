@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, Output} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
@@ -20,6 +20,7 @@ import {LocalizationService} from "../../../core/services/localization/localizat
 })
 @AutoUnsubscribe
 export class EditPartComponent implements OnInit {
+
   public editForm: FormGroup;
   public isEditMode: boolean = false;
   public isReady: boolean = false;
@@ -213,9 +214,21 @@ export class EditPartComponent implements OnInit {
       this.selectedPart.subtype = subtype;
 
       if (this.isNew) {
+        this.partsService.isBusy = true;
+
         this.isNew = false;
-        this.partsService.addNewPart(this.selectedPart);
-        this.navigation.navigate(['../', this.selectedPart.id], {relativeTo: this.route});
+        this.partsService.addNewPart(this.selectedPart)
+        .subscribe(
+          (result: Partial<{response: boolean, totalParts: number, reason: string}>) => {
+            this.partsService.isBusy = false;
+            if (result && result.response) {
+              this.navigation.navigate(['../', (result.totalParts - 1)], {relativeTo: this.route});
+            }
+            else {
+              this.selectedPart = null;
+            }
+          }
+        );
       }
       else {
         this.partsService.updatePartById(this.selectedPart, this.selectedPart.id);

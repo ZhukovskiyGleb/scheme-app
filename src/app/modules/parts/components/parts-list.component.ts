@@ -28,7 +28,6 @@ export class PartsListComponent implements AfterContentInit {
   private readySubscription: Subscription;
   
   partsCollection: PartModel[];
-  isBusy: boolean = true;
   inSearchMode: boolean = false;
 
   @ViewChild(PaginationComponent) pagination: PaginationComponent;
@@ -49,6 +48,10 @@ export class PartsListComponent implements AfterContentInit {
         this.init();
       }
     );
+  }
+
+  get isBusy(): boolean {
+    return this.partsService.isBusy;
   }
 
   init(): void {
@@ -83,7 +86,7 @@ export class PartsListComponent implements AfterContentInit {
   }
 
   updatePartCollection(currentPage: number):void {
-    this.isBusy = true;
+    this.partsService.isBusy = true;
     this.inSearchMode = false;
     const start = (currentPage - 1) * this.partsPerPage;
     
@@ -95,7 +98,7 @@ export class PartsListComponent implements AfterContentInit {
     .subscribe(
       (result: PartModel[]) => {
         this.partsCollection = result;
-        this.isBusy = false;
+        this.partsService.isBusy = false;
 
         this.changeDetector.detectChanges();
       }
@@ -109,7 +112,7 @@ export class PartsListComponent implements AfterContentInit {
     }
 
     this.pagination.currentPage = 1;
-    this.isBusy = true;
+    this.partsService.isBusy = true;
     this.inSearchMode = true;
     
     if (this.collectionSubscription) {
@@ -120,7 +123,7 @@ export class PartsListComponent implements AfterContentInit {
     .subscribe(
       (result: PartModel[]) => {
         this.partsCollection = result;
-        this.isBusy = false;
+        this.partsService.isBusy = false;
 
         this.changeDetector.detectChanges();
       }

@@ -5,6 +5,7 @@ import {Subscription} from 'rxjs';
 import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 import {AdminHelper} from '../shared/admin-helper';
 import {LocalizationService} from "../../../core/services/localization/localization.service";
+import { FirebaseService } from 'src/app/core/services/firebase/firebase.service';
 
 @Component({
   selector: 'app-admin',
@@ -20,6 +21,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   private subscriptionReady: Subscription;
 
   constructor(private fb: FormBuilder,
+              private firebase: FirebaseService,
               private typesService: TypesService,
               private changeDetector: ChangeDetectorRef,
               public loc: LocalizationService) { }
@@ -35,10 +37,6 @@ export class AdminComponent implements OnInit, OnDestroy {
       }
     );
   }
-
-  // onTestClick(): void {
-  //   this.typesService.testFunction();
-  // }
 
   initForm() {
     const tList = [];
