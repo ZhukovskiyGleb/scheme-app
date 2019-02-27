@@ -68,17 +68,25 @@
       <div class="field" *ngIf="isEditMode || editForm.get('description').value">
         <label class="label">{{loc.byId('edit_description')}}</label>
         <div class="control">
-          <textarea class="textarea" type="text" formControlName="description" placeholder="{{loc.byId('edit_description_hint')}}" [readOnly]="!isEditMode"></textarea>
+          <textarea class="textarea" type="text" style="min-height: 100px !important" formControlName="description" placeholder="{{loc.byId('edit_description_hint')}}" [readOnly]="!isEditMode"></textarea>
         </div>
       </div>
-
+      <div class="field" *ngIf="isEditMode">
+          <label class="label">{{loc.byId('edit_link')}}</label>
+          <div class="control">
+            <input class="input is-expanded" type="text" formControlName="link" placeholder="{{loc.byId('edit_link_hint')}}">
+          </div>
+        </div>
       <div class="field is-grouped">
         <div class="control is-expanded">
           <button type="submit" class="button is-link" *ngIf="isEditMode" [disabled]="!editForm.dirty || editForm.invalid">{{loc.byId('edit_button_save')}}</button>
-          <button type="button" class="button is-text" *ngIf="isEditMode" (click)="onCancelClick()">{{loc.byId('edit_button_cancel')}}</button>
+          <button type="button" class="button is-text" *ngIf="isEditMode" (click)="onCancelClick()" style="margin-left: 10px">{{loc.byId('edit_button_cancel')}}</button>
         </div>
         <div class="control is-right">
-          <button type="button" class="button is-warning" (click)="onCloseClick()">{{loc.byId('edit_button_close')}}</button>
+          <a class="button is-link is-info" href="{{editForm.get('link').value}}" target="_blank" *ngIf="!isEditMode && editForm.get('link').value">
+            <u>{{loc.byId('edit_link')}}</u>
+          </a>
+          <button type="button" class="button is-warning" (click)="onCloseClick()" style="margin-left: 10px">{{loc.byId('edit_button_close')}}</button>
         </div>
       </div>
       

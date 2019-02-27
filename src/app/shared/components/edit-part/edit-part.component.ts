@@ -117,6 +117,7 @@ export class EditPartComponent implements OnInit {
     let title = '';
     let type: number = 0;
     let subtype: number = 0;
+    let link = '';
     let description = '';
     const properties = this.fb.array([]);
 
@@ -128,6 +129,8 @@ export class EditPartComponent implements OnInit {
 
       subtype = this.typesService.getSubtypeById(type, this.selectedPart.subtype) 
                 ? this.selectedPart.subtype : null;
+
+      link = this.selectedPart.link;
 
       description = this.selectedPart.description;
       for (const property of this.selectedPart.properties) {
@@ -143,6 +146,7 @@ export class EditPartComponent implements OnInit {
         Validators.required, PartsValidators.dropdownRequired
       ]],
       subtype: [subtype],
+      link: [link],
       description: [description],
       properties: properties
     });
@@ -203,10 +207,11 @@ export class EditPartComponent implements OnInit {
 
   submitForm() {
     if (this.editForm.valid) {
-      const {title, type, subtype, description, properties} = this.editForm.value;
+      const {title, type, subtype, description, link, properties} = this.editForm.value;
 
       this.selectedPart.title = title;
 
+      this.selectedPart.link = link;
       this.selectedPart.description = description;
       this.selectedPart.properties = properties;
 

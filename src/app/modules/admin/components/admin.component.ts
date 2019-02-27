@@ -78,7 +78,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   submitForm() {
-    if (this.editForm.valid) {
+    if (this.editForm.valid && this.editForm.dirty) {
       this.typesService.updateTypes(this.editForm.value);
 
       this.editForm.markAsPristine();

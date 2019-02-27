@@ -5,6 +5,7 @@ class IPartParams {
     subtype: number;
     properties: IPartProperty[];
     description: string;
+    link: string;
     owner: string;
 }
 
@@ -28,5 +29,6 @@ export class PartModel {
                 public subtype: number = params.subtype,
                 public properties: IPartProperty[] = params.properties || [],
                 public description: string = params.description,
+                public link: string = params.link,
                 public owner: string = params.owner) {}
 }
