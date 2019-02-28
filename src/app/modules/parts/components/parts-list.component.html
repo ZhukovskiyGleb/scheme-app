@@ -23,7 +23,7 @@
           </tr>
         </tbody>
       </table>
-      <div class="buttons is-centered" *ngIf="!inSearchMode && (currentUser.isUserLogged | async)">
+      <div class="buttons is-centered" *ngIf="isAddNewAvailable()">
         <button type="button" class="button is-warning" (click)="onAddPartClick()">{{loc.byId('catalog_button_add')}}</button>
       </div>
       <app-pagination [isVisible]="!inSearchMode"></app-pagination>

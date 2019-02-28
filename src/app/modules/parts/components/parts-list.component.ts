@@ -158,4 +158,9 @@ export class PartsListComponent implements AfterContentInit {
     this.updatePartCollection(this.pagination.currentPage);
   }
 
+  isAddNewAvailable(): boolean {
+      return  !this.inSearchMode 
+              && (this.currentUser.isModer);
+  }
+
 }
