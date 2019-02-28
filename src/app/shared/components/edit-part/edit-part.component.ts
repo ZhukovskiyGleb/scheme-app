@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, Output} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
@@ -10,6 +10,7 @@ import {ISubtype, IType, TypesService} from 'src/app/core/services/types/types.s
 import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 import {isNumber} from 'util';
 import {PartsValidators} from 'src/app/modules/parts/shared/parts-validators';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-edit-part',
@@ -19,6 +20,7 @@ import {PartsValidators} from 'src/app/modules/parts/shared/parts-validators';
 })
 @AutoUnsubscribe
 export class EditPartComponent implements OnInit {
+
   public editForm: FormGroup;
   public isEditMode: boolean = false;
   public isReady: boolean = false;
@@ -37,7 +39,8 @@ export class EditPartComponent implements OnInit {
               private partsService: PartsService,
               private currentUser: CurrentUserService,
               public typesService: TypesService,
-              private changeDetector: ChangeDetectorRef) {}
+              private changeDetector: ChangeDetectorRef,
+              public loc: LocalizationService) {}
 
   ngOnInit() {
     this.initForm();
@@ -114,6 +117,7 @@ export class EditPartComponent implements OnInit {
     let title = '';
     let type: number = 0;
     let subtype: number = 0;
+    let link = '';
     let description = '';
     const properties = this.fb.array([]);
 
@@ -125,6 +129,8 @@ export class EditPartComponent implements OnInit {
 
       subtype = this.typesService.getSubtypeById(type, this.selectedPart.subtype) 
                 ? this.selectedPart.subtype : null;
+
+      link = this.selectedPart.link;
 
       description = this.selectedPart.description;
       for (const property of this.selectedPart.properties) {
@@ -140,6 +146,7 @@ export class EditPartComponent implements OnInit {
         Validators.required, PartsValidators.dropdownRequired
       ]],
       subtype: [subtype],
+      link: [link],
       description: [description],
       properties: properties
     });
@@ -200,10 +207,11 @@ export class EditPartComponent implements OnInit {
 
   submitForm() {
     if (this.editForm.valid) {
-      const {title, type, subtype, description, properties} = this.editForm.value;
+      const {title, type, subtype, description, link, properties} = this.editForm.value;
 
       this.selectedPart.title = title;
 
+      this.selectedPart.link = link;
       this.selectedPart.description = description;
       this.selectedPart.properties = properties;
 
@@ -211,9 +219,21 @@ export class EditPartComponent implements OnInit {
       this.selectedPart.subtype = subtype;
 
       if (this.isNew) {
+        this.partsService.isBusy = true;
+
         this.isNew = false;
-        this.partsService.addNewPart(this.selectedPart);
-        this.navigation.navigate(['../', this.selectedPart.id], {relativeTo: this.route});
+        this.partsService.addNewPart(this.selectedPart)
+        .subscribe(
+          (result: Partial<{response: boolean, totalParts: number, reason: string}>) => {
+            this.partsService.isBusy = false;
+            if (result && result.response) {
+              this.navigation.navigate(['../', (result.totalParts - 1)], {relativeTo: this.route});
+            }
+            else {
+              this.selectedPart = null;
+            }
+          }
+        );
       }
       else {
         this.partsService.updatePartById(this.selectedPart, this.selectedPart.id);

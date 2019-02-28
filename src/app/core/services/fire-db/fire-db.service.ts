@@ -1,11 +1,12 @@
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import * as firebase from 'firebase';
-import { from, Observable, of } from 'rxjs';
-import { UserModel } from 'src/app/core/models/user-model';
-import { PartModel } from '../../models/part-model';
-import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { ITypesList } from '../types/types.service';
-import { IBoxStorage, StorageModel } from '../../models/storage-model';
+import {from, Observable} from 'rxjs';
+import {UserModel} from 'src/app/core/models/user-model';
+import {PartModel} from '../../models/part-model';
+import {QueryDocumentSnapshot, QuerySnapshot} from '@angular/fire/firestore';
+import {ITypesList} from '../types/types.service';
+import {IBoxStorage, StorageModel} from '../../models/storage-model';
+import { generateSearchWords } from '../../shared/generateSearchWorlds';
 
 @Injectable({
   providedIn: 'root'
@@ -14,23 +15,17 @@ export class FireDbService{
 
   private db = firebase.firestore();
 
-  private systemObservable: Observable<firebase.firestore.QuerySnapshot>;
+  private systemObservable: Observable<any>;
 
   constructor() {
     this.updateSystem();
   }
 
-  updateSystem():Observable<firebase.firestore.QuerySnapshot> {
+  updateSystem():Observable<any> {
     if (!this.systemObservable) {
-      this.systemObservable = from(this.db.collection('system').get());
+       this.systemObservable = from(this.db.collection('system').get());
     }
     return this.systemObservable;
-  }
-
-  updatePartsCount(count: number): void {
-    this.db.collection('system').doc('counters').set({
-      parts: count
-    }, {merge: true});
   }
 
   createNewUser(uid: string, name: string): Observable<void> {
@@ -91,9 +86,7 @@ export class FireDbService{
   searchPartsByTitle(search: string, limit: number): Observable<PartModel[]> {
     const searchWord: string = search.toLowerCase();
     return from(
-      // this.db.collection('parts').orderBy('title').startAt(searchWord).endAt(searchWord + "\uf8ff").limit(10).get()
-      // this.db.collection('parts').where('search', 'array-contains', searchWord).limit(limit).get()
-      this.db.collection('parts').where('search', 'array-contains', searchWord).get()
+      this.db.collection('parts').orderBy('title').where('search', 'array-contains', searchWord).limit(limit).get()
       .then(
         (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
           let result: PartModel[] = [];
@@ -139,7 +132,7 @@ export class FireDbService{
     this.db.collection('parts').doc(id.toString()).set(
       {
         ...part,
-        search: this.generateSerchWords(part.title)
+        search: generateSearchWords(part.title)
       },
       {merge: true}
     );
@@ -147,45 +140,6 @@ export class FireDbService{
 
   updateTypes(types: ITypesList): void {
     this.db.collection('system').doc('types').set({...types});
-  }
-
-  generateSerchWords(title: string): string[] {
-    let mainWord:string = title.toLowerCase();
-    const result: string[] = [];
-    result.push(mainWord);
-
-    let split: string[];
-
-    split = mainWord.match(/[а-яА-Я]+|[a-zA-Z]+|[0-9]+/g);
-    if (split.length > 1) {
-      split.forEach(
-        value => {
-          if(value.length > 0) result.push(value);
-        }
-      );
-    }
-
-    split = mainWord.split(/-| |\(|\)|_|\\|\//);
-    if (split.length > 1) {
-      split.forEach(
-        value => {
-          if(value.length > 0 && result.indexOf(value) == -1) result.push(value);
-        }
-      )
-      mainWord = split.join('');
-      result.push(mainWord);
-    }
-
-    let i: number;
-    const max: number = Math.min(mainWord.length, 11 - result.length);
-    for (i = 1; i < max; i++) {
-      let word: string = mainWord.substr(0, i);
-      if (result.indexOf(word) == -1) {
-        result.push(word);
-      }
-    }
-    
-    return result;
   }
 
   getStorage(uid: string): Observable<StorageModel> {

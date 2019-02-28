@@ -2,6 +2,8 @@ import { Injectable, OnInit } from '@angular/core';
 import * as firebase from 'firebase';
 import { config, Observable, from, of, Subject } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { PartModel } from '../../models/part-model';
+import { generateSearchWords } from '../../shared/generateSearchWorlds';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +49,24 @@ export class FirebaseService {
     return (error: any): Observable<firebase.auth.UserCredential> => {
       throw error;
     };
+  }
+
+  addNewPart(part: PartModel): Observable<any> {
+    const addNewPart = firebase.functions().httpsCallable('addNewPart');
+
+    return from(
+      addNewPart({
+        part: {
+          ...part,
+          search: generateSearchWords(part.title)
+        }
+      })
+      .then(
+        (result: firebase.functions.HttpsCallableResult) => {
+          return result.data;
+        }
+      )
+    );
   }
 
 }

@@ -1,11 +1,23 @@
-import {ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import {noop, of, Subscription} from 'rxjs';
 import {ICaseStorage, IPartStorage} from 'src/app/core/models/storage-model';
 import {PartsService} from 'src/app/core/services/parts/parts.service';
 import {PartModel} from 'src/app/core/models/part-model';
 import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
 import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import {FormControl, FormGroup, FormArray, Validators} from '@angular/forms';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {LocalizationService} from "../../../../core/services/localization/localization.service";
 
 interface IPartInfo {
   title: string, part: IPartStorage
@@ -14,12 +26,14 @@ interface IPartInfo {
 @Component({
   selector: 'app-new-case',
   templateUrl: './new-case.component.html',
-  styleUrls: ['./new-case.component.css']
+  styleUrls: ['./new-case.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 @AutoUnsubscribe
-export class NewCaseComponent implements OnInit {
+export class NewCaseComponent implements OnInit, OnChanges {
 
   @Input() isActive: boolean = false;
+  @Input() isNew: boolean = false;
   @Input() selectedCase: ICaseStorage;
   @Input() onConfirmCallback: () => void = noop;
   @Input() onCancelCallback: () => void = noop;
@@ -36,7 +50,26 @@ export class NewCaseComponent implements OnInit {
   titleWasFocused: boolean = false;
 
   constructor(private partsService: PartsService,
-              private changeDetector: ChangeDetectorRef) { }
+              private changeDetector: ChangeDetectorRef,
+              public loc: LocalizationService) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!this.selectedCase) return;
+
+    this.parts = [];
+
+    this.selectedCase.parts.forEach(
+      (part: IPartStorage) => {
+        this.parts.push({
+          title: this.partsService.getCachedInfoById(part.id).title,
+          part: part
+        });
+      }
+    );
+
+    this.caseForm.get('title').setValue(this.selectedCase.title);
+    this.caseForm.get('search').setValue('');
+  }
 
   ngOnInit() {
 
@@ -45,8 +78,6 @@ export class NewCaseComponent implements OnInit {
       search: new FormControl('', {updateOn: 'change'}),
     });
 
-    this.clear();
-
     this.searchSubscription = this.caseForm.get('search').valueChanges
     .pipe(
       debounceTime(400),
@@ -54,7 +85,7 @@ export class NewCaseComponent implements OnInit {
       switchMap(
         (value: string) => {
           if (value && value.length > 0) {
-            return this.partsService.searchPartsByTitle(value, 10);
+            return this.partsService.searchPartsByTitle(value, 20);
           } 
           else {
             return of([]);
@@ -122,26 +153,15 @@ export class NewCaseComponent implements OnInit {
   onConfirmClick(): void {
     this.selectedCase.title = this.caseForm.get('title').value;
 
-    this.clear();
-
     this.onConfirmCallback();
   }
 
   onCancelClick(): void {
-    this.clear();
-
     this.onCancelCallback();
   }
 
   onModalClick(): void {
 
-  }
-
-  clear(): void {
-    this.parts = [];
-
-    this.caseForm.get('title').setValue('');
-    this.caseForm.get('search').setValue('');
   }
 
   get isSearchSelected(): boolean {

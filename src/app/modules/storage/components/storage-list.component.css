@@ -11,7 +11,9 @@
     min-height: 50px;
     cursor: pointer;
 }
-
 .panel-block {
     min-height: 65px;
+}
+.hero-body {
+  background-color: lightsteelblue;
 }

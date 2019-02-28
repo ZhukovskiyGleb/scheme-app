@@ -3,32 +3,32 @@
      *ngIf="selectedCase"
      (click)="onModalClick()">
   <div class="modal-background" [ngStyle]="{opacity: .5}"></div>
-  <div class="card" style="width: 25%">
+  <div class="card" style="width: 25%; min-width: 300px">
     <div class="card-header">
       <p class="card-header-title">
-        <strong>Новая ячейка</strong>
+        <strong>{{loc.byId('storage_new_popup_title')}}</strong>
       </p>
     </div>
     <div class="card-content">
       <div class="content">
         <form [formGroup]="caseForm">
           <div class="field is-grouped">
-            <label class="label">Название</label>
-            <input class="input is-small" type="text" value="" style="margin-left: 5px" placeholder="Название ячейки" formControlName="title"autofocus>
+            <label class="label">{{loc.byId('storage_new_popup_case_title')}}</label>
+            <input class="input is-small" type="text" value="" style="margin-left: 5px" placeholder="{{loc.byId('storage_new_popup_case_hint')}}" formControlName="title"autofocus>
           </div>
           <div class="control" *ngFor="let model of parts">
             <label class="label">{{model.title}}</label>
             <div class="field has-addons">
-              <input class="input is-small" type="number" [value]="model.part.amount" min="0" (change)="onAmountChanged(model, partAmount.value)" placeholder="Количество" #partAmount>
-              <button type="button" class="button is-danger is-small" (click)="onDeletePartClick(model)">X</button>
+              <input class="input is-small" type="number" [value]="model.part.amount" min="0" (change)="onAmountChanged(model, partAmount.value)" title="{{loc.byId('storage_new_popup_amount')}}" #partAmount autofocus>
+              <button type="button" class="button is-danger is-small" (click)="onDeletePartClick(model)" title="{{loc.byId('delete_hint')}}">X</button>
             </div>
           </div>
           <div class="field">
-              <label class="label">Добавить деталь</label>
-              <input class="input is-small" type="text" value="" placeholder="Поиск" formControlName="search" #searchField autofocus>
+              <label class="label">{{loc.byId('storage_new_popup_add_title')}}</label>
+              <input class="input is-small" type="text" value="" placeholder="{{loc.byId('storage_new_popup_add_hint')}}" formControlName="search" #searchField autofocus>
             </div>
           <div class="field is-grouped is-grouped-multiline" *ngIf="isSearchSelected && searchList && searchList.length > 0">
-            <div class="field" *ngFor="let part of searchList" (click)="onPartSelected(part)">
+            <div class="field" *ngFor="let part of searchList" (click)="onPartSelected(part)" style="margin: 0px !important">
               <button type="button" class="button is-small is-text">{{part.title}}</button>
             </div>
           </div>
@@ -38,8 +38,10 @@
     <div class="card-footer">
       <div class="card-footer-item">
         <div class="buttons is-centered">
-          <button class="button is-primary" (click)="onConfirmClick()" [disabled]="selectedCase.parts.length == 0 || caseForm.invalid">Добавить</button>
-          <button class="button is-right" (click)="onCancelClick()">Отмена</button>
+          <button class="button is-primary" (click)="onConfirmClick()" [disabled]="selectedCase.parts.length == 0 || caseForm.invalid">
+            {{isNew ? loc.byId('storage_new_popup_button_add') : loc.byId('edit_button_save')}}
+          </button>
+          <button class="button is-right" (click)="onCancelClick()">{{loc.byId('storage_new_popup_button_cancel')}}</button>
         </div>
       </div>
     </div>

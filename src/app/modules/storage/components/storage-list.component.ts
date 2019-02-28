@@ -8,6 +8,7 @@ import {CurrentUserService} from 'src/app/core/services/currentUser/current-user
 import {IPartShortInfo, PartsService} from 'src/app/core/services/parts/parts.service';
 import {Router, ActivatedRoute} from '@angular/router';
 import {SearchService} from 'src/app/core/services/search/search.service';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-storage-list',
@@ -21,6 +22,7 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
   selectedBox: IBoxStorage;
   selectedCase: ICaseStorage;
+  editCase: ICaseStorage;
 
   isBusy: boolean = false;
   isWarningVisibility: boolean = false;
@@ -36,7 +38,8 @@ export class StorageListComponent implements OnInit, OnDestroy {
               private storage: StorageService,
               private partsService: PartsService,
               private changeDetector: ChangeDetectorRef,
-              private search: SearchService) { }
+              private search: SearchService,
+              public loc: LocalizationService) { }
 
   ngOnInit() {
     this.loadStorage();
@@ -132,6 +135,7 @@ export class StorageListComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('click') onMouseClick() {
+    this.onPreventClick();
     this.deselectAll();
   }
 
@@ -158,8 +162,10 @@ export class StorageListComponent implements OnInit, OnDestroy {
   }
 
   deselectAll(): void {
-    this.selectedCase = null;
-    this.selectedBox = null;
+    if (this.selectedBox || this.selectedCase) {
+      this.selectedCase = null;
+      this.selectedBox = null;
+    }
   }
 
   onBoxClick(curBox: IBoxStorage) {
@@ -169,6 +175,20 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
     this.deselectAll();
     this.selectedBox = curBox;
+  }
+
+  sortedCases(box: IBoxStorage): ICaseStorage[] {
+    return box.cases.sort(
+      (a: ICaseStorage, b: ICaseStorage) => {
+        if (a.title > b.title) {
+          return 1;
+        }
+        if (a.title < b.title) {
+          return -1;
+        }
+        return 0;
+      }
+    );
   }
 
   onCaseClick(curBox: IBoxStorage, curCase: ICaseStorage) {
@@ -222,8 +242,6 @@ export class StorageListComponent implements OnInit, OnDestroy {
     this.deselectAll();
     this.selectedBox = box;
 
-    this.navigation.navigate(['storage']);
-
     this.storage.markAsChanged();
   }
 
@@ -235,7 +253,8 @@ export class StorageListComponent implements OnInit, OnDestroy {
       parts: []
     };
 
-    this.selectedCase = newCase;
+    this.selectedCase = null;
+    this.editCase = newCase;
 
     this.isAddingNewCaseVisibility = true;
   }
@@ -270,6 +289,48 @@ export class StorageListComponent implements OnInit, OnDestroy {
     this.isWarningVisibility = true;
   }
 
+  onMoveLeftClick(): void {
+    this.onPreventClick();
+
+    const index: number = this.boxList.indexOf(this.selectedBox);
+
+    if (index != -1 && index > 0) {
+      this.boxList[index] = this.boxList[index - 1];
+      this.boxList[index - 1] = this.selectedBox;
+    }
+
+    this.storage.markAsChanged();
+    this.changeDetector.markForCheck();
+  }
+
+  onMoveRightClick(): void {
+    this.onPreventClick();
+
+    const index: number = this.boxList.indexOf(this.selectedBox);
+
+    if (index != -1 && index < this.boxList.length - 1) {
+      this.boxList[index] = this.boxList[index + 1];
+      this.boxList[index + 1] = this.selectedBox;
+    }
+
+    this.storage.markAsChanged();
+    this.changeDetector.markForCheck();
+  }
+
+  onEditCaseClick(): void {
+    this.onPreventClick();
+
+    const newCase: ICaseStorage = {
+      title: this.selectedCase.title,
+      parts: [...this.selectedCase.parts]
+    };
+
+    this.editCase = newCase;
+    this.editCase = newCase;
+
+    this.isAddingNewCaseVisibility = true;
+  }
+
   onDeleteCaseClick(): void {
     this.onPreventClick();
 
@@ -278,7 +339,7 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
   onDeleteCancelClick = () => {
     this.isWarningVisibility = false;
-  }
+  };
 
   onDeleteConfirmClick = () => {
     this.isWarningVisibility = false;
@@ -308,10 +369,8 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
     this.deselectAll();
 
-    this.navigation.navigate(['storage']);
-
     this.storage.markAsChanged();
-  }
+  };
 
   onPreventClick(): void {
     event.preventDefault();
@@ -321,18 +380,25 @@ export class StorageListComponent implements OnInit, OnDestroy {
   onAddNewCaseConfirmClicked = () => {
     this.isAddingNewCaseVisibility = false;
 
-    this.selectedBox.cases.push(this.selectedCase);
+    if (this.selectedCase) {
+      this.selectedCase.title = this.editCase.title;
+      this.selectedCase.parts = this.editCase.parts;
+    }
+    else {
+      this.selectedBox.cases.push(this.editCase);
+    }
 
-    this.navigation.navigate(['storage']);
+    this.selectedCase = this.editCase;
+    this.editCase = null;
 
     this.storage.markAsChanged();
-  }
+  };
 
   onAddNewCaseCancelClicked = () => {
     this.isAddingNewCaseVisibility = false;
 
-    this.selectedCase = null;
-  }
+    this.editCase = null;
+  };
 
   hasChanges(): boolean {
     return this.storage.hasChanges()

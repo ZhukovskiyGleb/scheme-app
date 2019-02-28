@@ -1,9 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy } from '@angular/core';
-import { FormGroup, AbstractControl, FormArray, FormBuilder } from '@angular/forms';
-import { TypesService, IType } from 'src/app/core/services/types/types.service';
-import { Subscription } from 'rxjs';
-import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import { AdminHelper } from '../shared/admin-helper';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {AbstractControl, FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {IType, TypesService} from 'src/app/core/services/types/types.service';
+import {Subscription} from 'rxjs';
+import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import {AdminHelper} from '../shared/admin-helper';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
+import { FirebaseService } from 'src/app/core/services/firebase/firebase.service';
 
 @Component({
   selector: 'app-admin',
@@ -16,16 +18,18 @@ export class AdminComponent implements OnInit, OnDestroy {
   public editForm: FormGroup;
   isBusy: boolean = true;
 
-  private subscription: Subscription;
+  private subscriptionReady: Subscription;
 
   constructor(private fb: FormBuilder,
+              private firebase: FirebaseService,
               private typesService: TypesService,
-              private changeDetector: ChangeDetectorRef) { }
+              private changeDetector: ChangeDetectorRef,
+              public loc: LocalizationService) { }
 
   ngOnInit() {
     this.initForm();
 
-    this.subscription = this.typesService.waitListReady()
+    this.subscriptionReady = this.typesService.waitListReady()
     .subscribe(
       () => {
         this.isBusy = false;
@@ -63,14 +67,18 @@ export class AdminComponent implements OnInit, OnDestroy {
     });
 
     this.changeDetector.detectChanges();
-  }  
+  }
+
+  @HostListener('window:beforeunload') beforeUnload() {
+    // this.submitForm();
+  }
 
   ngOnDestroy() {
     this.submitForm();
   }
 
   submitForm() {
-    if (this.editForm.valid) {
+    if (this.editForm.valid && this.editForm.dirty) {
       this.typesService.updateTypes(this.editForm.value);
 
       this.editForm.markAsPristine();

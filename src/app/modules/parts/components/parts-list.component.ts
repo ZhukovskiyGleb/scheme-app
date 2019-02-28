@@ -1,15 +1,15 @@
-import { Component, ViewChild, AfterContentInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@angular/core';
-import { PaginationComponent } from 'src/app/shared/components/pagination/pagination.component';
-import { Subscription } from 'rxjs';
-import { PartModel } from 'src/app/core/models/part-model';
-import { PartsService } from 'src/app/core/services/parts/parts.service';
-import { Router, ActivatedRoute, Params } from '@angular/router';
-import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import { TypesService, IType, ISubtype } from 'src/app/core/services/types/types.service';
-import { SearchService } from 'src/app/core/services/search/search.service';
-import {tap} from "rxjs/operators";
-import { IPartStorage } from 'src/app/core/models/storage-model';
-import { CurrentUserService } from 'src/app/core/services/currentUser/current-user.service';
+import {AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
+import {PaginationComponent} from 'src/app/shared/components/pagination/pagination.component';
+import {Subscription} from 'rxjs';
+import {PartModel} from 'src/app/core/models/part-model';
+import {PartsService} from 'src/app/core/services/parts/parts.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import {ISubtype, IType, TypesService} from 'src/app/core/services/types/types.service';
+import {SearchService} from 'src/app/core/services/search/search.service';
+import {IPartStorage} from 'src/app/core/models/storage-model';
+import {CurrentUserService} from 'src/app/core/services/currentUser/current-user.service';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-parts-list',
@@ -28,7 +28,6 @@ export class PartsListComponent implements AfterContentInit {
   private readySubscription: Subscription;
   
   partsCollection: PartModel[];
-  isBusy: boolean = true;
   inSearchMode: boolean = false;
 
   @ViewChild(PaginationComponent) pagination: PaginationComponent;
@@ -39,7 +38,8 @@ export class PartsListComponent implements AfterContentInit {
               private changeDetector: ChangeDetectorRef,
               private search: SearchService,
               private route: ActivatedRoute,
-              public currentUser: CurrentUserService) { }
+              public currentUser: CurrentUserService,
+              public loc: LocalizationService) { }
 
   ngAfterContentInit() {
     this.readySubscription = this.typesService.waitListReady()
@@ -48,6 +48,10 @@ export class PartsListComponent implements AfterContentInit {
         this.init();
       }
     );
+  }
+
+  get isBusy(): boolean {
+    return this.partsService.isBusy;
   }
 
   init(): void {
@@ -82,7 +86,7 @@ export class PartsListComponent implements AfterContentInit {
   }
 
   updatePartCollection(currentPage: number):void {
-    this.isBusy = true;
+    this.partsService.isBusy = true;
     this.inSearchMode = false;
     const start = (currentPage - 1) * this.partsPerPage;
     
@@ -94,7 +98,7 @@ export class PartsListComponent implements AfterContentInit {
     .subscribe(
       (result: PartModel[]) => {
         this.partsCollection = result;
-        this.isBusy = false;
+        this.partsService.isBusy = false;
 
         this.changeDetector.detectChanges();
       }
@@ -108,18 +112,18 @@ export class PartsListComponent implements AfterContentInit {
     }
 
     this.pagination.currentPage = 1;
-    this.isBusy = true;
+    this.partsService.isBusy = true;
     this.inSearchMode = true;
     
     if (this.collectionSubscription) {
       this.collectionSubscription.unsubscribe();
     }
 
-    this.collectionSubscription = this.partsService.searchPartsByTitle(search, this.partsPerPage)
+    this.collectionSubscription = this.partsService.searchPartsByTitle(search, this.pagination.totalPages)
     .subscribe(
       (result: PartModel[]) => {
         this.partsCollection = result;
-        this.isBusy = false;
+        this.partsService.isBusy = false;
 
         this.changeDetector.detectChanges();
       }
@@ -152,6 +156,11 @@ export class PartsListComponent implements AfterContentInit {
 
   onCancelSearchClick() {
     this.updatePartCollection(this.pagination.currentPage);
+  }
+
+  isAddNewAvailable(): boolean {
+      return  !this.inSearchMode 
+              && (this.currentUser.isModer);
   }
 
 }

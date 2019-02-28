@@ -3,50 +3,57 @@
     <div class="container">
       <router-outlet></router-outlet>
       <div class="buttons is-centered" *ngIf="inSearchMode">
-        <button type="button" class="button is-warning" (click)="onCancelSearchClick()">Закрыть поиск</button>
+        <button type="button" class="button is-warning" (click)="onCancelSearchClick()">{{loc.byId('search_close')}}</button>
       </div>
-      <div class="columns is-gapless is-multiline is-mobile" *ngIf="boxList">
-        <div class="column is-4" *ngFor="let box of boxList">
+      <div class="columns is-gapless is-multiline is-desktop" *ngIf="boxList">
+        <div class="column is-3 is-2-fullhd" *ngFor="let box of boxList; index as i">
           <nav class="panel" (click)="onBoxClick(box)">
             <div class="panel-heading">
               <div *ngIf="selectedBox === box && !selectedCase; else notSelectedBox">
-                <div class="field is-grouped">
-                  <input class="input is-small" type="text" [value]="box.title" (change)="onBoxChanged(inputBoxTitle.value)" #inputBoxTitle placeholder="Введите название">
-                  <button type="button" class="button is-danger is-small" style="margin-left: 10px" (click)="onDeleteBoxClick()">Удалить</button>
+                <div class="field has-addons">
+                  <input class="input is-small" type="text" [value]="box.title" (change)="onBoxChanged(inputBoxTitle.value)" #inputBoxTitle placeholder="{{loc.byId('storage_storage_hint')}}">
+                  <button type="button" class="button is-danger is-small" (click)="onDeleteBoxClick()">{{loc.byId('storage_button_delete')}}</button>
+                </div>
+                <div class="buttons is-centered" style="margin-top: 5px">
+                  <button type="button" *ngIf="!inSearchMode && i > 0" class="button is-info is-small" (click)="onMoveLeftClick()" title="{{loc.byId('storage_move_left')}}">&#8592;</button>
+                  <button type="button" *ngIf="!inSearchMode && i < boxList.length - 1" class="button is-info is-small" (click)="onMoveRightClick()" title="{{loc.byId('storage_move_right')}}">&#8594;</button>
                 </div>
               </div>
               <ng-template #notSelectedBox>
-                <strong>{{box.title ? box.title : 'Хранилище'}}</strong>
+                <strong>{{box.title ? box.title : loc.byId('storage_storage') + ' ' + (i + 1)}}</strong>
               </ng-template>
             </div>
-            <a class="panel-block" *ngFor="let case of box.cases" (click)="onCaseClick(box, case)">
+            <a class="panel-block" *ngFor="let case of sortedCases(box)" (click)="onCaseClick(box, case)">
               <div class="control">
                 <div class="heading">
-                  <div class="field is-grouped" *ngIf="selectedCase === case; else notSelectedCase">
+                  <div class="field" *ngIf="selectedCase === case; else notSelectedCase">
                     <input class="input is-small" type="text" [value]="case.title" (change)="onCaseChanged(inputCaseAmount.value)" #inputCaseAmount>
-                    <button type="button" class="button is-danger is-small" style="margin-left: 10px" (click)="onDeleteCaseClick()">Удалить</button>
+                    <div class="buttons is-centered" style="margin-top: 5px">
+                      <button type="button" class="button is-info is-small" (click)="onEditCaseClick()">{{loc.byId('edit_button_edit')}}</button>
+                      <button type="button" class="button is-danger is-small" (click)="onDeleteCaseClick()">{{loc.byId('storage_button_delete')}}</button>
+                    </div>
                   </div>
                   <ng-template #notSelectedCase>
-                      <strong>Ячейка {{case.title}}:</strong>
+                      <strong>{{loc.byId('storage_case') + ' ' + case.title}}:</strong>
                   </ng-template>
                 </div>
-                <div class="control" *ngFor="let part of case.parts; trackBy: trackByPartId" title="{{getDescriptionById(part.id) | async}}">
-                  - {{(getTitleById(part.id) | async) || 'Загрузка'}}
+                <div class="control" *ngFor="let part of case.parts; trackBy: trackByPartId" title="{{getDescriptionById(part.id) | async}}" style="font-size: small !important">
+                  - {{(getTitleById(part.id) | async) || loc.byId('loading')}}
                   <a (click)="onPartClick(part.id)" *ngIf="selectedCase === case">
-                    <u style='margin-left: 5px'>(подробнее)</u>
+                    <u style='margin-left: 5px'>({{loc.byId('storage_link_more')}})</u>
                   </a>
                   <div class="field" *ngIf="selectedCase === case; else notSelectedCase">
                     <input class="input is-small" type="number" [value]="part.amount" min="0" (change)="onPartChanged(part, inputAmount.value)" #inputAmount>
                   </div>
                   <ng-template #notSelectedCase>
-                    {{part.amount > 0 ? '[x' + part.amount + ']' : 'пусто'}}
+                    {{part.amount > 0 ? '[x' + part.amount + ']' : loc.byId('storage_empty')}}
                   </ng-template>
                 </div>
               </div>
             </a>
             <a class="panel-block" (click)="onAddCaseClick()" style="min-height: 30px" *ngIf="selectedBox === box">
               <button type="button" class="button is-warning is-small is-fullwidth">
-                <strong>Добавить ячейку</strong>
+                <strong>{{loc.byId('storage_button_add_case')}}</strong>
               </button>
             </a>
           </nav>
@@ -55,7 +62,7 @@
           <nav class="panel" (click)="onAddStorageClick()">
             <p class="panel-heading">
               <button type="button" class="button is-warning is-small is-fullwidth">
-                <strong>Добавить хранилище</strong>
+                <strong>{{loc.byId('storage_button_add_storage')}}</strong>
               </button>
             </p>
           </nav>
@@ -63,12 +70,12 @@
       </div>
       <article class="message is-warning has-text-centered" *ngIf="hasChanges()">
         <div class="message-body" style="background-color: antiquewhite">
-          <strong style="color: dodgerblue; margin-top: 5px">Сохранить изменения?</strong>
+          <strong style="color: dodgerblue; margin-top: 5px">{{loc.byId('storage_changes_title')}}</strong>
           <div class="buttons is-centered" style="margin-top: 10px">
-            <button type="button" class="button is-success" (click)="saveStorage()">Да</button>
-            <button type="button" class="button is-danger" (click)="loadStorage(true)">Нет</button>
+            <button type="button" class="button is-success" (click)="saveStorage()">{{loc.byId('button_yes')}}</button>
+            <button type="button" class="button is-danger" (click)="loadStorage(true)">{{loc.byId('button_no')}}</button>
           </div>
-          <p class="help">* Изменения будут автоматически сохранены при переходе на другую вкладку</p>
+          <p class="help">* {{loc.byId('storage_changes_hint')}}</p>
         </div>
       </article>
     </div>
@@ -84,7 +91,8 @@
   
   <app-new-case
   [isActive]="isAddingNewCaseVisibility"
-  [selectedCase]="selectedCase"
+  [isNew]="!selectedCase"
+  [selectedCase]="editCase"
   [onConfirmCallback]="onAddNewCaseConfirmClicked"
   [onCancelCallback]="onAddNewCaseCancelClicked"
   (click)="onPreventClick()">

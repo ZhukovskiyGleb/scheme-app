@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { FireDbService } from '../fire-db/fire-db.service';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { AutoUnsubscribe } from 'src/app/shared/decorators/auto-unsubscribe.decorator';
+import {Injectable} from '@angular/core';
+import {FireDbService} from '../fire-db/fire-db.service';
+import {Observable, of} from 'rxjs';
+import {map, tap} from 'rxjs/operators';
+import {QueryDocumentSnapshot, QuerySnapshot} from '@angular/fire/firestore';
+import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
 
 export interface ISubtype {
   id: number;
@@ -57,21 +57,20 @@ export class TypesService {
   }
 
   waitListReady(): Observable<void> {
-    if (this.typesList)
+    if (this.typesList) {
       return of(null);
+    }
 
     return this.fireDB.updateSystem()
     .pipe(
       map(
-        (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
-          query.forEach(
+        (snapshot: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
+          
+          snapshot.forEach(
             (doc: QueryDocumentSnapshot<any>) => {
             switch (doc.id) {
               case 'types':
-                this.typesList = new ITypesList();
-                this.typesList.maxTypeId = doc.data().maxTypeId;
-                this.typesList.types = doc.data().types;
-                this.typesList.properties = doc.data().properties;
+              this.parseTypes(doc.data());
                 break;
             }
           });
@@ -79,6 +78,13 @@ export class TypesService {
         }
       )
     );
+  }
+
+  parseTypes(data: any): void  {
+    this.typesList = new ITypesList();
+    this.typesList.maxTypeId = data.maxTypeId;
+    this.typesList.types = data.types;
+    this.typesList.properties = data.properties;
   }
 
   updateTypes(list: ITypesList): void {

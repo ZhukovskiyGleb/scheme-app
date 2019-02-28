@@ -1,48 +1,48 @@
 <div class="container">
     <form [formGroup]="editForm" (ngSubmit)="submitForm()" *ngIf="isReady">
       <div class="is-grouped">
-        <label class="label">Название</label>
+        <label class="label">{{loc.byId('edit_title')}}</label>
         <div class="field has-addons">
           <div class="control is-expanded">
-            <input class="input" type="text" formControlName="title" placeholder="Название" [readonly]="!isEditMode">
+            <input class="input" type="text" formControlName="title" placeholder="{{loc.byId('edit_title_hint')}}" [readonly]="!isEditMode">
           </div>
           <div class="control" *ngIf="isEditAvailable()">
             <a class="button is-info" (click)="onEditClick()">
-              Редактировать
+              {{loc.byId('edit_button_edit')}}
             </a>
           </div>
         </div>
-        <p class="help is-warning" *ngIf="editForm.get('title').touched && editForm.hasError('required', ['title'])">Название не должно быть пустым</p>
+        <p class="help is-warning" *ngIf="editForm.get('title').touched && editForm.hasError('required', ['title'])">{{loc.byId('edit_title_error_empty')}}</p>
       </div>
       <div class="field is-grouped" style="margin-top: 10px" *ngIf="typesService.isReady">
         <div class="field" *ngIf="editForm && (currentTypeValue || isEditMode) && availableTypes.length > 0">
-          <label class="label">Тип</label>
+          <label class="label">{{loc.byId('edit_type')}}</label>
           <div class="control">
             <input class="input" type="text" value="{{currentTypeValue}}" *ngIf="!isEditMode" readonly>
             <div class="select" *ngIf="isEditMode">
               <select formControlName="type">
-                <option selected disabled hidden value=null>Выбрать</option>
-                <option *ngFor="let field of availableTypes; let i = index" [value]="field.id">{{field.value}}</option>
+                <option selected disabled hidden value=null>{{loc.byId('edit_type_choose')}}</option>
+                <option *ngFor="let field of availableTypes" [value]="field.id">{{field.value}}</option>
               </select>
             </div>
           </div>
         </div>
         <div class="field" style="margin-left: 10px" *ngIf="editForm && (currentSubtypeValue || isEditMode) && availableSubtypes.length > 0">
-          <label class="label">Подтип</label>
+          <label class="label">{{loc.byId('edit_subtype')}}</label>
           <div class="control">
             <input class="input" type="text" value="{{currentSubtypeValue}}" *ngIf="!isEditMode" readonly>
             <div class="select" *ngIf="isEditMode">
               <select formControlName="subtype">
-                <option selected value=null>Нет</option>
+                <option selected value=null>{{loc.byId('edit_subtype_no')}}</option>
                 <option *ngFor="let field of availableSubtypes; let i = index" [value]="field.id">{{field.value}}</option>
               </select>
             </div>
           </div>
         </div>
       </div>
-      <p class="help is-warning" *ngIf="editForm && editForm.hasError('dropdown', ['type'])">Выберите тип</p>
+      <p class="help is-warning" *ngIf="editForm && editForm.hasError('dropdown', ['type'])">{{loc.byId('edit_type_error')}}</p>
       <div class="field" formArrayName="properties" *ngIf="(propertiesList != null && propertiesList.length > 0 ) || isEditMode" style="margin-top: 10px">
-        <label class="label">Параметры</label>
+        <label class="label">{{loc.byId('edit_parameters')}}</label>
         <div class="field has-addons" *ngFor="let property of propertiesList; let i = index" [formGroupName]="i">
           <span class="select" *ngIf="isEditMode">
             <select formControlName="name">
@@ -52,33 +52,41 @@
             </select>
           </span>
           <div class="control">
-            <input class="input" type="text" formControlName="value" placeholder="Параметр" *ngIf="isEditMode">
-            <input class="input" type="text" value="{{property.value.name}}: {{property.value.value}}" placeholder="Параметр" *ngIf="!isEditMode" readonly>
+            <input class="input" type="text" formControlName="value" placeholder="{{loc.byId('edit_parameter_hint')}}" *ngIf="isEditMode">
+            <input class="input" type="text" value="{{property.value.name}}: {{property.value.value}}" *ngIf="!isEditMode" readonly>
           </div>
           <div class="control" *ngIf="isEditMode">
-            <a class="button is-danger" (click)="onDeletePropertyClick(i)">
+            <a class="button is-danger" (click)="onDeletePropertyClick(i)" title="{{loc.byId('delete_hint')}}">
               X
             </a>
           </div>
         </div>
-        <a class="button is-warning" (click)="onAddPropertyClick()" *ngIf="isEditMode">
+        <a class="button is-warning" (click)="onAddPropertyClick()" *ngIf="isEditMode" title="{{loc.byId('add_hint')}}">
           +
         </a>
       </div>
       <div class="field" *ngIf="isEditMode || editForm.get('description').value">
-        <label class="label">Описание</label>
+        <label class="label">{{loc.byId('edit_description')}}</label>
         <div class="control">
-          <textarea class="textarea" type="text" formControlName="description" placeholder="Описание" [readOnly]="!isEditMode"></textarea>
+          <textarea class="textarea" type="text" style="min-height: 100px !important" formControlName="description" placeholder="{{loc.byId('edit_description_hint')}}" [readOnly]="!isEditMode"></textarea>
         </div>
       </div>
-
+      <div class="field" *ngIf="isEditMode">
+          <label class="label">{{loc.byId('edit_link')}}</label>
+          <div class="control">
+            <input class="input is-expanded" type="text" formControlName="link" placeholder="{{loc.byId('edit_link_hint')}}">
+          </div>
+        </div>
       <div class="field is-grouped">
         <div class="control is-expanded">
-          <button type="submit" class="button is-link" *ngIf="isEditMode" [disabled]="!editForm.dirty || editForm.invalid">Сохранить</button>
-          <button type="button" class="button is-text" *ngIf="isEditMode" (click)="onCancelClick()">Отмена</button>
+          <button type="submit" class="button is-link" *ngIf="isEditMode" [disabled]="!editForm.dirty || editForm.invalid">{{loc.byId('edit_button_save')}}</button>
+          <button type="button" class="button is-text" *ngIf="isEditMode" (click)="onCancelClick()" style="margin-left: 10px">{{loc.byId('edit_button_cancel')}}</button>
         </div>
         <div class="control is-right">
-          <button type="button" class="button is-warning" (click)="onCloseClick()">Закрыть</button>
+          <a class="button is-link is-info" href="{{editForm.get('link').value}}" target="_blank" *ngIf="!isEditMode && editForm.get('link').value">
+            <u>{{loc.byId('edit_link')}}</u>
+          </a>
+          <button type="button" class="button is-warning" (click)="onCloseClick()" style="margin-left: 10px">{{loc.byId('edit_button_close')}}</button>
         </div>
       </div>
       
