@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, Output, HostListener} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
@@ -93,6 +93,10 @@ export class EditPartComponent implements OnInit {
         this.initForm();
       }
     );
+  }
+
+  onDatasheetClick(): void {
+    window.open(this.editForm.get('link').value, "_blank");
   }
 
   clear(): void {
