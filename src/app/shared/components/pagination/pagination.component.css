@@ -10,3 +10,44 @@
     color: white;
     cursor: pointer;
 }
+
+/* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination-previous,
+  .pagination-next {
+    flex-grow: 1;
+    flex-basis: 45%;
+    margin: 0.25rem;
+    order: 1;
+  }
+
+  .pagination-list {
+    flex-wrap: wrap;
+    justify-content: center;
+    order: 2;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .pagination-link {
+    min-width: 2rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .pagination-link.is-current {
+    width: 3rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .pagination-previous,
+  .pagination-next {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}

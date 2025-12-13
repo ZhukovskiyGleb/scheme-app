@@ -17,33 +17,42 @@
     <div id="navbarMain" class="navbar-menu"
     [ngClass]="{'is-active': isActivated}">
       <div class="navbar-start">
-        <a routerLink="/parts" class="navbar-item">
-          Каталог
+        <a routerLink="/parts" class="navbar-item" (click)="closeMenu()">
+          {{loc.byId('header_catalog')}}
         </a>
-        <a routerLink="/storage" class="navbar-item" *ngIf="currentUser.isUserLogged | async"
-           [style.color]="storage.hasChanges() ? 'orange' : 'white'">
-          Хранилище{{storage.hasChanges() ? '*' : ''}}
+        <a routerLink="/storage" class="navbar-item" *ngIf="currentUser.isUserLogged | async" (click)="closeMenu()">
+          {{loc.byId('header_storage')}}
         </a>
       </div>
 
       <div class="navbar-end">
-        <a routerLink="/admin" class="navbar-item" *ngIf="currentUser.isAdmin">
-          Система
+        <a routerLink="/admin" class="navbar-item" *ngIf="currentUser.isAdmin" (click)="closeMenu()">
+          {{loc.byId('header_system')}}
         </a>
-        <div class="navbar-item" *ngIf="!(currentUser.isUserLogged | async)">
-          <div class="buttons">
-            <a routerLink="/login" class="button is-warning">
-              <strong>Войти</strong>
+        <div class="navbar-item has-dropdown" [ngClass]="{'is-active': isLangDropdownOpen}">
+          <a class="navbar-link" (click)="toggleLangDropdown($event)">
+            {{loc.lang}}
+          </a>
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item" *ngFor="let lang of loc.langList" (click)="$event.stopPropagation(); loc.setLanguage(lang); closeMenu()">
+              {{lang}}
             </a>
           </div>
         </div>
-        <div class="navbar-item has-dropdown is-hoverable" *ngIf="currentUser.isUserLogged | async">
-          <a class="navbar-link">
+        <div class="navbar-item" *ngIf="!(currentUser.isUserLogged | async)">
+          <div class="buttons">
+            <a routerLink="/login" class="button is-warning" (click)="closeMenu()">
+              <strong>{{loc.byId('header_login')}}</strong>
+            </a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown" [ngClass]="{'is-active': isUserDropdownOpen}" *ngIf="currentUser.isUserLogged | async">
+          <a class="navbar-link" (click)="toggleUserDropdown($event)">
             {{currentUser.userName | name}}
           </a>
           <div class="navbar-dropdown is-boxed">
-            <a class="navbar-item" (click)="onLogoutClick()">
-              Выйти
+            <a class="navbar-item" (click)="$event.stopPropagation(); onLogoutClick(); closeMenu()">
+              {{loc.byId('header_logout')}}
             </a>
           </div>
         </div>

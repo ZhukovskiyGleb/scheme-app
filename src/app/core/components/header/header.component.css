@@ -1,0 +1,55 @@
+header {
+  background-color: rgba(43,43,43,0.91);
+}
+
+@media screen and (max-width: 1023px) {
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 300;
+  }
+
+  .navbar {
+    position: relative;
+  }
+
+  .navbar-brand {
+    position: relative;
+    z-index: 200;
+  }
+
+  .navbar-burger {
+    z-index: 200;
+  }
+
+  .navbar-menu.is-active {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    background-color: #ffffff;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .navbar-menu.is-active .navbar-dropdown {
+    display: block !important;
+    position: static !important;
+    background-color: transparent;
+    box-shadow: none;
+    padding-left: 1rem;
+  }
+
+  .navbar-menu.is-active .navbar-link::after {
+    display: none;
+  }
+
+  .navbar-menu.is-active .has-dropdown > .navbar-link {
+    pointer-events: none;
+  }
+}

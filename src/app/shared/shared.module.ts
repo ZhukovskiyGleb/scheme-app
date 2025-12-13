@@ -7,6 +7,7 @@ import { StringCutterPipe } from './pipes/string-cutter.pipe';
 import { LoadingModalComponent } from './modal/loading-modal/loading-modal.component';
 import { SearchComponent } from './components/search/search.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { EditPartComponent } from './components/edit-part/edit-part.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     PaginationComponent,
     SearchComponent,
     LoadingModalComponent,
+    EditPartComponent,
     RightClickDirective,
     StringCutterPipe
   ],
@@ -26,6 +28,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     PaginationComponent,
     SearchComponent,
     LoadingModalComponent,
+    EditPartComponent,
     RightClickDirective,
     StringCutterPipe
   ]

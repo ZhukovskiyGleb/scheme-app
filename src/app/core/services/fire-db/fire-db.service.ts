@@ -1,55 +1,48 @@
-import {Injectable, OnInit} from '@angular/core';
-import * as firebase from 'firebase';
-import { from, Observable, of } from 'rxjs';
-import { UserModel } from 'src/app/core/models/user-model';
-import { PartModel } from '../../models/part-model';
-import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { ITypesList } from '../types/types.service';
-import { IBoxStorage, StorageModel } from '../../models/storage-model';
+import {Injectable} from '@angular/core';
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, orderBy, where, limit, QuerySnapshot, DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
+import {from, Observable} from 'rxjs';
+import {UserModel} from 'src/app/core/models/user-model';
+import {PartModel} from '../../models/part-model';
+import {ITypesList} from '../types/types.service';
+import {IBoxStorage, StorageModel} from '../../models/storage-model';
+import { generateSearchWords } from '../../shared/generateSearchWorlds';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FireDbService{
 
-  private db = firebase.firestore();
+  private db = getFirestore();
 
-  private systemObservable: Observable<firebase.firestore.QuerySnapshot>;
+  private systemObservable: Observable<any> | null = null;
 
   constructor() {
     this.updateSystem();
   }
 
-  updateSystem():Observable<firebase.firestore.QuerySnapshot> {
+  updateSystem():Observable<any> {
     if (!this.systemObservable) {
-      this.systemObservable = from(this.db.collection('system').get());
+       this.systemObservable = from(getDocs(collection(this.db, 'system')));
     }
     return this.systemObservable;
   }
 
-  updatePartsCount(count: number): void {
-    this.db.collection('system').doc('counters').set({
-      parts: count
-    }, {merge: true});
-  }
-
   createNewUser(uid: string, name: string): Observable<void> {
     return from(
-      this.db.collection('users').doc(uid).set(
-        {
-          username: name
-        }).catch((error) => {
-          console.log('FireDbService -> createNewUser ->', error);
-          throw error;
-        })
+      setDoc(doc(this.db, 'users', uid), {
+        username: name
+      }).catch((error) => {
+        console.log('FireDbService -> createNewUser ->', error);
+        throw error;
+      })
     );
   }
 
-  getUserByUid(uid: string): Observable<UserModel> {
+  getUserByUid(uid: string): Observable<UserModel | null> {
     return from(
-      this.db.collection('users').doc(uid).get()
+      getDoc(doc(this.db, 'users', uid))
       .then((user) => {
-        if (user.exists) {
+        if (user.exists()) {
           return UserModel.create(uid, user.data());
         } else {
           console.log('FireDbService -> getUserByUid -> user not found');
@@ -58,24 +51,45 @@ export class FireDbService{
       }).catch((error) => {
         console.log('FireDbService -> getUserByUid ->', error);
         throw error;
+      })
+    );
+  }
+
+  saveUserLanguage(uid: string, language: string): Observable<void> {
+    return from(
+      setDoc(doc(this.db, 'users', uid), { language }, { merge: true })
+      .catch((error) => {
+        console.log('FireDbService -> saveUserLanguage ->', error);
+        throw error;
+      })
+    );
+  }
+
+  getUserLanguage(uid: string): Observable<string | null> {
+    return from(
+      getDoc(doc(this.db, 'users', uid))
+      .then((user) => {
+        if (user.exists()) {
+          const data = user.data();
+          return data['language'] || null;
+        }
+        return null;
+      }).catch((error) => {
+        console.log('FireDbService -> getUserLanguage ->', error);
         return null;
       })
     );
   }
 
-  getPartsCollection(start: number, end: number): Observable<PartModel[]> {
+  getPartsCollection(start: number, end: number): Observable<PartModel[] | null> {
     return from(
-      this.db.collection('parts').orderBy('id').where('id', '>=', start).limit(end - start).get()
+      getDocs(query(collection(this.db, 'parts'), orderBy('id'), where('id', '>=', start), limit(end - start)))
       .then(
-        (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
+        (querySnapshot: QuerySnapshot<DocumentData>) => {
           let result: PartModel[] = [];
-          query.forEach(
-            (doc: QueryDocumentSnapshot<any>) => {
-            result.push(PartModel.create(doc.data()));
-            // this.db.collection('parts').doc(doc.id).set({
-            //   ...doc.data(),
-            //   search: this.generateSerchWords(doc.data().title)
-            // });
+          querySnapshot.forEach(
+            (docSnap: QueryDocumentSnapshot<DocumentData>) => {
+            result.push(PartModel.create(docSnap.data()));
           });
           return result;
         }
@@ -89,17 +103,16 @@ export class FireDbService{
     );
   }
 
-  searchPartsByTitle(search: string, limit: number): Observable<PartModel[]> {
+  searchPartsByTitle(search: string, limitCount: number): Observable<PartModel[] | null> {
     const searchWord: string = search.toLowerCase();
     return from(
-      // this.db.collection('parts').orderBy('title').startAt(searchWord).endAt(searchWord + "\uf8ff").limit(10).get()
-      this.db.collection('parts').where('search', 'array-contains', searchWord).limit(limit).get()
+      getDocs(query(collection(this.db, 'parts'), orderBy('title'), where('search', 'array-contains', searchWord), limit(limitCount)))
       .then(
-        (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
+        (querySnapshot: QuerySnapshot<DocumentData>) => {
           let result: PartModel[] = [];
-          query.forEach(
-            (doc: QueryDocumentSnapshot<any>) => {
-            result.push(PartModel.create(doc.data()));
+          querySnapshot.forEach(
+            (docSnap: QueryDocumentSnapshot<DocumentData>) => {
+            result.push(PartModel.create(docSnap.data()));
           });
           return result;
         }
@@ -113,15 +126,15 @@ export class FireDbService{
     );
   }
 
-  getPartById(id: number): Observable<PartModel> {
+  getPartById(id: number): Observable<PartModel | null> {
     return from(
-      this.db.collection('parts').where('id', '==', id).limit(1).get()
+      getDocs(query(collection(this.db, 'parts'), where('id', '==', id), limit(1)))
     .then(
-      (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
-        let part: PartModel;
-        query.forEach(
-          (doc: QueryDocumentSnapshot<any>) => {
-          part = PartModel.create(doc.data());
+      (querySnapshot: QuerySnapshot<DocumentData>) => {
+        let part: PartModel | null = null;
+        querySnapshot.forEach(
+          (docSnap: QueryDocumentSnapshot<DocumentData>) => {
+          part = PartModel.create(docSnap.data());
         });
         return part;
       }
@@ -136,53 +149,25 @@ export class FireDbService{
   }
 
   setPartById(part: PartModel, id: number): void {
-    this.db.collection('parts').doc(id.toString()).set(
-      {
-        ...part,
-        search: this.generateSerchWords(part.title)
-      },
-      {merge: true}
-    );
+    setDoc(doc(this.db, 'parts', id.toString()), {
+      ...part,
+      search: generateSearchWords(part.title)
+    }, {merge: true});
   }
 
   updateTypes(types: ITypesList): void {
-    this.db.collection('system').doc('types').set({...types});
+    setDoc(doc(this.db, 'system', 'types'), {...types});
   }
 
-  generateSerchWords(title: string): string[] {
-    let mainWord:string = title.toLowerCase();
-    const result: string[] = [];
-    result.push(mainWord);
-
-    let split: string[] = mainWord.split(/-| |\(|\)|_|\\|\//);
-    if (split.length > 1) {
-      split.forEach(
-        value => {
-          if(value.length > 0) result.push(value);
-        }
-      )
-      mainWord = split.join('');
-      result.push(mainWord);
-    }
-
-    let i: number;
-    const max: number = Math.min(mainWord.length, 11 - result.length);
-    for (i = 1; i < max; i++) {
-      result.push(mainWord.substr(0, i));
-    }
-
-    return result;
-  }
-
-  getStorage(uid: string): Observable<StorageModel> {
+  getStorage(uid: string): Observable<StorageModel | null> {
     return from(
-      this.db.collection('storage').doc(uid).get()
+      getDoc(doc(this.db, 'storage', uid))
       .then(
-        (doc: QueryDocumentSnapshot<any>) => {
+        (docSnap) => {
           let result: StorageModel = new StorageModel();
-          if (doc.exists)
+          if (docSnap.exists())
           {
-            const storage: IBoxStorage[] = doc.data().boxes;
+            const storage: IBoxStorage[] = docSnap.data()['boxes'];
             storage.forEach(
               (box: IBoxStorage) => {
                 result.addBox(box);
@@ -199,8 +184,6 @@ export class FireDbService{
   }
 
   setStorage(storage: StorageModel, uid: string): void {
-    this.db.collection('storage').doc(uid).set(
-      {...storage}
-    );
+    setDoc(doc(this.db, 'storage', uid), {...storage});
   }
 }

@@ -1,3 +1,76 @@
 .is-selected {
     background-color: teal !important;
 }
+
+.hero-body {
+  background-color: lightsteelblue;
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.table-container {
+  overflow-x: hidden;
+}
+
+.id-column {
+  width: 8%;
+}
+
+.title-column {
+  width: 24%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.type-column {
+  width: 18%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description-column {
+  width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 768px) {
+  .details-wrapper:has(app-edit-part) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 400;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    overflow-y: auto;
+  }
+
+  .details-wrapper:has(app-edit-part) ::ng-deep app-edit-part {
+    display: block;
+    width: 100%;
+  }
+
+  .details-wrapper:has(app-edit-part) ::ng-deep .container {
+    background-color: white;
+    padding: 1rem;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    overflow-y: auto;
+  }
+
+  .details-wrapper:has(app-edit-part) ::ng-deep hr {
+    display: none;
+  }
+}

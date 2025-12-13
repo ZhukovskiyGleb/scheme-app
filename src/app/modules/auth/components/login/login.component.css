@@ -1,0 +1,22 @@
+/* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .field.is-grouped {
+    flex-direction: column;
+  }
+
+  .field.is-grouped .control {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .field.is-grouped .control .button {
+    width: 100%;
+  }
+}
+
+
+

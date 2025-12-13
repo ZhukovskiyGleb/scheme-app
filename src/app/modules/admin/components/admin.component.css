@@ -1,7 +1,38 @@
 .label {
     color: white;
 }
+
 .input {
-    min-width: 100;
-    max-width: 100;
+    min-width: 100px;
+    max-width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 0.5rem;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .field.is-grouped {
+        flex-wrap: wrap;
+    }
+
+    .field.has-addons {
+        flex-wrap: nowrap;
+        max-width: 100%;
+    }
+
+    .field.has-addons .input {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .hero-body {
+        padding: 1rem 0.5rem;
+    }
+
+    h1.title {
+        font-size: 1.5rem;
+    }
 }

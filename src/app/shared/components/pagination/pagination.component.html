@@ -1,27 +1,28 @@
 <nav class="pagination is-centered" role="navigation" aria-label="pagination" (click)="onPageClick($event)" *ngIf="isVisible">
-  <button class="pagination-previous" label="prev" title="Предыдущая страница" [disabled]="!prevButtonAvailable()">Предыдущая</button>
-  <button class="pagination-next" label="next" title="Следущая страница" [disabled]="!nextButtonAvailable()">Следующая</button>
+  <button class="pagination-previous" label="prev" title="{{loc.byId('pagination_button_prev_hint')}}" [disabled]="!prevButtonAvailable()">{{loc.byId('pagination_button_prev')}}</button>
+  <button class="pagination-next" label="next" title="{{loc.byId('pagination_button_next_hint')}}" [disabled]="!nextButtonAvailable()">{{loc.byId('pagination_button_next')}}</button>
   <ul class="pagination-list">
     <li>
-      <a class="pagination-link" label="first" title="Первая страница" *ngIf="firstPageAvailable()">1</a>
+      <a class="pagination-link" label="first" title="{{loc.byId('pagination_first_page')}}" *ngIf="firstPageAvailable()">1</a>
     </li>
     <li>
       <span class="pagination-ellipsis" *ngIf="prevDotsAvailable()">&hellip;</span>
     </li>
     <li>
-      <a class="pagination-link" label="prev" title="Страница {{currentPage - 1}}" *ngIf="prevPageAvailable()">{{currentPage - 1}}</a>
+      <a class="pagination-link" label="prev" title="{{loc.byId('pagination_page') + ' ' + (currentPage - 1)}}" *ngIf="prevPageAvailable()">{{currentPage - 1}}</a>
     </li>
     <li>
-      <a class="pagination-link is-current" title="Текущая страница"  label="current" aria-current="page" *ngIf="currentPageAvailable()">{{currentPage}}</a>
+      <!--<a class="pagination-link is-current" title="Текущая страница"  label="current" aria-current="page" *ngIf="currentPageAvailable()">{{currentPage}}</a>-->
+      <input class="pagination-link is-current" title="{{loc.byId('pagination_current_page')}}"  label="current" aria-current="page" *ngIf="currentPageAvailable()" [value]="currentPage" (change)="onCurrentPageChanged(currentInput)" #currentInput>
     </li>
     <li>
-      <a class="pagination-link" label="next" title="Страница {{currentPage + 1}}" *ngIf="nextPageAvailable()">{{currentPage + 1}}</a>
+      <a class="pagination-link" label="next" title="{{loc.byId('pagination_page') + ' ' + (currentPage + 1)}}" *ngIf="nextPageAvailable()">{{currentPage + 1}}</a>
     </li>
     <li>
       <span class="pagination-ellipsis" *ngIf="nextDotsAvailable()">&hellip;</span>
     </li>
     <li>
-      <a class="pagination-link" label="last" title="Последняя страница" *ngIf="lastPageAvailable()">{{totalPages}}</a>
+      <a class="pagination-link" label="last" title="{{loc.byId('pagination_last_page')}}" *ngIf="lastPageAvailable()">{{totalPages}}</a>
     </li>
   </ul>
 </nav>

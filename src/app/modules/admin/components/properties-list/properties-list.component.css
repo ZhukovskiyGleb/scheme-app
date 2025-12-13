@@ -1,7 +1,28 @@
 .label {
     color: white;
 }
+
 .input {
-    min-width: 100;
-    max-width: 100;
+    min-width: 100px;
+    max-width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    .field.has-addons {
+        flex-wrap: nowrap;
+        max-width: 100%;
+    }
+
+    .field.has-addons .input {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .field.has-addons .select {
+        flex-shrink: 1;
+    }
+
+    .field.has-addons .select select {
+        max-width: 80px;
+    }
 }

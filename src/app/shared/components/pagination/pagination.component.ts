@@ -1,11 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { Subject } from 'rxjs';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {Subject} from 'rxjs';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
+import {LangRefresher} from 'src/app/shared/decorators/lang-refresh.decorator';
 
 @Component({
   selector: 'app-pagination',
   templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.css']
+  styleUrls: ['./pagination.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
+@LangRefresher
 export class PaginationComponent implements OnInit {
 
   @Input() isVisible: boolean = true;
@@ -14,7 +18,8 @@ export class PaginationComponent implements OnInit {
   public totalPages: number = 1;
   public currentPage: number = 1;
 
-  constructor() { }
+  constructor(private changeDetector: ChangeDetectorRef,
+              public loc: LocalizationService) { }
 
   ngOnInit() {
   }
@@ -22,10 +27,12 @@ export class PaginationComponent implements OnInit {
   init(totalPages: number): void {
     this.totalPages = totalPages;
     this.pageEvent.next(this.currentPage);
+
+    this.changeDetector.detectChanges();
   }
 
   public onPageClick(event: Event): void {
-    const elem: Element = event.srcElement;
+    const elem = event.target as Element;
     const label = elem.attributes['label'];
     if (label) {
       switch (label.value) {
@@ -43,12 +50,23 @@ export class PaginationComponent implements OnInit {
           this.currentPage = 1;
           break;
         case ('last'):
-          this.currentPage = this.totalPages
+          this.currentPage = this.totalPages;
           break;
         default:
           return;
       }
       this.pageEvent.next(this.currentPage);
+    }
+  }
+
+  onCurrentPageChanged(input: HTMLInputElement): void {
+    const value: number = +input.value;
+    if (value > 0 && value <= this.totalPages) {
+      this.currentPage = value;
+      this.pageEvent.next(this.currentPage);
+    }
+    else {
+      input.value = this.currentPage.toString();
     }
   }
 

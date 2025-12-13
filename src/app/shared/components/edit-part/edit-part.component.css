@@ -1,0 +1,50 @@
+/* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .field.is-grouped {
+    flex-direction: column;
+  }
+
+  .field.is-grouped .field {
+    margin-left: 0 !important;
+    margin-bottom: 0.5rem;
+  }
+
+  .field.has-addons {
+    flex-direction: column;
+  }
+
+  .field.has-addons .control,
+  .field.has-addons .input,
+  .field.has-addons .button,
+  .field.has-addons .select {
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+
+  .select, .select select {
+    width: 100%;
+  }
+
+  .control.is-right {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .control.is-right .button {
+    width: 100%;
+    margin-left: 0 !important;
+    margin-bottom: 0.5rem;
+  }
+
+  .button {
+    margin-left: 0 !important;
+  }
+}
+
+
+

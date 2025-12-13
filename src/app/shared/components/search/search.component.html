@@ -1,11 +1,11 @@
 <div class="container">
   <div class="field has-addons">
     <div class="control is-expanded">
-      <input class="input" type="text" placeholder="Найти" #titleInput>
+      <input class="input" type="text" placeholder="{{loc.byId('search_hint')}}" #titleInput>
     </div>
     <div class="control">
       <a class="button is-info" (click)="onSearchClick()">
-        Поиск
+        {{loc.byId('search_button_find')}}
       </a>
     </div>
   </div>

@@ -1,10 +1,15 @@
-export interface ICaseStorage {
+export interface IPartStorage {
     id: number;
     amount: number;
   }
+
+export interface ICaseStorage {
+    title: string;
+    parts: IPartStorage[];
+  }
   
 export interface IBoxStorage {
-    id: number,
+    id: number;
     title: string;
     cases: ICaseStorage[];
   }

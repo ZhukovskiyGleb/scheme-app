@@ -2,31 +2,31 @@
   <div class="hero-body">
     <div class="container">
       <h1 class="title">
-        Войти
+        {{loc.byId('login_title')}}
       </h1>
       <form [formGroup]="editForm" (ngSubmit)="submitForm()">
         <div class="field">
-          <label class="label">Почтовый адрес</label>
+          <label class="label">{{loc.byId('login_email_title')}}</label>
           <div class="control">
-            <input class="input" type="email" formControlName="email" placeholder="Введите ваш почтовый адрес">
+            <input class="input" type="email" formControlName="email" placeholder="{{loc.byId('login_email_hint')}}">
           </div>
-          <p class="help is-danger" *ngIf="editForm.get('email').touched && editForm.hasError('required', ['email'])">Почтовый адрес не должен быть пустым</p>
-          <p class="help is-danger" *ngIf="editForm.get('email').touched && editForm.hasError('email', ['email'])">Почтовый адрес введен неверно</p>
+          <p class="help is-danger" *ngIf="editForm.get('email').touched && editForm.hasError('required', ['email'])">{{loc.byId('login_email_error_empty')}}</p>
+          <p class="help is-danger" *ngIf="editForm.get('email').touched && editForm.hasError('email', ['email'])">{{loc.byId('login_email_error_incorrect')}}</p>
         </div>
         <div class="field">
-          <label class="label">Пароль</label>
+          <label class="label">{{loc.byId('login_password_title')}}</label>
           <div class="control">
-            <input class="input" type="password" formControlName="password" placeholder="Введите ваш пароль">
+            <input class="input" type="password" formControlName="password" placeholder="{{loc.byId('login_password_hint')}}">
           </div>
-          <p class="help is-danger" *ngIf="editForm.get('password').touched && editForm.hasError('required', ['password'])">Введите пароль</p>
-          <p class="help is-danger" *ngIf="editForm.get('password').touched && editForm.hasError('length', ['password'])">Пароль не должен быть короче 6 символов</p>
+          <p class="help is-danger" *ngIf="editForm.get('password').touched && editForm.hasError('required', ['password'])">{{loc.byId('login_password_error_empty')}}</p>
+          <p class="help is-danger" *ngIf="editForm.get('password').touched && editForm.hasError('length', ['password'])">{{loc.byId('login_password_error_short')}}</p>
         </div>
         <div class="field is-grouped">
           <div class="control">
-            <button type="submit" class="button is-link" [disabled]="!editForm.valid">Войти</button>
+            <button type="submit" class="button is-link" [disabled]="!editForm.valid">{{loc.byId('login_button_login')}}</button>
           </div>
           <div class="control">
-            <button routerLink="new" type="button" class="button is-text">Регистрация</button>
+            <button routerLink="new" type="button" class="button is-text">{{loc.byId('login_button_register')}}</button>
           </div>
         </div>
       </form>

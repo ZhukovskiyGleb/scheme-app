@@ -1,10 +1,11 @@
-import { Injectable, EventEmitter } from '@angular/core';
-import { FireDbService } from '../fire-db/fire-db.service';
-import { Observable, of, from } from 'rxjs';
-import { PartModel } from '../../models/part-model';
-import { map, switchMap, tap } from 'rxjs/operators';
-import { QuerySnapshot, QueryDocumentSnapshot } from '@angular/fire/firestore';
-import { CurrentUserService } from '../currentUser/current-user.service';
+import {EventEmitter, Injectable} from '@angular/core';
+import {FireDbService} from '../fire-db/fire-db.service';
+import {Observable, of} from 'rxjs';
+import {PartModel} from '../../models/part-model';
+import {map, switchMap, tap} from 'rxjs/operators';
+import {QueryDocumentSnapshot, QuerySnapshot} from '@angular/fire/firestore';
+import {CurrentUserService} from '../currentUser/current-user.service';
+import { FirebaseService } from '../firebase/firebase.service';
 
 export interface IPartShortInfo {
   title: string,
@@ -21,22 +22,26 @@ interface InfoCache {
 export class PartsService {
   newPartAddedEvent = new EventEmitter<number>();
 
+  public isBusy: boolean = false;
+
   private partsCollection: PartModel[];
   private partsCount: number;
   private infoCache: InfoCache = {};
 
   constructor(public fireDB: FireDbService,
+              private firebase: FirebaseService,
               private currentUser: CurrentUserService) { }
 
   get totalParts(): Observable<number> {
-    if (this.partsCount)
+    if (this.partsCount) {
       return of(this.partsCount);
+    }
 
     return this.fireDB.updateSystem()
     .pipe(
       map(
-        (query: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
-          query.forEach(
+        (snapshot: QuerySnapshot<QueryDocumentSnapshot<any>>) => {
+          snapshot.forEach(
             (doc: QueryDocumentSnapshot<any>) => {
             switch (doc.id) {
               case 'counters':
@@ -67,7 +72,6 @@ export class PartsService {
     .pipe(
       map(
         (result: PartModel[]) => {
-          // console.log(result);
           this.partsCollection = result;
           return this.partsCollection;
         }
@@ -99,16 +103,6 @@ export class PartsService {
       return of(part);
     }
     return this.fireDB.getPartById(id)
-    .pipe(
-      tap(
-        (part: PartModel) => {
-          if (!this.partsCollection) {
-            this.partsCollection = [];
-          }
-          this.partsCollection.push(part);
-        }
-      )
-    );
   }
 
   updateCacheForId(part:PartModel, id: number): void {
@@ -154,9 +148,11 @@ export class PartsService {
   }
 
   updatePartById(part: PartModel, id: number): void {
-    const index = this.partsCollection.findIndex(value => value.id === id);
-    if (index) {
-      this.partsCollection[index] = part;
+    if (this.partsCollection) {
+      const index = this.partsCollection.findIndex(value => value.id === id);
+      if (index) {
+        this.partsCollection[index] = part;
+      }
     }
     
     this.updateCacheForId(part, id);
@@ -164,18 +160,18 @@ export class PartsService {
     this.fireDB.setPartById(part, id);
   }
 
-  addNewPart(part: PartModel): void {
-    const id = this.partsCount;
-
-    this.partsCount += 1;
-
+  addNewPart(part: PartModel): Observable<any> {
     part.owner = this.currentUser.uid;
-    part.id = id;
-
-    this.fireDB.setPartById(part, id);
-
-    this.fireDB.updatePartsCount(this.partsCount);
-
-    this.newPartAddedEvent.emit(this.partsCount);
+    return this.firebase.addNewPart(part)
+    .pipe(
+      tap(
+        (result: Partial<{response: boolean, totalParts: number, reason: string}>) => {
+          if (result && result.response) {
+            this.partsCount = result.totalParts || this.partsCount;
+            this.newPartAddedEvent.emit(this.partsCount);
+          }
+        }
+      )
+    );
   }
 }

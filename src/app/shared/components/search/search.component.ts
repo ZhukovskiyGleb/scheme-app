@@ -1,15 +1,21 @@
-import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import {SearchService} from 'src/app/core/services/search/search.service';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
+import {LangRefresher} from 'src/app/shared/decorators/lang-refresh.decorator';
 
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.css']
+  styleUrls: ['./search.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
+@LangRefresher
 export class SearchComponent implements OnInit {
 
   @ViewChild('titleInput') title: ElementRef;
-  constructor(private search: SearchService) { }
+  constructor(private search: SearchService,
+              public loc: LocalizationService,
+              public cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
   }

@@ -4,14 +4,14 @@
     <div class="modal-content has-text-centered">
       <article class="message is-warning">
         <div class="message-header">
-          <p>Удаление</p>
+          <p>{{loc.byId('storage_confirm_popup_title')}}</p>
         </div>
         <div class="message-body">
-          Вы уверены, что хотите удалить {{caseSelected ? 'выбранную ячейку' : 'выбранное хранилище'}} ?
+           {{caseSelected ? loc.byId('storage_confirm_popup_storage') : loc.byId('storage_confirm_popup_case')}} ?
         </div>
         <div class="buttons is-centered" style="margin: 10px">
-          <button class="button is-danger" (click)="onConfirmClick()">Да</button>
-          <button class="button" (click)="onCancelClick()">Нет</button>
+          <button class="button is-danger" (click)="onConfirmClick()">{{loc.byId('button_yes')}}</button>
+          <button class="button" (click)="onCancelClick()">{{loc.byId('button_no')}}</button>
         </div>
       </article>
     </div>

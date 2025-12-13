@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
-import { from, Observable, of, throwError, Subject } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import {map, tap, switchMap, catchError, take, filter} from 'rxjs/operators';
 import { FireDbService } from '../fire-db/fire-db.service';
 import { CurrentUserService } from '../currentUser/current-user.service';
 import { UserModel } from 'src/app/core/models/user-model';
 import { FirebaseService } from '../firebase/firebase.service';
-import UserCredential = firebase.auth.UserCredential;
-import {User} from "firebase";
+import { User, UserCredential } from 'firebase/auth';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private token: string;
+  private token: string | null = null;
   private isLogged = false;
 
   constructor(private firebase: FirebaseService,
@@ -24,8 +23,8 @@ export class AuthService {
     return this.firebase.createUserWithEmailAndPassword(email, password)
     .pipe(
       switchMap((userCred: UserCredential) => {
-        const uid = userCred.user.uid;
-        return from(userCred.user.getIdToken())
+        const uid = userCred.user!.uid;
+        return from(userCred.user!.getIdToken())
         .pipe(
           switchMap((token: string) => {
             this.token = token;
@@ -52,8 +51,8 @@ export class AuthService {
     return this.firebase.signInWithEmailAndPassword(email, password)
     .pipe(
       switchMap((userCred: UserCredential) => {
-        const uid = userCred.user.uid;
-        return from(userCred.user.getIdToken())
+        const uid = userCred.user!.uid;
+        return from(userCred.user!.getIdToken())
         .pipe(
           map((token: string) => {
             this.token = token;
@@ -64,7 +63,7 @@ export class AuthService {
       switchMap((uid: string) => {
         return this.fireDB.getUserByUid(uid);
       }),
-      map( (user: UserModel) => {
+      map( (user: UserModel | null) => {
         if (!!user) {
           this.currentUser.setCurrentUser(user);
           this.isLogged = true;
@@ -91,7 +90,7 @@ export class AuthService {
     return this.firebase.getLastUser()
     .pipe(
       take(1),
-      switchMap((user: User) => {
+      switchMap((user: User | null) => {
         if (!user) {
           throw ('no user');
         }
@@ -107,7 +106,7 @@ export class AuthService {
       switchMap((uid: string) => {
         return this.fireDB.getUserByUid(uid);
       }),
-      map((user: UserModel) => {
+      map((user: UserModel | null) => {
         if (!!user) {
           this.currentUser.setCurrentUser(user);
           this.isLogged = true;

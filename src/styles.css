@@ -1,7 +1,111 @@
+/* Form validation styles */
 .input.ng-invalid.ng-touched {
   border-color: red !important;
 }
 
 .select.ng-invalid.ng-touched {
   border-color: red !important;
+}
+
+/* Global mobile-friendly styles */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* Make tables responsive on mobile */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.table-container table {
+  min-width: 100%;
+}
+
+@media screen and (max-width: 1023px) {
+  body {
+    padding-top: 52px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    max-width: 100%;
+  }
+
+  /* Adjust hero body padding */
+  .hero-body {
+    padding: 1rem;
+  }
+
+  /* Make navbar dropdowns work better on mobile */
+  .navbar-dropdown {
+    position: relative !important;
+  }
+
+  /* Adjust form fields */
+  .field {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Make buttons full width on mobile */
+  .buttons .button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Adjust modal sizing */
+  .modal-card {
+    margin: 0 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+
+  /* Fix column overflow */
+  .columns {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .column {
+    padding: 0.5rem;
+  }
+
+  /* Make cards fit screen */
+  .card {
+    max-width: 100%;
+  }
+
+  /* Pagination adjustments */
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination-list {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Box adjustments for storage page */
+  .box {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Extra small devices */
+@media screen and (max-width: 480px) {
+  .hero-body {
+    padding: 0.5rem;
+  }
+
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }

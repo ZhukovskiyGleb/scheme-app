@@ -2,7 +2,7 @@
     <div class="hero-body">
       <div class="container">
         <h1 class="title">
-          Настройки типов и параметров
+          {{loc.byId('system_title')}}
         </h1>
         <form [formGroup]="editForm" (ngSubmit)="submitForm()">
             <div class="field" formArrayName="types" *ngIf="typesList">
@@ -10,56 +10,56 @@
                 <div class="field is-grouped">
                   <div class="field has-addons">
                     <div class="control">
-                      <input class="input" type="text" formControlName="value" placeholder="Архетип">
+                      <input class="input" type="text" formControlName="value" placeholder="{{loc.byId('system_type_hint')}}">
                     </div>
                     <div class="control">
-                      <a class="button is-danger" (click)="onDeleteTypeClick(i)">
+                      <a class="button is-danger" (click)="onDeleteTypeClick(i)" title="{{loc.byId('delete_hint')}}">
                         X
                       </a>
                     </div>
                   </div>
                   <div class="field" formArrayName="subtypes" *ngIf="subtypesList(i)">
                     <div class="control" style="margin-top: 5px; margin-left: 10px; margin-bottom: 10px">
-                      <label class="label">Подтипы:</label>
+                      <label class="label">{{loc.byId('system_subtypes')}}:</label>
                     </div>
                     <div class="field" *ngFor="let subtype of subtypesList(i); let j = index" [formGroupName]="j" style="margin-left: 10px">
                       <div class="field has-addons" >
                         <div class="control">
-                          <input class="input" type="text" formControlName="value" placeholder="Подтип">
+                          <input class="input" type="text" formControlName="value" placeholder="{{loc.byId('system_subtype_hint')}}">
                         </div>
                         <div class="control">
-                          <a class="button is-danger" (click)="onDeleteSubtypeClick(i, j)">
+                          <a class="button is-danger" (click)="onDeleteSubtypeClick(i, j)" title="{{loc.byId('delete_hint')}}">
                             X
                           </a>
                         </div>
                       </div>
-                      <app-properties-list title="Параметры подтипа:" [properties]="subtypesPropertiesList(i, j)" [group]="subtype" [type]="type.value.id" [subtype]="subtype.value.id"></app-properties-list>
+                      <app-properties-list label="{{loc.byId('system_subtype_parameters')}}:" [properties]="subtypesPropertiesList(i, j)" [group]="subtype" [type]="type.value.id" [subtype]="subtype.value.id"></app-properties-list>
                     </div>
                     <a class="button is-warning" (click)="onAddSubtypeClick(i)" style="margin-left: 10px">
-                      Добавить подтип
+                      {{loc.byId('system_button_add_subtype')}}
                     </a>
                   </div>
                 </div>
-                <app-properties-list title="Параметры типа:" [properties]="typesPropertiesList(i)" [group]="type" [type]="type.value.id"></app-properties-list>
+                <app-properties-list label="{{loc.byId('system_type_parameters')}}:" [properties]="typesPropertiesList(i)" [group]="type" [type]="type.value.id"></app-properties-list>
                 <hr>
               </div>
               <a class="button is-warning" (click)="onAddTypeClick()">
-                Добавить архетип
+                {{loc.byId('system_button_add_type')}}
               </a>
             </div>
             <hr>
-            <app-properties-list title="Глобальные параметры:" [properties]="propertiesList" [group]="editForm"></app-properties-list>
+            <app-properties-list label="{{loc.byId('system_global_parameters')}}:" [properties]="propertiesList" [group]="editForm"></app-properties-list>
             <div class="field is-grouped" style="margin-top: 10px">
               <div class="control">
-                <button type="submit" class="button is-link" [disabled]="!editForm.dirty || !editForm.valid">Сохранить</button>
+                <button type="submit" class="button is-link" [disabled]="!editForm.dirty || !editForm.valid">{{loc.byId('system_button_save')}}</button>
               </div>
               <div class="control">
-                  <button type="button" class="button" [disabled]="!editForm.dirty" (click)="onCancelClick()">Отмена</button>
-                </div>
+                <button type="button" class="button" [disabled]="!editForm.dirty" (click)="onCancelClick()">{{loc.byId('system_button_cancel')}}</button>
+              </div>
             </div>
+            <p class="help" *ngIf='editForm.dirty && editForm.valid'>* {{loc.byId('system_changes_hint')}}</p>
           </form>
       </div>
     </div>
     <app-loading-modal [isActive]="isBusy"></app-loading-modal>
   </section>
-  

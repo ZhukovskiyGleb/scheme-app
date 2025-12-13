@@ -8,10 +8,100 @@
 .panel-heading {
     background-color: dimgray;
     color: white;
-    min-height: 50px;
+    min-height: 40px;
     cursor: pointer;
+    padding: 0.5em 0.75em;
+    font-size: 0.9rem;
+}
+.panel-block {
+    min-height: 40px;
+    padding: 0.4em 0.75em;
+}
+.hero-body {
+  background-color: lightsteelblue;
 }
 
-.panel-block {
-    min-height: 65px;
+.column {
+    padding: 0.5rem;
+}
+
+@media screen and (max-width: 768px) {
+  .hero-body {
+    padding: 0.5rem;
+  }
+
+  .container {
+    padding: 0;
+  }
+
+  .panel {
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .panel-heading {
+    padding: 0.4rem 0.5rem;
+    min-height: auto;
+    font-size: 0.85rem;
+  }
+
+  .panel-heading strong {
+    font-size: 0.85rem;
+  }
+
+  .panel-blocks-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .panel-block {
+    min-height: auto;
+    padding: 0.3rem 0.5rem;
+    border: none;
+    border-bottom: 1px solid #dbdbdb;
+  }
+
+  .panel-block:nth-child(odd) {
+    border-right: 1px solid #dbdbdb;
+  }
+
+  .column {
+    padding: 0.25rem;
+  }
+
+  .field.has-addons {
+    flex-direction: column;
+  }
+
+  .field.has-addons .input,
+  .field.has-addons .button {
+    width: 100%;
+    margin-bottom: 0.2rem;
+  }
+
+  .buttons.is-centered {
+    flex-wrap: wrap;
+    margin-top: 0.25rem !important;
+  }
+
+  .buttons.is-centered .button {
+    margin: 0.15rem;
+    padding: 0.3em 0.5em;
+    font-size: 0.75rem;
+  }
+
+  .button.is-small {
+    font-size: 0.7rem;
+    padding: 0.25em 0.5em;
+  }
+
+  .input.is-small {
+    font-size: 0.8rem;
+    padding: 0.25em 0.5em;
+  }
+
+  .add-case-block {
+    min-height: 30px;
+  }
 }

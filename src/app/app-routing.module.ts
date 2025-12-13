@@ -7,17 +7,17 @@ import { AdminGuard } from './modules/admin/guards/admin.guard';
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
-  {path: 'home', loadChildren: 'src/app/modules/home/home.module#HomeModule'},
-  {path: 'login', loadChildren: 'src/app/modules/auth/auth.module#AuthModule', canActivate: [LoginGuardService]},
-  {path: 'admin', loadChildren: 'src/app/modules/admin/admin.module#AdminModule', canActivate: [AdminGuard]},
-  {path: 'parts', loadChildren: 'src/app/modules/parts/parts.module#PartsModule'},
-  {path: 'storage', loadChildren: 'src/app/modules/storage/storage.module#StorageModule', canActivate: [AuthGuardService]},
+  {path: 'home', loadChildren: () => import('./modules/home/home.module').then(m => m.HomeModule)},
+  {path: 'login', loadChildren: () => import('./modules/auth/auth.module').then(m => m.AuthModule), canActivate: [LoginGuardService]},
+  {path: 'admin', loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule), canActivate: [AdminGuard]},
+  {path: 'parts', loadChildren: () => import('./modules/parts/parts.module').then(m => m.PartsModule)},
+  {path: 'storage', loadChildren: () => import('./modules/storage/storage.module').then(m => m.StorageModule), canActivate: [AuthGuardService]},
   {path: 'error', component: PageNotFoundComponent},
   {path: '**', redirectTo: '/error', pathMatch: 'full'}
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { scrollPositionRestoration: 'top' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

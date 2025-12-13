@@ -1,13 +1,15 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {StorageService} from 'src/app/core/services/storage/storage.service';
-import {Observable, Subscription} from 'rxjs';
-import {IBoxStorage, ICaseStorage, StorageModel} from 'src/app/core/models/storage-model';
+import {Observable, Subscription, forkJoin, of} from 'rxjs';
+import {IBoxStorage, ICaseStorage, StorageModel, IPartStorage} from 'src/app/core/models/storage-model';
 import {AutoUnsubscribe} from 'src/app/shared/decorators/auto-unsubscribe.decorator';
-import {map, tap} from 'rxjs/operators';
+import {LangRefresher} from 'src/app/shared/decorators/lang-refresh.decorator';
+import {map, tap, switchMap} from 'rxjs/operators';
 import {CurrentUserService} from 'src/app/core/services/currentUser/current-user.service';
 import {IPartShortInfo, PartsService} from 'src/app/core/services/parts/parts.service';
-import {Router} from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 import {SearchService} from 'src/app/core/services/search/search.service';
+import {LocalizationService} from "../../../core/services/localization/localization.service";
 
 @Component({
   selector: 'app-storage-list',
@@ -16,11 +18,13 @@ import {SearchService} from 'src/app/core/services/search/search.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 @AutoUnsubscribe
+@LangRefresher
 export class StorageListComponent implements OnInit, OnDestroy {
   boxList: IBoxStorage[];
 
   selectedBox: IBoxStorage;
   selectedCase: ICaseStorage;
+  editCase: ICaseStorage;
 
   isBusy: boolean = false;
   isWarningVisibility: boolean = false;
@@ -32,10 +36,12 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
   constructor(private currentUser: CurrentUserService,
               private navigation: Router,
+              private route: ActivatedRoute,
               private storage: StorageService,
               private partsService: PartsService,
               private changeDetector: ChangeDetectorRef,
-              private search: SearchService) { }
+              private search: SearchService,
+              public loc: LocalizationService) { }
 
   ngOnInit() {
     this.loadStorage();
@@ -53,16 +59,42 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
     this.storageSubscription = this.storage.loadStorage(refresh)
     .pipe(
-      tap(
-        (storage:StorageModel) => {
-          this.boxList = storage.boxList;
-
-          this.isBusy = false;
-          this.changeDetector.detectChanges();
-        }
-      )
+      switchMap((storage: StorageModel) => {
+        this.boxList = storage.boxList;
+        return this.preloadAllParts();
+      }),
+      tap(() => {
+        this.isBusy = false;
+        this.changeDetector.detectChanges();
+      })
     )
     .subscribe();
+  }
+
+  private preloadAllParts(): Observable<any> {
+    const partIds = new Set<number>();
+    
+    if (this.boxList) {
+      this.boxList.forEach(box => {
+        box.cases.forEach(c => {
+          c.parts.forEach(part => {
+            if (!this.partsService.getCachedInfoById(part.id)) {
+              partIds.add(part.id);
+            }
+          });
+        });
+      });
+    }
+
+    if (partIds.size === 0) {
+      return of(null);
+    }
+
+    const requests = Array.from(partIds).map(id => 
+      this.partsService.getShortInfoById(id)
+    );
+
+    return forkJoin(requests);
   }
 
   onCancelSearchClick(): void {
@@ -103,9 +135,17 @@ export class StorageListComponent implements OnInit, OnDestroy {
           let cases: ICaseStorage[] = curBox.cases;
           cases.forEach(
             (curCase: ICaseStorage) => {
-              let info: IPartShortInfo = this.partsService.getCachedInfoById(curCase.id);
-              if (info && info.title.toLowerCase().search(search) >= 0) {
+              if (curCase.title.toLowerCase().search(search) >= 0) {
                 newBox.cases.push(curCase);
+              } 
+              else {
+                for (let curPart of curCase.parts) {
+                  let info: IPartShortInfo = this.partsService.getCachedInfoById(curPart.id);
+                  if (info && info.title.toLowerCase().search(search) >= 0) {
+                    newBox.cases.push(curCase);
+                    break;
+                  }
+                }
               }
             }
           );
@@ -123,6 +163,7 @@ export class StorageListComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('click') onMouseClick() {
+    this.onPreventClick();
     this.deselectAll();
   }
 
@@ -132,12 +173,13 @@ export class StorageListComponent implements OnInit, OnDestroy {
         const value: string = (document.activeElement as HTMLInputElement).value;
         if(value) {
           if (this.selectedCase) {
-            this.onCaseChanged(+value);
+            this.onCaseChanged(value);
           }
           else if (this.selectedBox) {
             this.onBoxChanged(value);
           }
         }
+        this.changeDetector.detectChanges();
         this.deselectAll();
       }
     }
@@ -148,8 +190,10 @@ export class StorageListComponent implements OnInit, OnDestroy {
   }
 
   deselectAll(): void {
-    this.selectedCase = null;
-    this.selectedBox = null;
+    if (this.selectedBox || this.selectedCase) {
+      this.selectedCase = null;
+      this.selectedBox = null;
+    }
   }
 
   onBoxClick(curBox: IBoxStorage) {
@@ -159,6 +203,20 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
     this.deselectAll();
     this.selectedBox = curBox;
+  }
+
+  sortedCases(box: IBoxStorage): ICaseStorage[] {
+    return box.cases.sort(
+      (a: ICaseStorage, b: ICaseStorage) => {
+        if (a.title > b.title) {
+          return 1;
+        }
+        if (a.title < b.title) {
+          return -1;
+        }
+        return 0;
+      }
+    );
   }
 
   onCaseClick(curBox: IBoxStorage, curCase: ICaseStorage) {
@@ -171,9 +229,16 @@ export class StorageListComponent implements OnInit, OnDestroy {
     this.selectedCase = curCase;
   }
 
-  onCaseChanged(value: number): void {
+  onPartChanged(part: IPartStorage, value: number): void {
+    if (part) {
+      part.amount = value >= 0 ? value : part.amount;
+      this.storage.markAsChanged();
+    }
+  }
+
+  onCaseChanged(value: string): void {
     if (this.selectedCase) {
-      this.selectedCase.amount = value >= 0 ? value : this.selectedCase.amount;
+      this.selectedCase.title = value || this.selectedCase.title;
       this.storage.markAsChanged();
     }
   }
@@ -197,6 +262,16 @@ export class StorageListComponent implements OnInit, OnDestroy {
     );
   }
 
+  getCachedTitle(id: number): string {
+    const info = this.partsService.getCachedInfoById(id);
+    return info ? info.title : '';
+  }
+
+  getCachedDescription(id: number): string {
+    const info = this.partsService.getCachedInfoById(id);
+    return info ? info.description || '---' : '';
+  }
+
   onAddStorageClick(): void {
     this.onPreventClick();
 
@@ -212,11 +287,12 @@ export class StorageListComponent implements OnInit, OnDestroy {
     this.onPreventClick();
 
     const newCase: ICaseStorage = {
-      id: -1,
-      amount: 0
+      title: '',
+      parts: []
     };
 
-    this.selectedCase = newCase;
+    this.selectedCase = null;
+    this.editCase = newCase;
 
     this.isAddingNewCaseVisibility = true;
   }
@@ -233,8 +309,8 @@ export class StorageListComponent implements OnInit, OnDestroy {
     );
   }
 
-  trackByCaseId(index: number, item: ICaseStorage): number {
-    return item.id;
+  trackByPartId(index: number, part: IPartStorage): number {
+    return part.id;
   }
 
   ngOnDestroy() {
@@ -251,6 +327,48 @@ export class StorageListComponent implements OnInit, OnDestroy {
     this.isWarningVisibility = true;
   }
 
+  onMoveLeftClick(): void {
+    this.onPreventClick();
+
+    const index: number = this.boxList.indexOf(this.selectedBox);
+
+    if (index != -1 && index > 0) {
+      this.boxList[index] = this.boxList[index - 1];
+      this.boxList[index - 1] = this.selectedBox;
+    }
+
+    this.storage.markAsChanged();
+    this.changeDetector.markForCheck();
+  }
+
+  onMoveRightClick(): void {
+    this.onPreventClick();
+
+    const index: number = this.boxList.indexOf(this.selectedBox);
+
+    if (index != -1 && index < this.boxList.length - 1) {
+      this.boxList[index] = this.boxList[index + 1];
+      this.boxList[index + 1] = this.selectedBox;
+    }
+
+    this.storage.markAsChanged();
+    this.changeDetector.markForCheck();
+  }
+
+  onEditCaseClick(): void {
+    this.onPreventClick();
+
+    const newCase: ICaseStorage = {
+      title: this.selectedCase.title,
+      parts: [...this.selectedCase.parts]
+    };
+
+    this.editCase = newCase;
+    this.editCase = newCase;
+
+    this.isAddingNewCaseVisibility = true;
+  }
+
   onDeleteCaseClick(): void {
     this.onPreventClick();
 
@@ -259,7 +377,7 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
   onDeleteCancelClick = () => {
     this.isWarningVisibility = false;
-  }
+  };
 
   onDeleteConfirmClick = () => {
     this.isWarningVisibility = false;
@@ -290,7 +408,7 @@ export class StorageListComponent implements OnInit, OnDestroy {
     this.deselectAll();
 
     this.storage.markAsChanged();
-  }
+  };
 
   onPreventClick(): void {
     event.preventDefault();
@@ -300,18 +418,31 @@ export class StorageListComponent implements OnInit, OnDestroy {
   onAddNewCaseConfirmClicked = () => {
     this.isAddingNewCaseVisibility = false;
 
-    this.selectedBox.cases.push(this.selectedCase);
+    if (this.selectedCase) {
+      this.selectedCase.title = this.editCase.title;
+      this.selectedCase.parts = this.editCase.parts;
+    }
+    else {
+      this.selectedBox.cases.push(this.editCase);
+    }
+
+    this.selectedCase = this.editCase;
+    this.editCase = null;
 
     this.storage.markAsChanged();
-  }
+  };
 
   onAddNewCaseCancelClicked = () => {
     this.isAddingNewCaseVisibility = false;
 
-    this.selectedCase = null;
-  }
+    this.editCase = null;
+  };
 
   hasChanges(): boolean {
     return this.storage.hasChanges()
+  }
+
+  onPartClick(id: number): void {
+    this.navigation.navigate([id], {relativeTo: this.route});
   }
 }

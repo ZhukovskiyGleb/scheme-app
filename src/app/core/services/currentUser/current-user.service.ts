@@ -34,6 +34,12 @@ export class CurrentUserService {
     return this.user ? this.user.admin : false;
   }
 
+  get isModer(): boolean {
+    return this.user ? 
+    (this.user.moder || this.user.admin)
+     : false;
+  }
+
   get isUserLogged(): Observable<boolean> {
     if (!!this.user) {
       return of(true);

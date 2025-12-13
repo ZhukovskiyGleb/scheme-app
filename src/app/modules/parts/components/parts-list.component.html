@@ -1,30 +1,34 @@
 <section class="hero is-fullheight-with-navbar is-primary is-bold">
   <div class="hero-body">
     <div class="container">
-      <router-outlet></router-outlet>
-      <div class="buttons is-centered" *ngIf="inSearchMode">
-        <button type="button" class="button is-warning" (click)="onCancelSearchClick()">Закрыть поиск</button>
+      <div class="details-wrapper">
+        <router-outlet></router-outlet>
       </div>
-      <table class="table is-striped is-fullwidth">
-        <thead>
-          <tr>
-            <th><span>#</span></th>
-            <th><span>Название</span></th>
-            <th><span>Тип</span></th>
-            <th><span>Описание</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let part of partsCollection" appRightClick (click)="onTableClick(part.id)" style="cursor: pointer">
-            <th>{{part.id + 1}}</th>
-            <td>{{part.title}}</td>
-            <td>{{getTypeValue(part.type)}}</td>
-            <td>{{part.description | stringCutter}}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="buttons is-centered" *ngIf="!inSearchMode">
-        <button type="button" class="button is-warning" (click)="onAddPartClick()">Добавить</button>
+      <div class="buttons is-centered" *ngIf="inSearchMode">
+        <button type="button" class="button is-warning" (click)="onCancelSearchClick()">{{loc.byId('search_close')}}</button>
+      </div>
+      <div class="table-container">
+        <table class="table is-striped is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th class="id-column"><span>#</span></th>
+              <th class="title-column"><span>{{loc.byId('catalog_table_title')}}</span></th>
+              <th class="type-column"><span>{{loc.byId('catalog_table_type')}}</span></th>
+              <th class="description-column"><span>{{loc.byId('catalog_table_description')}}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let part of partsCollection; trackBy: trackByPartId" appRightClick (click)="onTableClick(part.id)" style="cursor: pointer">
+              <th class="id-column">{{part.id + 1}}</th>
+              <td class="title-column">{{part.title}}</td>
+              <td class="type-column">{{getTypeValue(part.type) + ' ' + getSubtypeValue(part.type, part.subtype)}}</td>
+              <td class="description-column">{{part.description}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="buttons is-centered" *ngIf="isAddNewAvailable()">
+        <button type="button" class="button is-warning" (click)="onAddPartClick()">{{loc.byId('catalog_button_add')}}</button>
       </div>
       <app-pagination [isVisible]="!inSearchMode"></app-pagination>
     </div>

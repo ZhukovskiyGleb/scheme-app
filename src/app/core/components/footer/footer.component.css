@@ -1,0 +1,9 @@
+footer {
+  background-color: rgba(43,43,43,0.91);
+}
+
+a:link,
+a:hover,
+a:visited {
+  color: antiquewhite !important;
+}
