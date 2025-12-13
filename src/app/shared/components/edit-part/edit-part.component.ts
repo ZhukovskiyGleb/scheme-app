@@ -135,6 +135,8 @@ export class EditPartComponent implements OnInit {
 
       link = this.selectedPart.link;
 
+      link = this.selectedPart.link;
+
       description = this.selectedPart.description;
       for (const property of this.selectedPart.properties) {
         properties.push(this.createPropertyControl(property));
