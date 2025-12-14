@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, User, UserCredential } from 'firebase/auth';
-import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 import { Observable, from, Subject } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { PartModel } from '../../models/part-model';
 import { generateSearchWords } from '../../shared/generateSearchWorlds';
+import { doc, getFirestore, runTransaction } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
+  private db = getFirestore();
+
   constructor() {
 
   }
@@ -59,21 +61,34 @@ export class FirebaseService {
   }
 
   addNewPart(part: PartModel): Observable<any> {
-    const functions = getFunctions();
-    const addNewPartFn = httpsCallable(functions, 'addNewPart');
-
     return from(
-      addNewPartFn({
-        part: {
+      runTransaction(this.db, async (tx) => {
+
+        const countersRef = doc(this.db, 'system/counters');
+        const countersSnap = await tx.get(countersRef);
+
+        if (!countersSnap.exists()) {
+          throw new Error('Counters not found');
+        }
+
+        const currentId = countersSnap.data()['parts'];
+        const newTotal = currentId + 1;
+
+        const partData = {
           ...part,
           search: generateSearchWords(part.title)
-        }
+        };
+
+        const partRef = doc(this.db, `parts/${currentId}`);
+
+        tx.set(countersRef, { parts: newTotal }, { merge: true });
+        tx.set(partRef, partData);
+
+        return {
+          response: true,
+          totalParts: newTotal
+        };
       })
-      .then(
-        (result: HttpsCallableResult) => {
-          return result.data;
-        }
-      )
     );
   }
 
