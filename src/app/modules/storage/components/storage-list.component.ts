@@ -30,6 +30,9 @@ export class StorageListComponent implements OnInit, OnDestroy {
   isWarningVisibility: boolean = false;
   isAddingNewCaseVisibility: boolean = false;
   inSearchMode: boolean = false;
+  
+  // Track expanded panels by box id
+  expandedBoxes: Set<number> = new Set();
 
   private storageSubscription: Subscription;
   private searchSubscription: Subscription;
@@ -203,6 +206,37 @@ export class StorageListComponent implements OnInit, OnDestroy {
 
     this.deselectAll();
     this.selectedBox = curBox;
+  }
+
+  toggleBoxExpand(box: IBoxStorage, event: Event): void {
+    event.stopPropagation();
+    
+    if (this.expandedBoxes.has(box.id)) {
+      this.expandedBoxes.delete(box.id);
+    } else {
+      this.expandedBoxes.add(box.id);
+    }
+    this.changeDetector.markForCheck();
+  }
+
+  isBoxExpanded(box: IBoxStorage): boolean {
+    return this.expandedBoxes.has(box.id);
+  }
+
+  toggleExpandAll(): void {
+    if (this.areAllExpanded()) {
+      // Collapse all
+      this.expandedBoxes.clear();
+    } else {
+      // Expand all
+      this.boxList.forEach(box => this.expandedBoxes.add(box.id));
+    }
+    this.changeDetector.markForCheck();
+  }
+
+  areAllExpanded(): boolean {
+    return this.boxList && this.boxList.length > 0 && 
+           this.boxList.every(box => this.expandedBoxes.has(box.id));
   }
 
   sortedCases(box: IBoxStorage): ICaseStorage[] {

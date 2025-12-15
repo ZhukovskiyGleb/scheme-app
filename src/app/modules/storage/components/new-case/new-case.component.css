@@ -1,17 +1,89 @@
+/* ============================================
+   MODERN NEW CASE MODAL CARD
+   ============================================ */
+
 .card {
-    background-color: antiquewhite;
-    color: brown;
+  background: white;
+  color: #475569;
+  border-radius: 1rem !important;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
 }
-.card-header-title {
-    color: white;
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 .card-header {
-    background-color: dimgrey;
-    color: white;
-    min-height: 50px;
-    cursor: pointer;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  min-height: 60px;
+  cursor: default;
+  border: none;
+}
+
+.card-header-title {
+  color: white !important;
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
 .card-content {
-    min-height: 65px;
+  min-height: 80px;
+  padding: 1.5rem;
+}
+
+.card-footer {
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.card-footer-item {
+  padding: 1rem;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.card-footer-item:hover {
+  background: rgba(102, 126, 234, 0.05);
+}
+
+/* Form elements inside card */
+.card .input {
+  border-radius: 0.625rem !important;
+  border: 2px solid #e2e8f0 !important;
+  transition: all 0.2s ease;
+}
+
+.card .input:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
+}
+
+.card .label {
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.card .button.is-success {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+  border: none !important;
+  border-radius: 0.625rem !important;
+}
+
+.card .button.is-danger {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%) !important;
+  border: none !important;
+  border-radius: 0.625rem !important;
 }

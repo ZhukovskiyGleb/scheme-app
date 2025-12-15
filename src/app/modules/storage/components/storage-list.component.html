@@ -5,25 +5,35 @@
       <div class="buttons is-centered" *ngIf="inSearchMode">
         <button type="button" class="button is-warning" (click)="onCancelSearchClick()">{{loc.byId('search_close')}}</button>
       </div>
+      <div class="storage-toolbar" *ngIf="boxList && boxList.length > 0">
+        <button type="button" class="button is-small expand-all-btn" (click)="toggleExpandAll()">
+          <span class="icon">{{areAllExpanded() ? '▲' : '▼'}}</span>
+          <span>{{areAllExpanded() ? loc.byId('collapse_all'): loc.byId('expand_all')}}</span>
+        </button>
+      </div>
       <div class="columns is-multiline is-mobile" *ngIf="boxList">
         <div class="column is-12-mobile is-6-tablet is-3-desktop is-2-fullhd" *ngFor="let box of boxList; index as i">
-          <nav class="panel" (click)="onBoxClick(box)">
-            <div class="panel-heading">
-              <div *ngIf="selectedBox === box && !selectedCase; else notSelectedBox">
-                <div class="field has-addons">
-                  <input class="input is-small" type="text" [value]="box.title" (change)="onBoxChanged(inputBoxTitle.value)" #inputBoxTitle placeholder="{{loc.byId('storage_storage_hint')}}">
-                  <button type="button" class="button is-danger is-small" (click)="onDeleteBoxClick()">{{loc.byId('storage_button_delete')}}</button>
+          <nav class="panel" [class.is-expanded]="isBoxExpanded(box)" (click)="onBoxClick(box)">
+            <div class="panel-heading" (click)="toggleBoxExpand(box, $event)">
+              <div class="panel-heading-content">
+                <div *ngIf="selectedBox === box && !selectedCase; else notSelectedBox">
+                  <div class="field has-addons" (click)="$event.stopPropagation()">
+                    <input class="input is-small" type="text" [value]="box.title" (change)="onBoxChanged(inputBoxTitle.value)" #inputBoxTitle placeholder="{{loc.byId('storage_storage_hint')}}">
+                    <button type="button" class="button is-danger is-small" (click)="onDeleteBoxClick()">{{loc.byId('storage_button_delete')}}</button>
+                  </div>
+                  <div class="buttons is-centered" style="margin-top: 5px" (click)="$event.stopPropagation()">
+                    <button type="button" *ngIf="!inSearchMode && i > 0" class="button is-info is-small" (click)="onMoveLeftClick()" title="{{loc.byId('storage_move_left')}}">&#8592;</button>
+                    <button type="button" *ngIf="!inSearchMode && i < boxList.length - 1" class="button is-info is-small" (click)="onMoveRightClick()" title="{{loc.byId('storage_move_right')}}">&#8594;</button>
+                  </div>
                 </div>
-                <div class="buttons is-centered" style="margin-top: 5px">
-                  <button type="button" *ngIf="!inSearchMode && i > 0" class="button is-info is-small" (click)="onMoveLeftClick()" title="{{loc.byId('storage_move_left')}}">&#8592;</button>
-                  <button type="button" *ngIf="!inSearchMode && i < boxList.length - 1" class="button is-info is-small" (click)="onMoveRightClick()" title="{{loc.byId('storage_move_right')}}">&#8594;</button>
-                </div>
+                <ng-template #notSelectedBox>
+                  <strong>{{box.title ? box.title : loc.byId('storage_storage') + ' ' + (i + 1)}}</strong>
+                  <span class="panel-item-count">({{box.cases.length}})</span>
+                </ng-template>
               </div>
-              <ng-template #notSelectedBox>
-                <strong>{{box.title ? box.title : loc.byId('storage_storage') + ' ' + (i + 1)}}</strong>
-              </ng-template>
+              <span class="panel-toggle-icon" [class.is-expanded]="isBoxExpanded(box)">▼</span>
             </div>
-            <div class="panel-blocks-wrapper">
+            <div class="panel-blocks-wrapper" *ngIf="isBoxExpanded(box)">
             <a class="panel-block" *ngFor="let case of sortedCases(box)" (click)="onCaseClick(box, case)">
               <div class="control">
                 <div class="heading">

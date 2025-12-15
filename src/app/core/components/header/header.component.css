@@ -1,14 +1,160 @@
+/* ============================================
+   MODERN GLASSMORPHISM HEADER
+   ============================================ */
+
 header {
-  background-color: rgba(43,43,43,0.91);
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.navbar.is-dark {
+  background: transparent !important;
+}
+
+.navbar-item {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  border-radius: 0.5rem;
+  margin: 0 0.25rem;
+}
+
+.navbar-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+.navbar-item img {
+  max-height: 2.5rem;
+  transition: transform 0.25s ease;
+}
+
+.navbar-item:hover img {
+  transform: scale(1.05);
+}
+
+.navbar-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  border-radius: 0.5rem;
+}
+
+.navbar-link:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+.navbar-link::after {
+  border-color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.navbar-dropdown {
+  background: rgba(26, 26, 46, 0.98) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.navbar-dropdown .navbar-item {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  margin: 0.125rem 0;
+}
+
+.navbar-dropdown .navbar-item:hover {
+  background: rgba(102, 126, 234, 0.3) !important;
+}
+
+.button.is-warning {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+  border: none !important;
+  color: #1a1a2e !important;
+  font-weight: 600;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1.25rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+}
+
+.button.is-warning:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+}
+
+.navbar-burger {
+  color: white !important;
+  transition: all 0.25s ease;
+  /* Hidden on desktop, shown on mobile via media query */
+  display: none;
+}
+
+.navbar-burger:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0.5rem;
+}
+
+.navbar-burger span {
+  background-color: white !important;
+  height: 2px;
+  left: calc(50% - 8px);
+  width: 16px;
+  position: absolute;
+  transition: all 0.25s ease;
+}
+
+.navbar-burger span:nth-child(1) {
+  top: calc(50% - 6px);
+}
+
+.navbar-burger span:nth-child(2) {
+  top: calc(50% - 1px);
+}
+
+.navbar-burger span:nth-child(3) {
+  top: calc(50% + 4px);
+}
+
+/* Burger active state (X shape) */
+.navbar-burger.is-active span:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+
+.navbar-burger.is-active span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-burger.is-active span:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
+/* ============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================ */
+
+/* Hide backdrop on desktop */
+.navbar-backdrop {
+  display: none;
 }
 
 @media screen and (max-width: 1023px) {
+  /* Show backdrop on mobile */
+  .navbar-backdrop {
+    display: block;
+  }
   header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 300;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   }
 
   .navbar {
@@ -21,28 +167,88 @@ header {
   }
 
   .navbar-burger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 200;
+    width: 3rem;
+    height: 3rem;
+    margin-right: 4px;
+    margin-top: 4px;
   }
 
-  .navbar-menu.is-active {
+  /* Backdrop overlay to block clicks below menu */
+  .navbar-backdrop {
     position: fixed;
-    top: 52px;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 100;
-    background-color: #ffffff;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+    display: block;
+  }
+
+  .navbar-backdrop.is-active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Let Bulma handle display, just style when active */
+  .navbar-menu.is-active {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    background: #1a1a2e !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 0.5rem 0;
+    max-height: calc(100vh - 52px);
     overflow-y: auto;
+  }
+
+  .navbar-menu.is-active .navbar-start,
+  .navbar-menu.is-active .navbar-end {
+    display: block;
+  }
+
+  .navbar-menu.is-active .navbar-item {
+    color: white !important;
+    padding: 0.75rem 1.25rem;
+    display: block;
+  }
+
+  .navbar-menu.is-active .navbar-item:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .navbar-menu.is-active .navbar-link {
+    color: white !important;
+    padding: 0.75rem 1.25rem;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .navbar-menu.is-active .navbar-dropdown {
     display: block !important;
     position: static !important;
-    background-color: transparent;
+    background: rgba(0, 0, 0, 0.2) !important;
     box-shadow: none;
-    padding-left: 1rem;
+    padding: 0.25rem 0;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  .navbar-menu.is-active .navbar-dropdown .navbar-item {
+    padding: 0.5rem 1.5rem 0.5rem 2rem;
+    font-size: 0.95rem;
   }
 
   .navbar-menu.is-active .navbar-link::after {
@@ -51,5 +257,13 @@ header {
 
   .navbar-menu.is-active .has-dropdown > .navbar-link {
     pointer-events: none;
+  }
+
+  .navbar-menu.is-active .buttons {
+    padding: 0.75rem 1.25rem;
+  }
+
+  .navbar-menu.is-active .button.is-warning {
+    width: 100%;
   }
 }

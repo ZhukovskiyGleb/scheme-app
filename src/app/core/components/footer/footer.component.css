@@ -1,9 +1,86 @@
+/* ============================================
+   MODERN FOOTER
+   ============================================ */
+
 footer {
-  background-color: rgba(43,43,43,0.91);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 2rem 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
+footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+}
+
+.content p {
+  margin-bottom: 0.75rem;
+}
+
+.content p strong {
+  color: white !important;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+a,
 a:link,
-a:hover,
 a:visited {
-  color: antiquewhite !important;
+  color: #94a3b8 !important;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  font-weight: 500;
+}
+
+a:hover {
+  color: #667eea !important;
+  text-decoration: none;
+}
+
+/* Social link styling */
+.content p:last-child a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.25s ease;
+}
+
+.content p:last-child a:hover {
+  background: rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
+@media screen and (max-width: 768px) {
+  footer {
+    padding: 1.5rem 1rem;
+  }
+
+  .content p strong {
+    font-size: 0.9rem;
+  }
+
+  a {
+    font-size: 0.9rem;
+  }
 }

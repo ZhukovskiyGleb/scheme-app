@@ -1,7 +1,261 @@
-/* Mobile responsiveness */
+/* ============================================
+   MODERN EDIT PART FORM
+   ============================================ */
+
+:host {
+  display: block;
+}
+
+.container {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   FORM LABELS & FIELDS
+   ============================================ */
+
+.label {
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+/* ============================================
+   INPUTS & TEXTAREAS
+   ============================================ */
+
+.input, .textarea {
+  border-radius: 0.625rem !important;
+  border: 2px solid #e2e8f0 !important;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+}
+
+.input:focus, .textarea:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
+  background: white;
+}
+
+.input:hover, .textarea:hover {
+  border-color: #cbd5e1 !important;
+}
+
+.input[readonly], .textarea[readonly] {
+  background: #f1f5f9;
+  color: #475569;
+  cursor: default;
+}
+
+.input[readonly]:hover, .textarea[readonly]:hover {
+  border-color: #e2e8f0 !important;
+}
+
+.input::placeholder, .textarea::placeholder {
+  color: #94a3b8;
+}
+
+.textarea {
+  min-height: 120px !important;
+  resize: vertical;
+}
+
+/* ============================================
+   SELECT DROPDOWNS
+   ============================================ */
+
+.select {
+  width: 100%;
+}
+
+.select select {
+  border-radius: 0.625rem !important;
+  border: 2px solid #e2e8f0 !important;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+  width: 100%;
+}
+
+.select select:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
+}
+
+.select::after {
+  border-color: #667eea !important;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.button {
+  border-radius: 0.625rem !important;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  border: none !important;
+}
+
+.button.is-link {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.button.is-link:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.button.is-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.button.is-info {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.button.is-info:hover {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.button.is-warning {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+  color: #1e293b !important;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.button.is-warning:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+}
+
+.button.is-danger {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.button.is-danger:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.button.is-text {
+  background: transparent !important;
+  color: #64748b !important;
+  box-shadow: none;
+  border: 2px solid #e2e8f0 !important;
+}
+
+.button.is-text:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  transform: none;
+}
+
+/* ============================================
+   HELP MESSAGES
+   ============================================ */
+
+.help.is-warning {
+  color: #d97706 !important;
+  font-size: 0.8rem;
+  margin-top: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.help.is-warning::before {
+  content: "⚠";
+  font-size: 0.75rem;
+}
+
+/* ============================================
+   FIELD HAS ADDONS
+   ============================================ */
+
+.field.has-addons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.field.has-addons .control.is-expanded {
+  flex: 1;
+}
+
+.field.has-addons .control.is-expanded .input {
+  width: 100%;
+}
+
+/* ============================================
+   PROPERTIES LIST
+   ============================================ */
+
+.field[formArrayName="properties"] .field.has-addons {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 0.625rem;
+  border: 1px solid #e2e8f0;
+}
+
+/* ============================================
+   HR DIVIDER
+   ============================================ */
+
+hr {
+  background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+  height: 1px;
+  border: none;
+  margin: 1.5rem 0;
+}
+
+/* ============================================
+   GROUPED FIELDS
+   ============================================ */
+
+.field.is-grouped {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.control.is-right {
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
 @media screen and (max-width: 768px) {
   .container {
-    padding: 0.5rem;
+    padding: 1rem;
   }
 
   .field.is-grouped {
@@ -10,11 +264,12 @@
 
   .field.is-grouped .field {
     margin-left: 0 !important;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
   }
 
   .field.has-addons {
     flex-direction: column;
+    gap: 0.375rem;
   }
 
   .field.has-addons .control,
@@ -33,18 +288,20 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    margin-left: 0;
+    gap: 0.5rem;
   }
 
   .control.is-right .button {
     width: 100%;
     margin-left: 0 !important;
-    margin-bottom: 0.5rem;
   }
 
   .button {
     margin-left: 0 !important;
   }
+
+  .field[formArrayName="properties"] .field.has-addons {
+    padding: 0.625rem;
+  }
 }
-
-
-

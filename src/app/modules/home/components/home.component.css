@@ -1,1 +1,27 @@
+/* Ensure hero background shows gradient */
+.hero.is-primary,
+.hero.is-primary.is-bold {
+  background-color: #667eea !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
 
+/* Force white text for title and subtitle in hero */
+.hero.is-primary .title,
+.hero.is-primary h1.title {
+  color: #f8fafc !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.hero.is-primary .subtitle,
+.hero.is-primary h2.subtitle {
+  color: #f8fafc !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Ensure all text in hero is white */
+.hero.is-primary .hero-body,
+.hero.is-primary .container,
+.hero.is-primary .has-text-centered {
+  color: #f8fafc !important;
+}

@@ -1,3 +1,61 @@
+/* ============================================
+   MODERN LOADING MODAL
+   ============================================ */
+
+.modal-background {
+  background: rgba(15, 23, 42, 0.6) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  max-width: 280px;
+}
+
 .notification {
-    color: black;
+  background: white;
+  color: #1e293b;
+  border-radius: 1rem !important;
+  padding: 2rem;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.notification strong {
+  display: block;
+  font-size: 1rem;
+  color: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.notification::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 1rem auto;
+  border: 3px solid #e2e8f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
 }

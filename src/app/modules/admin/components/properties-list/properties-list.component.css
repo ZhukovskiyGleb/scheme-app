@@ -1,28 +1,94 @@
+/* ============================================
+   MODERN PROPERTIES LIST (ADMIN)
+   ============================================ */
+
 .label {
-    color: white;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.875rem;
 }
 
 .input {
-    min-width: 100px;
-    max-width: 100%;
+  min-width: 100px;
+  max-width: 100%;
+  border-radius: 0.625rem !important;
+  border: 2px solid #e2e8f0 !important;
+  transition: all 0.2s ease;
+  background: white;
 }
 
+.input:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
+}
+
+.input:hover {
+  border-color: #cbd5e1 !important;
+}
+
+.select select {
+  border-radius: 0.625rem !important;
+  border: 2px solid #e2e8f0 !important;
+  transition: all 0.2s ease;
+}
+
+.select select:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
+}
+
+.field.has-addons {
+  gap: 0.5rem;
+}
+
+.button {
+  border-radius: 0.625rem !important;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  border: none !important;
+}
+
+.button.is-link {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.button.is-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.button.is-danger {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.button.is-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
 @media screen and (max-width: 768px) {
-    .field.has-addons {
-        flex-wrap: nowrap;
-        max-width: 100%;
-    }
+  .field.has-addons {
+    flex-wrap: nowrap;
+    max-width: 100%;
+  }
 
-    .field.has-addons .input {
-        min-width: 0;
-        flex: 1;
-    }
+  .field.has-addons .input {
+    min-width: 0;
+    flex: 1;
+  }
 
-    .field.has-addons .select {
-        flex-shrink: 1;
-    }
+  .field.has-addons .select {
+    flex-shrink: 1;
+  }
 
-    .field.has-addons .select select {
-        max-width: 80px;
-    }
+  .field.has-addons .select select {
+    max-width: 100px;
+    font-size: 0.875rem;
+  }
 }

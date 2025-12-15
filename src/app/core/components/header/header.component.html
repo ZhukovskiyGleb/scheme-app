@@ -1,4 +1,11 @@
 <header class="hero-head">
+  <!-- Mobile menu backdrop overlay -->
+  <div class="navbar-backdrop" 
+       *ngIf="isActivated"
+       (click)="closeMenu()"
+       [ngClass]="{'is-active': isActivated}">
+  </div>
+  
   <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
       <a class="navbar-item" routerLink="/home">

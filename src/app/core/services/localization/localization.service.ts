@@ -87,6 +87,9 @@ export class LocalizationService {
       'storage_changes_title': 'Save changes?',
       'storage_changes_hint': 'Changes will be automatically saved when switching to another tab',
 
+      'collapse_all': 'Collapse all',
+      'expand_all': 'Expand all',
+
       'button_yes': 'Yes',
       'button_no': 'No',
       'add_hint': 'Add',
@@ -213,6 +216,9 @@ export class LocalizationService {
       'storage_changes_title': 'Сохранить изменения?',
       'storage_changes_hint': 'Изменения будут автоматически сохранены при переходе на другую вкладку',
 
+      'collapse_all': 'Свернуть все',
+      'expand_all': 'Развернуть все',
+
       'button_yes': 'Да',
       'button_no': 'Нет',
       'add_hint': 'Добавить',
@@ -338,6 +344,9 @@ export class LocalizationService {
       'storage_button_add_case': 'Додати комірку',
       'storage_changes_title': 'Зберегти зміни?',
       'storage_changes_hint': 'Зміни будуть автоматично збережені при переході на іншу вкладку',
+
+      'collapse_all': 'Свернути все',
+      'expand_all': 'Развернуть все',
 
       'button_yes': 'Так',
       'button_no': 'Ні',

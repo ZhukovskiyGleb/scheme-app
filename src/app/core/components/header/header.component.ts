@@ -42,6 +42,7 @@ export class HeaderComponent implements OnInit {
 
   onBurgerClick() {
     this.isActivated = !this.isActivated;
+    this.updateBodyScroll();
     this.changeDetector.markForCheck();
   }
 
@@ -49,7 +50,18 @@ export class HeaderComponent implements OnInit {
     this.isActivated = false;
     this.isLangDropdownOpen = false;
     this.isUserDropdownOpen = false;
+    this.updateBodyScroll();
     this.changeDetector.markForCheck();
+  }
+
+  private updateBodyScroll() {
+    if (this.isActivated) {
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('menu-open');
+    } else {
+      document.body.style.overflow = '';
+      document.body.classList.remove('menu-open');
+    }
   }
 
   toggleLangDropdown(event: Event) {
