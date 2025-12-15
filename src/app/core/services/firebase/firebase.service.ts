@@ -64,7 +64,7 @@ export class FirebaseService {
     return from(
       runTransaction(this.db, async (tx) => {
 
-        const countersRef = doc(this.db, 'system/counters');
+        const countersRef = doc(this.db, 'system', 'counters');
         const countersSnap = await tx.get(countersRef);
 
         if (!countersSnap.exists()) {
@@ -79,7 +79,7 @@ export class FirebaseService {
           search: generateSearchWords(part.title)
         };
 
-        const partRef = doc(this.db, `parts/${currentId}`);
+        const partRef = doc(this.db, 'parts', currentId.toString());
 
         tx.set(countersRef, { parts: newTotal }, { merge: true });
         tx.set(partRef, partData);
